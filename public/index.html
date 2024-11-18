@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Firebase Hosting</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="./css/dsnguoidung.css">
+    <script type="module" src="./JavaScript/index.js"></script>
+    <script type="module" src="./JavaScript/dsnguoidung.js"></script>
+
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="div_trai">
+            <div class="div_logo">
+                <img src="./image/logo.png" alt="W3Schools.com" width="80" height="80">
+                <h3>StayNow</h3>
+            </div>
+            <div class="div_chucnang">
+                <div class="div_chucnangchinh">
+                    <div class="nut btn_chucnang" onclick="setActive(this)" data-title="Trang Chủ">
+                        <img src="./image/iconhome.png" alt="Home" width="25" height="30">
+                        <p>Trang Chủ</p>
+                    </div>
+                    <div class="nut btn_chucnang" onclick="setActive(this)" data-title="Tìm Kiếm">
+                        <img src="./image/iconhome.png" alt="Search" width="25" height="25">
+                        <p>Tìm Kiếm</p>
+                    </div>
+                    <div class="nut btn_chucnang" onclick="setActive(this)" data-title="Danh Sách Người dùng">
+                        <img src="./image/iconhome.png" alt="Post" width="25" height="25">
+                        <p>Danh sách người dùng</p>
+                    </div>
+                </div>
+                <div class="div_chucnangphu">
+                    <div class="nut btn_chucnang" onclick="setActive(this)" data-title="Đăng Xuất">
+                        <img src="./image/iconhome.png" alt="Logout" width="25" height="25">
+                        <p>Đăng Xuất</p>
+                    </div>
+                    <div class="nut btn_chucnang" onclick="setActive(this)" data-title="Tài Khoản">
+                        <img src="./image/iconhome.png" alt="Account" width="25" height="25">
+                        <p>Tài Khoản</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="div_phai">
+            <div class="div_header_phai">
+                <div class="dp_trai">
+                    <p>Quản Lý Người Thuê Trọ</p>
+                </div>
+                <div class="dp_phai">
+                    <div class="taikhoan">
+                        <img src="./image/iconhome.png" alt="Account" width="25" height="25">
+                        <p class="title">Nguyễn Văn A</p>
+                    </div>
+                    <div class="div_timkiem">
+                        <input type="text" id="search" name="search" placeholder="Search..">
+                        <button type="submit"><img src="./image/iconsearch.png" alt="Search" ></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="div_content_phai">
+                <div class="content" id="content">
+                    <p>Chọn một chức năng từ bên trái.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="userDialog" class="dialog">
+            <div class="dialog-content">
+                <span class="close" id="closeDialog">&times;</span>
+                <h3 id="dialogName"></h3>
+                <img id="dialogAvatar" src="" alt="Avatar" />
+                <p id="dialogPhone"></p>
+                <p id="dialogEmail"></p>
+                <p id="dialogAccountType"></p> <!-- Loại tài khoản -->
+                <p id="dialogUserId"></p> <!-- Mã người dùng -->
+                <p id="dialogAccountStatus"></p> <!-- Trạng thái tài khoản -->
+                <p id="dialogCreatedDate"></p> <!-- Ngày tạo tài khoản -->
+                <p id="dialogUpdatedDate"></p> <!-- Ngày cập nhật -->
+                <p id="dialogBookingCount"></p> <!-- Số lượt đặt lịch -->
+            </div>
+        </div>
+        
+    </div>
+</body>
+
+</html>
