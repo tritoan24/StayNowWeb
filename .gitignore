@@ -68,4 +68,3 @@ node_modules/
 # dataconnect generated files
 .dataconnect
 
-database.rules.json 
