@@ -1,5 +1,5 @@
 // Hàm để thiết lập trạng thái của các nút
-window.setActive = function(div) {
+window.setActive = function (div) {
     const buttons = document.querySelectorAll('.btn_chucnang');
     buttons.forEach(btn => btn.classList.remove('active'));
 
@@ -10,21 +10,21 @@ window.setActive = function(div) {
 
     switch (title) {
         case 'Trang Chủ':
-            loadContent('trangchu.html');
+            loadContent('./Html/trangchu.html', title);
             break;
         case 'Tìm Kiếm':
-            loadContent('timkiem.html');
+            loadContent('timkiem.html', title);
             break;
         case 'Danh Sách Người dùng':
-            loadContent('danhsachnguoidung.html');
+            loadContent('./Html/danhsachnguoidung.html', title);
             break;
         default:
             break;
     }
-}
+};
 
 // Hàm để tải nội dung từ các tệp HTML
-function loadContent(fileName) {
+function loadContent(fileName, title) {
     const contentElement = document.getElementById('content');
     fetch(fileName)
         .then(response => {
@@ -35,9 +35,24 @@ function loadContent(fileName) {
         })
         .then(html => {
             contentElement.innerHTML = html; // Thay thế nội dung trong phần content
+            localStorage.setItem('currentContent', fileName); // Lưu trạng thái nội dung hiện tại
+            localStorage.setItem('currentTitle', title); // Lưu tiêu đề của nội dung hiện tại
         })
         .catch(error => {
             console.error('Error fetching content:', error);
             contentElement.innerHTML = '<p>Không thể tải nội dung.</p>';
         });
 }
+
+// Khôi phục nội dung khi tải lại trang
+document.addEventListener('DOMContentLoaded', () => {
+    const currentContent = localStorage.getItem('currentContent') || 'trangchu.html'; // Mặc định là Home
+    const currentTitle = localStorage.getItem('currentTitle') || 'Trang Chủ';
+
+    loadContent(currentContent, currentTitle); // Tải nội dung đã lưu
+
+    const activeButton = document.querySelector(`[data-title="${currentTitle}"]`);
+    if (activeButton) {
+        activeButton.classList.add('active');
+    }
+});
