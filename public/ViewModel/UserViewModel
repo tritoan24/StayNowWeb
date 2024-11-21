@@ -1,0 +1,30 @@
+class UserViewModel {
+    constructor(database) {
+        this.database = database;
+        this.users = [];
+        this.liveData = new rxjs.BehaviorSubject([]); // RxJS BehaviorSubject giống như LiveData
+    }
+
+    async fetchUsers() {
+        const usersRef = ref(this.database, 'NguoiDung');
+        try {
+            const snapshot = await get(usersRef);
+            if (snapshot.exists()) {
+                const users = snapshot.val();
+                this.users = Object.values(users).map(user => new UserModel(user));
+                this.liveData.next(this.users);
+            } else {
+                console.log("No data available");
+            }
+        } catch (error) {
+            console.error("Error fetching data: ", error);
+        }
+    }
+    
+
+    // Hàm tìm kiếm người dùng
+    searchUsers(searchText) {
+        const filteredUsers = this.users.filter(user => user.ho_ten.toLowerCase().includes(searchText.toLowerCase()));
+        this.liveData.next(filteredUsers); // Cập nhật liveData với kết quả tìm kiếm
+    }
+}

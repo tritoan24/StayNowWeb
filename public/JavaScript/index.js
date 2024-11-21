@@ -23,7 +23,6 @@ window.setActive = function (div) {
     }
 };
 
-// Hàm để tải nội dung từ các tệp HTML
 function loadContent(fileName, title) {
     const contentElement = document.getElementById('content');
     fetch(fileName)
@@ -37,12 +36,18 @@ function loadContent(fileName, title) {
             contentElement.innerHTML = html; // Thay thế nội dung trong phần content
             localStorage.setItem('currentContent', fileName); // Lưu trạng thái nội dung hiện tại
             localStorage.setItem('currentTitle', title); // Lưu tiêu đề của nội dung hiện tại
+
+            // Kiểm tra nếu là trang Danh Sách Người Dùng, gọi fetchUsers
+            if (fileName.includes('danhsachnguoidung.html')) {
+                fetchUsers();
+            }
         })
         .catch(error => {
             console.error('Error fetching content:', error);
             contentElement.innerHTML = '<p>Không thể tải nội dung.</p>';
         });
 }
+
 
 // Khôi phục nội dung khi tải lại trang
 document.addEventListener('DOMContentLoaded', () => {
