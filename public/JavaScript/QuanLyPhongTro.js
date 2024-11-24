@@ -3,8 +3,10 @@ import {
   getFirestore,
   collection,
   getDocs,
-
+  getDoc,
+  doc,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
 // Cấu hình Firebase
 const firebaseConfig = {
@@ -20,6 +22,7 @@ const firebaseConfig = {
 // Khởi tạo Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const dbRT = getDatabase(app);
 
 // Biến toàn cục để lưu trữ danh sách phòng trọ
 let rooms = [];
@@ -62,8 +65,8 @@ function renderRoomList(rooms) {
 
     roomDiv.innerHTML = `
             <span>${room.Ten_phongtro}</span>
-            <p>${room.Dia_chi}</p>
-            <p>${formattedPrice}</p>
+ <p><img src="../image/icons/ic-ping.svg" alt="Địa chỉ" class="room-icon"> ${room.Dia_chi}</p>
+     <p><img src="../image/icons/ic-monny.svg" alt="Giá phòng" class="room-icon"> ${formattedPrice}</p>
             <div class="actions">
                 <button class="approve" onclick="approveRoom('${room.id}')">Duyệt</button>
                 <button class="cancel" onclick="cancelRoom('${room.id}')">Hủy</button>
@@ -75,14 +78,47 @@ function renderRoomList(rooms) {
   });
 }
 
+// Hàm lấy thông tin người dùng từ Realtime Database
+async function getUserInfo(maNguoiDung) {
+    try {
+      const userRef = ref(dbRT, `NguoiDung/${maNguoiDung}`); // Tham chiếu đến nút "NguoiDung/{Ma_nguoidung}" trong Realtime Database
+      const snapshot = await get(userRef); // Lấy dữ liệu từ Realtime Database
+  
+      if (snapshot.exists()) {
+        return snapshot.val(); // Trả về dữ liệu người dùng
+      } else {
+        console.error("Không tìm thấy người dùng với Ma_nguoidung:", maNguoiDung);
+        return null;
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy thông tin người dùng:", error);
+      return null;
+    }
+  }
+
 // Hàm hiển thị chi tiết phòng trọ
-function viewDetails(roomId) {
+async function viewDetails(roomId) {
   const room = rooms.find((r) => r.id === roomId);
   currentRoomId = roomId; // Cập nhật roomId hiện tại
 
   if (room) {
-    const roomDetails = document.getElementById("roomDetails");
-    roomDetails.innerHTML = `
+    try {
+          // Lấy thông tin người dùng từ Realtime Database
+      const userInfo = await getUserInfo(room.Ma_nguoidung);
+
+      const loaiPhongRef = doc(db, "LoaiPhong", room.Ma_loaiphong); // Truy cập tài liệu trong bộ sưu tập 'LoaiPhong'
+      const loaiPhongSnapshot = await getDoc(loaiPhongRef);
+
+      // Lấy thông tin giới tính
+      const gioiTinhRef = doc(db, "GioiTinh", room.Ma_gioiTinh); // Truy cập tài liệu trong bộ sưu tập 'GioiTinh'
+      const gioiTinhSnapshot = await getDoc(gioiTinhRef);
+
+      if (loaiPhongSnapshot.exists() && gioiTinhSnapshot.exists()) {
+        const loaiPhongData = loaiPhongSnapshot.data();
+        const gioiTinhData = gioiTinhSnapshot.data();
+
+        const roomDetails = document.getElementById("roomDetails");
+        roomDetails.innerHTML = `
             <strong>Tên phòng:</strong> ${room.Ten_phongtro} <br>
             <strong>Địa chỉ:</strong> ${room.Dia_chi} <br>
             <strong>Giá phòng:</strong> ${new Intl.NumberFormat("vi-VN", {
@@ -91,27 +127,39 @@ function viewDetails(roomId) {
             }).format(room.Gia_phong)} <br>
             <strong>Mô tả chi tiết:</strong> ${room.Mota_chitiet} <br>
             <strong>Số lượt xem:</strong> ${room.So_luotxemphong} <br>
+            <strong>Loại phòng:</strong> ${loaiPhongData.Ten_loaiphong} <br>
+            <strong>Giới tính:</strong> ${gioiTinhData.Ten_gioitinh} <br> 
+             <strong>Tên người dùng:</strong> ${userInfo.ho_ten} 
         `;
 
-    const imageContainer = document.getElementById("roomImages");
-    const carouselImages = imageContainer.querySelector(".carousel-images");
-    carouselImages.innerHTML = ""; // Xóa ảnh cũ
+        const imageContainer = document.getElementById("roomImages");
+        const carouselImages = imageContainer.querySelector(".carousel-images");
+        carouselImages.innerHTML = ""; // Xóa ảnh cũ
 
-    // Thêm ảnh vào slide
-    room.imageUrls.forEach((url) => {
-      const imgElement = document.createElement("img");
-      imgElement.src = url;
-      imgElement.alt = room.Ten_phongtro;
-      carouselImages.appendChild(imgElement);
-    });
+        // Thêm ảnh vào slide
+        room.imageUrls.forEach((url) => {
+          const imgElement = document.createElement("img");
+          imgElement.src = url;
+          imgElement.alt = room.Ten_phongtro;
+          carouselImages.appendChild(imgElement);
+        });
 
-    // Hiển thị hộp thoại và lớp phủ mờ
-    document.getElementById("detailDialog").style.display = "block";
-    document.getElementById("overlay").style.display = "block";
+        // Hiển thị hộp thoại và lớp phủ mờ
+        document.getElementById("detailDialog").style.display = "block";
+        document.getElementById("overlay").style.display = "block";
 
-    // Reset slide về ảnh đầu tiên
-    currentSlide = 0;
-    updateSlidePosition();
+        // Reset slide về ảnh đầu tiên
+        currentSlide = 0;
+        updateSlidePosition();
+      } else {
+        console.error(
+          "Không tìm thấy loại phòng với Ma_loaiphong:",
+          room.Ma_loaiphong
+        );
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy thông tin loại phòng:", error);
+    }
   }
 }
 
@@ -140,7 +188,6 @@ function closeDetails() {
   document.getElementById("detailDialog").style.display = "none";
   document.getElementById("overlay").style.display = "none";
 }
-
 
 // Lắng nghe sự kiện DOMContentLoaded và gọi hàm fetchAllRooms
 document.addEventListener("DOMContentLoaded", () => {
