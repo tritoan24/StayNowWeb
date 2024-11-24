@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "@vue/cli-service": "5.0.8",
-    "vue-template-compiler": "^2.7.16"
+    "vue-template-compiler": "^2.7.16",
+    "@fontsource/montserrat": "^5.0.18"
   }
 }
