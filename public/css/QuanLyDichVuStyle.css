@@ -1,0 +1,283 @@
+/* Reset một số thuộc tính mặc định */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f9;
+  color: #333;
+}
+
+header {
+  display: grid;
+  grid-template-columns: 10fr 90fr;
+  background-color: #471bc4;
+  color: white;
+  padding: 15px;
+  text-align: center;
+}
+
+header .back-button button {
+  background-color: #0056b3;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  margin-right: 20px;
+}
+
+header h1 {
+  font-size: 24px;
+  margin-top: 10px;
+}
+
+.container {
+  padding: 20px;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+/* Danh sách các phòng */
+#serviceList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+/* Container tổng cho từng phòng */
+.service-card {
+  width: 600px;
+  display: flex;
+  flex-direction: row; /* Sắp xếp theo chiều ngang */
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-bottom: 20px;
+}
+
+.service-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Hình ảnh của phòng */
+.service-image img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Thông tin phòng */
+.service-info {
+  flex: 1;
+  margin-left: 15px; /* Khoảng cách giữa hình ảnh và thông tin */
+}
+
+.service-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.service-address {
+  font-size: 14px;
+  color: #666;
+  margin: 5px 0;
+}
+
+/* Khu vực hành động */
+.service-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.service-actions .btn {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.active-column {
+  background-color: #e0ffe0; /* Màu nền nhẹ cho cột "Hoạt động" */
+}
+
+.inactive-column {
+  background-color: #ffe0e0; /* Màu nền nhẹ cho cột "Đã hủy" */
+}
+
+.btn.update {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.btn.approve:hover {
+  background-color: #45a049;
+}
+
+.btn.cancel {
+  background-color: #f44336;
+  color: white;
+}
+
+.btn.cancel:hover {
+  background-color: #d32f2f;
+}
+
+/* Liên kết xem chi tiết */
+.service-details {
+  margin-top: 10px;
+}
+
+
+/* Chi tiết phòng trọ */
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 1;
+}
+
+#detailDialog {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  width: 50%;
+  top: 0;
+  left: 0;
+  right: 0;
+  max-width: 800px;
+  margin: 5% auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: none;
+  position: absolute;
+  z-index: 2;
+}
+
+#detailDialog h3 {
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+#serviceDetails {
+  margin-bottom: 20px;
+}
+
+#serviceImages {
+  width: 100%;
+  margin-bottom: 20px;
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.carousel-container {
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-images {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+  width: 60%;
+  height: 20%;
+}
+
+.carousel-images img {
+  width: 100%;
+  border-radius: 8px;
+  margin: 0 5px;
+  max-width: 100%;
+}
+
+button.prev,
+button.next {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 20px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  border-radius: 50%;
+}
+
+button.prev {
+  left: 10px;
+}
+
+button.next {
+  right: 10px;
+}
+
+button.prev:hover,
+button.next:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.actions {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.actions button {
+  font-size: 16px;
+  padding: 10px 20px;
+  margin-right: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.actions .approve {
+  background-color: #28a745;
+  color: white;
+}
+
+.actions .cancel {
+  background-color: #dc3545;
+  color: white;
+}
+
+button.close {
+  background-color: #471bc4;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 15px;
+  display: block;
+  width: 100%;
+  font-size: 16px;
+}
+
+button.close:hover {
+  background-color: #471bc4;
+}
+
+
