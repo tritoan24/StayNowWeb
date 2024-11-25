@@ -41,7 +41,7 @@ header h1 {
 h2 {
   margin-bottom: 20px;
 }
-
+/* Danh sách các phòng */
 #roomList {
   display: flex;
   flex-wrap: wrap;
@@ -49,55 +49,102 @@ h2 {
   justify-content: space-between;
 }
 
-.room {
-  background-color: white;
+/* Container tổng cho từng phòng */
+.room-card {
+  width: 600px;
+  display: flex;
+  flex-direction: row; /* Sắp xếp theo chiều ngang */
+  align-items: center;
+  justify-content: space-between;
   padding: 15px;
+  border: 1px solid #ccc;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  width: 45%;
-  position: relative;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.room span {
-  font-weight: bold;
+.room-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Hình ảnh của phòng */
+.room-image img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Thông tin phòng */
+.room-info {
+  flex: 1;
+  margin-left: 15px; /* Khoảng cách giữa hình ảnh và thông tin */
+}
+
+.room-title {
   font-size: 18px;
+  font-weight: bold;
+  color: #333;
 }
 
-.room p {
-  margin: 10px 0;
-}
-
-.room .actions {
-  margin-top: 15px;
-}
-
-.room .actions button {
-  padding: 8px 16px;
-  margin-right: 10px;
-  border: none;
-  cursor: pointer;
+.room-address,
+.room-price {
   font-size: 14px;
+  color: #666;
+  margin: 5px 0;
+}
+
+/* Khu vực hành động */
+.room-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.room-actions .btn {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: none;
   border-radius: 4px;
-}
-
-.room .actions .approve {
-  background-color: #28a745;
-  color: white;
-}
-
-.room .actions .cancel {
-  background-color: #dc3545;
-  color: white;
-}
-
-.room .details {
-  color: #471bc4;
   cursor: pointer;
-  text-decoration: underline;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.btn.approve {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.btn.approve:hover {
+  background-color: #45a049;
+}
+
+.btn.cancel {
+  background-color: #f44336;
+  color: white;
+}
+
+.btn.cancel:hover {
+  background-color: #d32f2f;
+}
+
+/* Liên kết xem chi tiết */
+.room-details {
   margin-top: 10px;
 }
 
-.room .details:hover {
+.details-link {
+  color: #007BFF;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.details-link:hover {
   color: #0056b3;
 }
 
@@ -139,6 +186,7 @@ h2 {
 }
 
 #roomImages {
+  width: 100%;
   margin-bottom: 20px;
   position: relative;
   max-width: 100%;
@@ -146,6 +194,7 @@ h2 {
 }
 
 .carousel-container {
+  width: 100%;
   position: relative;
   display: flex;
   align-items: center;
@@ -233,3 +282,5 @@ button.close {
 button.close:hover {
   background-color: #471bc4;
 }
+
+
