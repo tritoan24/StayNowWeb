@@ -6,7 +6,7 @@ function navigateTo(url) {
 
 document.getElementById('content').addEventListener('click', function (event) {
     if (event.target && event.target.id === 'btnPhongTro') {
-        navigateTo('./Html/QuanLyPhong.html');
+        navigateTo('./Html/QuanLyPhongTro.html');
     }
     if (event.target && event.target.id === 'btnNguoiDung') {
         navigateTo('quanlynguoidung.html');

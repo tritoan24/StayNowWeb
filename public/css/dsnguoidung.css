@@ -1,12 +1,4 @@
-  /* Căn chỉnh giao diện và chia thành hai cột */
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f2f5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-}
+
 
 #content{
     overflow-y: auto; 
