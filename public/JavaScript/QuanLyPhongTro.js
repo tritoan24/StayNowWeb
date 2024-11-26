@@ -62,17 +62,28 @@ function renderRoomList(rooms) {
       style: "currency",
       currency: "VND",
     }).format(room.Gia_phong);
-
     roomDiv.innerHTML = `
-            <span>${room.Ten_phongtro}</span>
- <p><img src="../image/icons/ic-ping.svg" alt="Địa chỉ" class="room-icon"> ${room.Dia_chi}</p>
-     <p><img src="../image/icons/ic-monny.svg" alt="Giá phòng" class="room-icon"> ${formattedPrice}</p>
-            <div class="actions">
-                <button class="approve" onclick="approveRoom('${room.id}')">Duyệt</button>
-                <button class="cancel" onclick="cancelRoom('${room.id}')">Hủy</button>
-            </div>
-            <span class="details" onclick="viewDetails('${room.id}')">Xem chi tiết</span>
-        `;
+    <div class="room-card">
+      <div class="room-image">
+          <img src="${room.imageUrls[0]}" alt="${room.Ten_phongtro}" />
+      </div>
+      <div class="room-info">
+          <h3 class="room-title">${room.Ten_phongtro}</h3>
+          <p class="room-address">${room.Dia_chi}</p>
+          <p class="room-price">${formattedPrice}</p>
+          <div class="room-actions">
+              <button class="btn approve" onclick="approveRoom('${room.id}')">Duyệt</button>
+              <button class="btn cancel" onclick="cancelRoom('${room.id}')">Hủy</button>
+          </div>
+          <div class="room-details">
+              <span class="details-link" onclick="viewDetails('${room.id}')">Xem chi tiết</span>
+          </div>
+      </div>
+    </div>
+  `;
+  
+  
+
 
     roomListContainer.appendChild(roomDiv);
   });

@@ -42,7 +42,7 @@ h2 {
   margin-bottom: 20px;
 }
 /* Danh sách các phòng */
-#roomList {
+#serviceList {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
@@ -50,7 +50,7 @@ h2 {
 }
 
 /* Container tổng cho từng phòng */
-.room-card {
+.service-card {
   width: 600px;
   display: flex;
   flex-direction: row; /* Sắp xếp theo chiều ngang */
@@ -62,15 +62,16 @@ h2 {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   background-color: #fff;
   transition: transform 0.2s, box-shadow 0.2s;
+  margin-bottom: 20px;
 }
 
-.room-card:hover {
+.service-card:hover {
   transform: scale(1.02);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Hình ảnh của phòng */
-.room-image img {
+.service-image img {
   width: 120px;
   height: 120px;
   object-fit: cover;
@@ -78,33 +79,32 @@ h2 {
 }
 
 /* Thông tin phòng */
-.room-info {
+.service-info {
   flex: 1;
   margin-left: 15px; /* Khoảng cách giữa hình ảnh và thông tin */
 }
 
-.room-title {
+.service-title {
   font-size: 18px;
   font-weight: bold;
   color: #333;
 }
 
-.room-address,
-.room-price {
+.service-address {
   font-size: 14px;
   color: #666;
   margin: 5px 0;
 }
 
 /* Khu vực hành động */
-.room-actions {
+.service-actions {
   display: flex;
   flex-direction: row;
   gap: 10px;
   align-items: flex-start;
 }
 
-.room-actions .btn {
+.service-actions .btn {
   padding: 6px 10px;
   font-size: 14px;
   border: none;
@@ -113,7 +113,15 @@ h2 {
   transition: background-color 0.3s, color 0.3s;
 }
 
-.btn.approve {
+.active-column {
+  background-color: #e0ffe0; /* Màu nền nhẹ cho cột "Hoạt động" */
+}
+
+.inactive-column {
+  background-color: #ffe0e0; /* Màu nền nhẹ cho cột "Đã hủy" */
+}
+
+.btn.update {
   background-color: #4CAF50;
   color: white;
 }
@@ -132,21 +140,10 @@ h2 {
 }
 
 /* Liên kết xem chi tiết */
-.room-details {
+.service-details {
   margin-top: 10px;
 }
 
-.details-link {
-  color: #007BFF;
-  text-decoration: none;
-  cursor: pointer;
-  font-size: 14px;
-  transition: color 0.3s;
-}
-
-.details-link:hover {
-  color: #0056b3;
-}
 
 /* Chi tiết phòng trọ */
 #overlay {
@@ -181,11 +178,11 @@ h2 {
   margin-bottom: 15px;
 }
 
-#roomDetails {
+#serviceDetails {
   margin-bottom: 20px;
 }
 
-#roomImages {
+#serviceImages {
   width: 100%;
   margin-bottom: 20px;
   position: relative;
