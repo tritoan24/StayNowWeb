@@ -6,6 +6,7 @@ import {
   doc,
   updateDoc,
   addDoc,
+  deleteDoc,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // Cấu hình Firebase
@@ -25,44 +26,52 @@ const db = getFirestore(app);
 
 // Biến toàn cục để lưu trữ danh sách phòng trọ
 let services = [];
+let allServices = []; // Danh sách gốc
 
 async function fetchAllServices() {
-  const servicesRef = collection(db, "DichVu"); // Truy cập vào bộ sưu tập 'PhongTro'
+  const servicesRef = collection(db, "DichVu");
 
   try {
-    const querySnapshot = await getDocs(servicesRef); // Lấy tất cả tài liệu trong bộ sưu tập 'PhongTro'
+    const querySnapshot = await getDocs(servicesRef);
+    allServices = []; // Reset danh sách gốc
+    services = []; // Reset danh sách hiển thị
 
-    // Xử lý danh sách phòng trọ
-    services = []; // Reset lại danh sách
     querySnapshot.forEach((doc) => {
-      services.push({ id: doc.id, ...doc.data() }); // Lưu dữ liệu phòng trọ vào mảng 'rooms'
+      const service = { id: doc.id, ...doc.data() };
+      allServices.push(service); // Lưu vào danh sách gốc
+      services.push(service); // Lưu vào danh sách hiển thị
     });
 
-    console.log("Danh sách dịch vụ:", services); // In danh sách phòng trọ ra console
-    renderServiceList(services); // Gọi hàm render để hiển thị danh sách phòng trọ
+    renderServiceList(services); // Hiển thị danh sách
   } catch (e) {
     console.error("Lỗi khi lấy danh sách dịch vụ:", e);
   }
+}
+
+function filterServices(event) {
+  const keyword = event.target.value.toLowerCase(); // Lấy từ khóa và chuyển về chữ thường
+
+  // Lọc danh sách gốc để tìm dịch vụ phù hợp
+  const filteredServices = allServices.filter((service) =>
+    service.Ten_dichvu.toLowerCase().includes(keyword)
+  );
+
+  // Hiển thị danh sách đã lọc
+  renderServiceList(filteredServices);
 }
 
 function renderServiceList(services) {
   const serviceListContainer = document.getElementById("serviceList");
   serviceListContainer.innerHTML = ""; // Xóa nội dung cũ
 
-  // Nhóm dịch vụ theo trạng thái
   const activeServices = services.filter((service) => service.Status === true);
   const inactiveServices = services.filter(
     (service) => service.Status === false
   );
 
-  // Tạo hai cột: một cột cho dịch vụ hoạt động và một cột cho dịch vụ đã hủy
-  const activeColumn = document.createElement("div");
-  activeColumn.className = "service-column active-column";
-
-  const inactiveColumn = document.createElement("div");
-  inactiveColumn.className = "service-column inactive-column";
-
-  // Hiển thị các dịch vụ có trạng thái hoạt động
+  // Hiển thị dịch vụ hoạt động
+  const activeServicesContainer = document.createElement("div");
+  activeServicesContainer.innerHTML = `<h3>Hoạt động</h3>`;
   activeServices.forEach((service) => {
     const serviceDiv = document.createElement("div");
     serviceDiv.className = "service";
@@ -75,25 +84,22 @@ function renderServiceList(services) {
         </div>
         <div class="service-info">
             <h3 class="service-title">${service.Ten_dichvu}</h3>
-            <p class="service-unit">${service.Don_vi.join(", ")}</p>
-            <p class="service-status">${
-              service.Status ? "Hoạt động" : "Đã hủy"
-            }</p>
+            <p class="service-unit">${service.Don_vi}</p>
+            <p class="service-status">Hoạt động</p>
+           
             <div class="service-actions">
-                <button class="btn update" onclick="updateService('${
-                  service.id
-                }')">Cập nhật</button>
-                <button class="btn cancel" onclick="cancelService('${
-                  service.id
-                }')">Hủy</button>
+                <button class="btn update" onclick="updateService('${service.id}')">Cập nhật</button>
+                <button class="btn cancel" onclick="cancelService('${service.id}')">Hủy</button>
             </div>
         </div>
       </div>
     `;
-    activeColumn.appendChild(serviceDiv);
+    activeServicesContainer.appendChild(serviceDiv);
   });
 
-  // Hiển thị các dịch vụ có trạng thái đã hủy
+  // Hiển thị dịch vụ đã hủy
+  const inactiveServicesContainer = document.createElement("div");
+  inactiveServicesContainer.innerHTML = `<h3>Đã hủy</h3>`;
   inactiveServices.forEach((service) => {
     const serviceDiv = document.createElement("div");
     serviceDiv.className = "service";
@@ -106,30 +112,21 @@ function renderServiceList(services) {
         </div>
         <div class="service-info">
             <h3 class="service-title">${service.Ten_dichvu}</h3>
-            <p class="service-unit">${service.Don_vi.join(", ")}</p>
-            <p class="service-status">${
-              service.Status ? "Hoạt động" : "Đã hủy"
-            }</p>
+            <p class="service-unit">${service.Don_vi}</p>
+            <p class="service-status">Đã hủy</p>
+           
             <div class="service-actions">
-                <button class="btn update" onclick="updateService('${
-                  service.id
-                }')">Cập nhật</button>
-                <button class="btn cancel" onclick="cancelService('${
-                  service.id
-                }')">Hủy</button>
-                <button class="btn activate" onclick="activateService('${
-                  service.id
-                }')">Kích hoạt lại</button> <!-- Nút Kích hoạt lại -->
+                <button class="btn activate" onclick="activateService('${service.id}')">Kích hoạt</button>
+                <button class="btn delete" onclick="deleteService('${service.id}')">Xóa</button>
             </div>
         </div>
       </div>
     `;
-    inactiveColumn.appendChild(serviceDiv);
+    inactiveServicesContainer.appendChild(serviceDiv);
   });
 
-  // Thêm hai cột vào container
-  serviceListContainer.appendChild(activeColumn);
-  serviceListContainer.appendChild(inactiveColumn);
+  serviceListContainer.appendChild(activeServicesContainer);
+  serviceListContainer.appendChild(inactiveServicesContainer);
 }
 
 async function cancelService(serviceId) {
@@ -174,12 +171,31 @@ async function activateService(serviceId) {
   }
 }
 
+async function deleteService(serviceId) {
+  if (confirm("Bạn có chắc chắn muốn xóa dịch vụ này không?")) {
+    try {
+      const serviceDocRef = doc(db, "DichVu", serviceId);
+      await deleteDoc(serviceDocRef); // Xóa dịch vụ trong Firestore
+
+      // Cập nhật danh sách dịch vụ
+      fetchAllServices();
+      alert("Dịch vụ đã được xóa thành công.");
+    } catch (error) {
+      console.error("Lỗi khi xóa dịch vụ:", error);
+      alert("Có lỗi xảy ra khi xóa dịch vụ.");
+    }
+  }
+}
+
 async function addService(event) {
   event.preventDefault(); // Ngừng việc làm mới trang khi nhấn nút Submit
 
   // Lấy dữ liệu từ các trường input
   const serviceName = document.getElementById("serviceName").value;
-  const serviceUnit = document.getElementById("serviceUnit").value.split(","); // Để đơn vị có thể nhập nhiều giá trị cách nhau bằng dấu phẩy
+  const serviceUnit = document
+    .getElementById("serviceUnit")
+    .value.split(",")
+    .map((unit) => unit.trim());
   const serviceIcon = document.getElementById("serviceIcon").value;
   const serviceStatus =
     document.getElementById("serviceStatus").value === "true"; // Convert về kiểu boolean
@@ -224,3 +240,5 @@ document
 window.cancelService = cancelService;
 window.activateService = activateService;
 window.addService = addService;
+window.deleteService = deleteService;
+window.filterServices = filterServices;

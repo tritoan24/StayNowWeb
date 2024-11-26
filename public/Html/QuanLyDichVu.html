@@ -16,15 +16,16 @@
     </header>
     
     <div class="container">
+        
         <!-- Form Thêm Dịch Vụ Mới -->
-        <div id="addServiceForm">
+        <form id="addServiceForm" onsubmit="addService(event)">
             <h3>Thêm dịch vụ mới</h3>
             <label for="serviceName">Tên dịch vụ:</label>
             <input type="text" id="serviceName" placeholder="Tên dịch vụ" required />
 
-            <label for="serviceUnit">Đơn vị:</label>
-            <input type="text" id="serviceUnit" placeholder="Đơn vị (Ví dụ: Phòng, Người)" required />
-
+            <label for="serviceUnit">Đơn vị (ngăn cách bởi dấu phẩy):</label>
+            <input type="text" id="serviceUnit" placeholder="Ví dụ: Phòng, Người" required />
+            
             <label for="serviceIcon">URL Icon:</label>
             <input type="url" id="serviceIcon" placeholder="URL Icon" required />
 
@@ -35,8 +36,17 @@
             </select>
 
             <button type="submit" id="submitServiceBtn">Thêm dịch vụ</button>
-        </div>
+      </form>
 
+      <div class="search-service">
+        <input 
+          type="text" 
+          id="searchService" 
+          placeholder="Tìm kiếm dịch vụ theo tên..." 
+          oninput="filterServices(event)" 
+        />
+      </div>
+      
         <!-- Danh sách dịch vụ -->
         <h2>Danh sách dịch vụ</h2>
         <div id="serviceList"></div> <!-- Đây là nơi sẽ hiển thị danh sách dịch vụ -->
