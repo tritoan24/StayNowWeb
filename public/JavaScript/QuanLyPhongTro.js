@@ -3,6 +3,8 @@ import {
   getFirestore,
   collection,
   getDocs,
+  getDoc,
+  doc
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
