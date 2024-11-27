@@ -3,8 +3,6 @@ import {
   getFirestore,
   collection,
   getDocs,
-  getDoc,
-  doc,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
@@ -69,8 +67,15 @@ function renderRoomList(rooms) {
       </div>
       <div class="room-info">
           <h3 class="room-title">${room.Ten_phongtro}</h3>
-          <p class="room-address">${room.Dia_chi}</p>
-          <p class="room-price">${formattedPrice}</p>
+          <div class="room-address">
+          <img src="../image/icons/ic-ping.svg" alt="${room.Dia_chi}">
+                  <p>${room.Dia_chi}</p>
+                    </div>
+
+                    <div class="room-price">
+                    <img src="../image/icons/ic-monny.svg" alt="${room.Dia_chi}">
+                     <p>${formattedPrice}</p>
+                    </div>
           <div class="room-actions">
               <button class="btn approve" onclick="approveRoom('${room.id}')">Duyệt</button>
               <button class="btn cancel" onclick="cancelRoom('${room.id}')">Hủy</button>
@@ -81,9 +86,6 @@ function renderRoomList(rooms) {
       </div>
     </div>
   `;
-  
-  
-
 
     roomListContainer.appendChild(roomDiv);
   });
@@ -199,6 +201,29 @@ function closeDetails() {
   document.getElementById("detailDialog").style.display = "none";
   document.getElementById("overlay").style.display = "none";
 }
+function goBack() {
+  if (document.referrer) {
+    window.history.back(); // Quay về trang trước nếu có trang trước
+  } else {
+    console.log("Không có trang trước để quay lại.");
+  }
+}
+
+function searchRooms() {
+  const searchInput = document
+    .getElementById("searchInput")
+    .value.toLowerCase(); // Lấy giá trị tìm kiếm và chuyển thành chữ thường
+
+  // Lọc các phòng trọ dựa trên tên hoặc địa chỉ (hoặc các thuộc tính khác)
+  const filteredRooms = rooms.filter(
+    (room) =>
+      room.Ten_phongtro.toLowerCase().includes(searchInput) || // Tìm theo tên phòng
+      room.Dia_chi.toLowerCase().includes(searchInput) // Tìm theo địa chỉ
+  );
+
+  // Gọi hàm render lại danh sách phòng trọ sau khi lọc
+  renderRoomList(filteredRooms);
+}
 
 // Lắng nghe sự kiện DOMContentLoaded và gọi hàm fetchAllRooms
 document.addEventListener("DOMContentLoaded", () => {
@@ -208,3 +233,5 @@ document.addEventListener("DOMContentLoaded", () => {
 window.viewDetails = viewDetails;
 window.closeDetails = closeDetails;
 window.changeSlide = changeSlide;
+window.goBack = goBack;
+window.searchRooms = searchRooms;

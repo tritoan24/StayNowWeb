@@ -8,7 +8,7 @@
 body {
   font-family: Arial, sans-serif;
   background-color: #f4f4f9;
-  color: #333;
+  color: #2a3547;
 }
 
 header {
@@ -21,26 +21,94 @@ header {
 }
 
 header .back-button button {
-  background-color: #0056b3;
-  color: white;
+  background-color: white;
+  color: #471bc4;
   border: none;
   padding: 8px 16px;
   cursor: pointer;
-  margin-right: 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+header .back-button button:hover {
+  background-color: #cfc1ff;
 }
 
 header h1 {
   font-size: 24px;
   margin-top: 10px;
+  margin-right: 10%;
 }
 
 .container {
-  padding: 20px;
+  padding: 40px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+  border-radius: 12px;
+  background-color: #fff;
 }
 
 h2 {
   margin-bottom: 20px;
 }
+
+.search-view {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 90% 10%;
+  margin-bottom: 2%;
+}
+
+/* Container của thanh tìm kiếm */
+.search-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 4px; /* Đường viền bo tròn */
+  padding: 5px 15px; /* Khoảng cách trong */
+  max-width: 100%; /* Độ rộng tối đa */
+  border: 1px solid #eaeff4;
+}
+
+/* Biểu tượng tìm kiếm */
+.search-container img:first-child {
+  width: 20px; /* Kích thước biểu tượng tìm kiếm */
+  height: 20px;
+  margin-right: 10px;
+}
+
+/* Input tìm kiếm */
+.search-container input {
+  flex: 1; /* Chiếm không gian còn lại trong container */
+  padding: 10px 15px;
+  font-size: 16px;
+  border: none; /* Xóa viền */
+  border-radius: 4px; /* Đường viền bo tròn */
+  outline: none; /* Xóa viền focus */
+  background-color: transparent; /* Nền trong suốt */
+  color: #2a3547; /* Màu chữ */
+}
+
+/* Phần chứa các biểu tượng (Sort, Fill) */
+.search-actions {
+  display: flex;
+  gap: 10px; /* Khoảng cách giữa các biểu tượng */
+  justify-content: center;
+}
+
+/* Biểu tượng Sort và Fill */
+.search-actions img {
+  width: 20px; /* Kích thước biểu tượng */
+  height: 20px;
+  cursor: pointer; /* Hiển thị con trỏ khi hover */
+}
+
+.search-actions img:hover {
+  opacity: 0.7; /* Hiệu ứng mờ khi hover */
+}
+
 /* Danh sách các phòng */
 #roomList {
   display: flex;
@@ -86,14 +154,22 @@ h2 {
 .room-title {
   font-size: 18px;
   font-weight: bold;
-  color: #333;
+  color: #2a3547;
 }
 
-.room-address,
-.room-price {
+.room-address, .room-price {
+  display: flex;
+  align-items: center; /* Căn giữa các phần tử theo chiều dọc */
+  flex-direction: row; /* Hiển thị theo chiều ngang */
+}
+
+.room-address p, .room-price p {
   font-size: 14px;
   color: #666;
   margin: 5px 0;
+  display: inline-block;
+  max-width: calc(100% - 28px); /* Đảm bảo văn bản không tràn ra ngoài */
+  word-wrap: break-word; /* Đảm bảo từ không bị tràn ra ngoài */
 }
 
 /* Khu vực hành động */
@@ -114,7 +190,7 @@ h2 {
 }
 
 .btn.approve {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
 }
 
@@ -137,7 +213,7 @@ h2 {
 }
 
 .details-link {
-  color: #007BFF;
+  color: #007bff;
   text-decoration: none;
   cursor: pointer;
   font-size: 14px;
@@ -282,5 +358,3 @@ button.close {
 button.close:hover {
   background-color: #471bc4;
 }
-
-

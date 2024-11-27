@@ -71,7 +71,7 @@ function renderServiceList(services) {
 
   // Hiển thị dịch vụ hoạt động
   const activeServicesContainer = document.createElement("div");
-  activeServicesContainer.innerHTML = `<h3>Hoạt động</h3>`;
+  activeServicesContainer.innerHTML = `<h3 class="titleStatus">Hoạt động</h3>`;
   activeServices.forEach((service) => {
     const serviceDiv = document.createElement("div");
     serviceDiv.className = "service";
@@ -85,7 +85,10 @@ function renderServiceList(services) {
         <div class="service-info">
             <h3 class="service-title">${service.Ten_dichvu}</h3>
             <p class="service-unit">${service.Don_vi}</p>
-            <p class="service-status">Hoạt động</p>
+            <div class="status-layout">
+                 <img src="../image/icons/ic-dot-active.svg" alt="">
+                             <p class="service-status">Hoạt động</p>
+            </div>
            
             <div class="service-actions">
                 <button class="btn update" onclick="updateService('${service.id}')">Cập nhật</button>
@@ -99,7 +102,7 @@ function renderServiceList(services) {
 
   // Hiển thị dịch vụ đã hủy
   const inactiveServicesContainer = document.createElement("div");
-  inactiveServicesContainer.innerHTML = `<h3>Đã hủy</h3>`;
+  inactiveServicesContainer.innerHTML = `<h3 class="titleStatus">Đã hủy</h3>`;
   inactiveServices.forEach((service) => {
     const serviceDiv = document.createElement("div");
     serviceDiv.className = "service";
@@ -113,7 +116,10 @@ function renderServiceList(services) {
         <div class="service-info">
             <h3 class="service-title">${service.Ten_dichvu}</h3>
             <p class="service-unit">${service.Don_vi}</p>
+            <div class="status-layout">
+                 <img src="../image/icons/ic-dot-cancel.svg" alt="">
             <p class="service-status">Đã hủy</p>
+            </div>
            
             <div class="service-actions">
                 <button class="btn activate" onclick="activateService('${service.id}')">Kích hoạt</button>
@@ -186,9 +192,11 @@ async function deleteService(serviceId) {
     }
   }
 }
-
-async function addService(event) {
+async function handleFormSubmit(event) {
   event.preventDefault(); // Ngừng việc làm mới trang khi nhấn nút Submit
+
+  const form = document.getElementById("addServiceForm");
+  const mode = form.getAttribute("data-mode"); // Lấy trạng thái của form (add hoặc update)
 
   // Lấy dữ liệu từ các trường input
   const serviceName = document.getElementById("serviceName").value;
@@ -207,25 +215,92 @@ async function addService(event) {
   }
 
   try {
-    // Thêm dịch vụ mới vào Firestore
-    const servicesRef = collection(db, "DichVu");
-    await addDoc(servicesRef, {
-      Ten_dichvu: serviceName,
-      Don_vi: serviceUnit,
-      Icon_dichvu: serviceIcon,
-      Status: serviceStatus,
-    });
-    console.log("Đã thêm dịch vụ mới");
+    if (mode === "add") {
+      // Thêm dịch vụ mới
+      const servicesRef = collection(db, "DichVu");
+      await addDoc(servicesRef, {
+        Ten_dichvu: serviceName,
+        Don_vi: serviceUnit,
+        Icon_dichvu: serviceIcon,
+        Status: serviceStatus,
+      });
+      alert("Đã thêm dịch vụ mới");
+    } else if (mode === "update") {
+      // Lấy ID dịch vụ đang được cập nhật (giả sử lưu trong form)
+      const serviceId = form.getAttribute("data-service-id");
+      if (!serviceId) {
+        alert("Không tìm thấy ID dịch vụ để cập nhật.");
+        return;
+      }
+
+      // Cập nhật dịch vụ
+      const serviceRef = doc(db, "DichVu", serviceId);
+      await updateDoc(serviceRef, {
+        Ten_dichvu: serviceName,
+        Don_vi: serviceUnit,
+        Icon_dichvu: serviceIcon,
+        Status: serviceStatus,
+      });
+      alert("Đã cập nhật dịch vụ");
+    }
 
     // Cập nhật lại danh sách dịch vụ
     fetchAllServices();
 
-    // Reset form
-    document.getElementById("addServiceForm").reset();
+    // Reset form và đặt lại về chế độ thêm mới
+    clearForm();
   } catch (e) {
-    console.error("Lỗi khi thêm dịch vụ:", e);
-    alert("Có lỗi xảy ra khi thêm dịch vụ.");
+    console.error("Lỗi khi xử lý form:", e);
+    alert("Có lỗi xảy ra.");
   }
+}
+function updateService(serviceId) {
+  // Tìm dịch vụ theo ID từ danh sách allServices
+  const selectedService = allServices.find(
+    (service) => service.id === serviceId
+  );
+
+  if (selectedService) {
+    // Điền thông tin vào form
+    document.getElementById("serviceName").value =
+      selectedService.Ten_dichvu || "";
+    document.getElementById("serviceUnit").value = selectedService.Don_vi || "";
+    document.getElementById("serviceIcon").value =
+      selectedService.Icon_dichvu || "";
+    document.getElementById("serviceStatus").value =
+      selectedService.Status.toString();
+
+    // Chuyển form sang chế độ cập nhật
+    const form = document.getElementById("addServiceForm");
+    form.setAttribute("data-mode", "update");
+    form.setAttribute("data-service-id", serviceId); // Lưu ID dịch vụ để cập nhật
+
+    // Thay đổi nút "Thêm dịch vụ" thành "Cập nhật dịch vụ"
+    const submitButton = document.getElementById("submitServiceBtn");
+    submitButton.textContent = "Cập nhật dịch vụ";
+  }
+}
+
+function goBack() {
+  if (document.referrer) {
+    window.history.back(); // Quay về trang trước nếu có trang trước
+  } else {
+    console.log("Không có trang trước để quay lại.");
+  }
+}
+function clearForm() {
+  document.getElementById("serviceName").value = "";
+  document.getElementById("serviceUnit").value = "";
+  document.getElementById("serviceIcon").value = "";
+  document.getElementById("serviceStatus").value = "true";
+
+  const form = document.getElementById("addServiceForm");
+  form.setAttribute("data-mode", "add");
+  form.removeAttribute("data-service-id"); // Xóa ID dịch vụ nếu có
+
+  // Đặt lại nút submit về trạng thái "Thêm dịch vụ"
+  const submitButton = document.getElementById("submitServiceBtn");
+  submitButton.textContent = "Thêm dịch vụ";
 }
 
 // Lắng nghe sự kiện DOMContentLoaded và gọi hàm fetchAllRooms
@@ -235,10 +310,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document
   .getElementById("submitServiceBtn")
-  .addEventListener("click", addService);
+  .addEventListener("click", handleFormSubmit);
+
+document.getElementById("clearFormBtn").addEventListener("click", clearForm);
 
 window.cancelService = cancelService;
 window.activateService = activateService;
-window.addService = addService;
 window.deleteService = deleteService;
 window.filterServices = filterServices;
+window.goBack = goBack;
+window.clearForm = clearForm;
+window.handleFormSubmit = handleFormSubmit;
+window.updateService = updateService;
