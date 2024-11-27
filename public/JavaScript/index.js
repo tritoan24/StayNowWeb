@@ -26,7 +26,7 @@ window.setActive = function (div) {
 
 function loadContent(fileName, title) {
     const contentElement = document.getElementById("content");
-  
+    let historyStack = [];
     // Lưu trạng thái hiện tại vào stack trước khi tải nội dung mới
     historyStack.push(contentElement.innerHTML);
   
