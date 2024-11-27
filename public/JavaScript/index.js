@@ -23,30 +23,34 @@ window.setActive = function (div) {
     }
 };
 
-function loadContent(fileName, title) {
-    const contentElement = document.getElementById('content');
-    fetch(fileName)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text();
-        })
-        .then(html => {
-            contentElement.innerHTML = html; // Thay thế nội dung trong phần content
-            localStorage.setItem('currentContent', fileName); // Lưu trạng thái nội dung hiện tại
-            localStorage.setItem('currentTitle', title); // Lưu tiêu đề của nội dung hiện tại
 
-            // Kiểm tra nếu là trang Danh Sách Người Dùng, gọi fetchUsers
-            if (fileName.includes('danhsachnguoidung.html')) {
-                fetchUsers();
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching content:', error);
-            contentElement.innerHTML = '<p>Không thể tải nội dung.</p>';
-        });
-}
+function loadContent(fileName, title) {
+    const contentElement = document.getElementById("content");
+  
+    // Lưu trạng thái hiện tại vào stack trước khi tải nội dung mới
+    historyStack.push(contentElement.innerHTML);
+  
+    fetch(fileName)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.text();
+      })
+      .then((html) => {
+        contentElement.innerHTML = html;
+        localStorage.setItem("currentContent", fileName);
+        localStorage.setItem("currentTitle", title);
+  
+        if (fileName.includes("danhsachnguoidung.html")) {
+          fetchUsers();
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching content:", error);
+        contentElement.innerHTML = "<p>Không thể tải nội dung.</p>";
+      });
+  }
 
 
 // Khôi phục nội dung khi tải lại trang
