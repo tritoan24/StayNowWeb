@@ -31,6 +31,10 @@
                 placeholder="Tên dịch vụ"
                 required
               />
+              <div id="serviceNameError" class="error hidden">
+                <img src="../image/icons/ic-error.svg" alt="Error icon" />
+                <p class="error-message">Vui lòng điền tên dịch vụ!</p>
+              </div>
 
               <label for="serviceUnit">Đơn vị (ngăn cách bởi dấu phẩy):</label>
               <input
@@ -39,6 +43,10 @@
                 placeholder="Ví dụ: Phòng, Người"
                 required
               />
+              <div id="serviceUnitError" class="error hidden">
+                <img src="../image/icons/ic-error.svg" alt="Error icon" />
+                <p class="error-message">Vui lòng điền đơn vị!</p>
+              </div>
             </div>
 
             <div class="inputForm">
@@ -49,6 +57,10 @@
                 placeholder="URL Icon"
                 required
               />
+              <div id="serviceIconError" class="error hidden">
+                <img src="../image/icons/ic-error.svg" alt="" />
+                <p class="error-message">Vui lòng điền url icon!</p>
+              </div>
 
               <label for="serviceStatus">Trạng thái:</label>
               <select id="serviceStatus">
@@ -72,6 +84,30 @@
           </div>
         </div>
       </form>
+
+      <div id="successModal" class="modal modalHidden">
+        <div class="modal-content">
+          <span id="closeModal" class="close">&times;</span>
+          <div class="modal-icon">
+            <img src="../image/icons/ic-tick-success.svg" alt="Success Icon" />
+          </div>
+          <h2 class="modal-title">Thành công!</h2>
+          <p id="modalMessage">Dịch vụ đã được thêm thành công.</p>
+          <button id="modalAction" class="modal-button">OK</button>
+        </div>
+      </div>
+      
+      <div id="deleteConfirmModal" class="modal modalHidden">
+        <div class="modal-content">
+          <h2 class="modal-title">Xác nhận xóa</h2>
+          <p>Bạn có chắc chắn muốn xóa dịch vụ này không?</p>
+          <div class="modal-actions">
+            <button id="confirmDelete" class="modal-button danger">Xóa</button>
+            <button id="cancelDelete" class="modal-button">Hủy</button>
+          </div>
+        </div>
+      </div>
+      
 
       <div class="serviceContainerView">
         <div class="titleAddForm">
