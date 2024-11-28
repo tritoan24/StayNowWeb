@@ -480,7 +480,7 @@ button.close:hover {
 
 /* Kiểu dáng nội dung của modal */
 .modal-content {
-  background: linear-gradient(135deg, #6ab04c, #badc58); /* Hiệu ứng gradient */
+  background: linear-gradient(135deg, #471bc4, #481bc48a); /* Hiệu ứng gradient */
   margin: 10% auto;
   padding: 20px;
   border-radius: 10px; /* Góc bo tròn */
@@ -549,9 +549,9 @@ button.close:hover {
 
 /* Nút hành động */
 .modal-button {
-  background-color: #471bc4;
+  background-color: #fff;
+  color: #471bc4;
   border: none;
-  color: #fff;
   padding: 10px 20px;
   border-radius: 5px;
   font-size: 16px;
@@ -561,7 +561,8 @@ button.close:hover {
 }
 
 .modal-button:hover {
-  background-color: #218c74;
+  background-color: #998db6;
+  color: #fff;
   transform: scale(1.05);
 }
 

@@ -165,7 +165,6 @@ async function activateInformation(informationId) {
       const informationRef = doc(db, "ThongTin", informationId); // Tạo tham chiếu đến dịch vụ trong Firestore
       await updateDoc(informationRef, { Status: true }); // Cập nhật trạng thái thành true
 
-
       information.Status = true;
 
       // Làm mới giao diện để hiển thị trạng thái mới
@@ -177,19 +176,19 @@ async function activateInformation(informationId) {
 }
 
 async function deleteInformation(informationId) {
-  if (confirm("Bạn có chắc chắn muốn xóa thông tin này không?")) {
+  showDeleteConfirmModal(informationId, async (id) => {
     try {
-      const informationDocRef = doc(db, "ThongTin", informationId);
-      await deleteDoc(informationDocRef); // Xóa dịch vụ trong Firestore
+      const informationDocRef = doc(db, "ThongTin", id);
+      await deleteDoc(informationDocRef);
 
       // Cập nhật danh sách dịch vụ
       fetchAllInformations();
-      alert("Thông tin đã được xóa thành công.");
+      showSuccessModal("Thông tin đã được xóa thành công.");
     } catch (error) {
       console.error("Lỗi khi xóa thông tin:", error);
       alert("Có lỗi xảy ra khi xóa thông tin.");
     }
-  }
+  });
 }
 
 async function handleFormSubmit(event) {
@@ -204,31 +203,30 @@ async function handleFormSubmit(event) {
   const informationIcon = document.getElementById("informationIcon").value;
   const informationStatus =
     document.getElementById("informationStatus").value === "true"; // Convert về kiểu boolean
-    let hasError = false
+  let hasError = false;
 
   // Kiểm tra xem các trường có hợp lệ không
   if (!informationName) {
     document.getElementById("informationNameError").classList.remove("hidden");
     hasError = true;
-    return
+    return;
   } else {
     document.getElementById("informationNameError").classList.add("hidden");
   }
   if (!informationIcon) {
     document.getElementById("informationIconError").classList.remove("hidden");
     hasError = true;
-    return
+    return;
   } else {
     document.getElementById("informationIconError").classList.add("hidden");
   }
   if (!informationUnit) {
     document.getElementById("informationUnitError").classList.remove("hidden");
     hasError = true;
-    return
+    return;
   } else {
     document.getElementById("informationUnitError").classList.add("hidden");
   }
- 
 
   try {
     if (mode === "add") {
@@ -240,7 +238,10 @@ async function handleFormSubmit(event) {
         Icon_dichvu: informationIcon,
         Status: informationStatus,
       });
-      alert("Đã thêm thông tin mới");
+      showSuccessModal("Thông tin đã được thêm thành công.", () => {
+        clearForm();
+        fetchAllInformations();
+      });
     } else if (mode === "update") {
       // Lấy ID dịch vụ đang được cập nhật (giả sử lưu trong form)
       const informationId = form.getAttribute("data-information-id");
@@ -257,14 +258,11 @@ async function handleFormSubmit(event) {
         Icon_dichvu: informationIcon,
         Status: informationStatus,
       });
-      alert("Đã cập nhật thông tin");
+      showSuccessModal("Thông tin đã được cập nhật thành công.", () => {
+        clearForm();
+        fetchAllInformations();
+      });
     }
-
-    // Cập nhật lại danh sách dịch vụ
-    fetchAllInformations();
-
-    
-    clearForm();
   } catch (e) {
     console.error("Lỗi khi xử lý form:", e);
     alert("Có lỗi xảy ra.");
@@ -279,12 +277,13 @@ function updateInformation(informationId) {
   if (selectedInformation) {
     // Điền thông tin vào form
     document.getElementById("informationName").value =
-    selectedInformation.Ten_thongtin || "";
-    document.getElementById("informationUnit").value = selectedInformation.Don_vi || "";
+      selectedInformation.Ten_thongtin || "";
+    document.getElementById("informationUnit").value =
+      selectedInformation.Don_vi || "";
     document.getElementById("informationIcon").value =
-    selectedInformation.Icon_dichvu || "";
+      selectedInformation.Icon_dichvu || "";
     document.getElementById("informationStatus").value =
-    selectedInformation.Status.toString();
+      selectedInformation.Status.toString();
 
     // Chuyển form sang chế độ cập nhật
     const form = document.getElementById("insertInformationForm");
@@ -295,6 +294,59 @@ function updateInformation(informationId) {
     const submitButton = document.getElementById("submitInformationBtn");
     submitButton.textContent = "Cập nhật thông tin";
   }
+}
+
+function showSuccessModal(message, callback = null) {
+  const modal = document.getElementById("successModal");
+  const modalMessage = document.getElementById("modalMessage");
+  const modalAction = document.getElementById("modalAction");
+
+  modalMessage.textContent = message;
+  modal.classList.remove("modalHidden");
+  modal.style.display = "block";
+
+  modalAction.onclick = () => {
+    hideModal(modal);
+    if (callback) callback();
+  };
+
+  document.getElementById("closeModal").onclick = () => hideModal(modal);
+}
+
+function showDeleteConfirmModal(serviceId, deleteCallback) {
+  const modal = document.getElementById("deleteConfirmModal");
+  modal.classList.remove("modalHidden");
+  modal.style.display = "block";
+
+  // Xác nhận xóa
+  document.getElementById("confirmDelete").onclick = async function () {
+    await deleteCallback(serviceId);
+    hideModalDelete(modal);
+  };
+
+  // Hủy bỏ xóa
+  document.getElementById("cancelDelete").onclick = () =>
+    hideModalDelete(modal);
+
+  // Đóng modal khi nhấn ra ngoài
+  window.onclick = function (event) {
+    if (event.target === modal) {
+      hideModalDelete(modal);
+    }
+  };
+}
+
+// Ẩn modal
+function hideModal() {
+  const modal = document.getElementById("successModal");
+  modal.classList.add("modalHidden");
+  modal.style.display = "none";
+}
+
+function hideModalDelete() {
+  const modal = document.getElementById("deleteConfirmModal");
+  modal.classList.add("modalHidden");
+  modal.style.display = "none";
 }
 
 function goBack() {
@@ -321,7 +373,7 @@ function clearForm() {
 
 // Lắng nghe sự kiện DOMContentLoaded và gọi hàm fetchAllRooms
 document.addEventListener("DOMContentLoaded", () => {
-  fetchAllInformations(); 
+  fetchAllInformations();
 });
 
 document
@@ -337,4 +389,4 @@ window.goBack = goBack;
 window.clearForm = clearForm;
 window.handleFormSubmit = handleFormSubmit;
 window.updateInformation = updateInformation;
-window.filterInformation = filterInformation
+window.filterInformation = filterInformation;
