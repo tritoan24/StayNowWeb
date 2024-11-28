@@ -17,41 +17,69 @@
     
     <div class="container">
         
-        <!-- Form Thêm Dịch Vụ Mới -->
-        <form id="insertInformationForm" onsubmit="insertInfomation(event)">
-            <h3>Thêm thông tin mới</h3>
-            <label for="informationName">Tên thông tin:</label>
-            <input type="text" id="informationName" placeholder="Tên dịch vụ" required />
+        <!-- Form Thêm Thông Tin Mới -->
+        <form id="insertInformationForm" class="insertInformationForm" data-mode="add">
+            <div class="titleAddForm">
+                <h3>Thêm thông tin mới</h3>
+            </div>
+            <div class="inputFormContainer">
+                <div class="inputFormContent">
+                    <div class="inputForm">
+                        <label for="informationName">Tên thông tin:</label>
+                        <input type="text" id="informationName" placeholder="Tên thông tin" required />
 
-            <label for="informationUnit">Đơn vị:</label>
-            <input type="text" id="informationUnit" placeholder="Ví dụ: Phòng" required />
-            
-            <label for="informationIcon">URL Icon:</label>
-            <input type="url" id="informationIcon" placeholder="URL Icon" required />
+                        <label for="informationUnit">Đơn vị:</label>
+                        <input type="text" id="informationUnit" placeholder="Ví dụ: Phòng" required />
+                    </div>
 
-            <label for="informationStatus">Trạng thái:</label>
-            <select id="informationStatus">
-                <option value="true">Hoạt động</option>
-                <option value="false">Đã hủy</option>
-            </select>
+                    <div class="inputForm">
+                        <label for="informationIcon">URL Icon:</label>
+                        <input type="url" id="informationIcon" placeholder="URL Icon" required />
 
-            <button type="submit" id="submitInformationBtn">Thêm thông tin</button>
-      </form>
+                        <label for="informationStatus">Trạng thái:</label>
+                        <select id="informationStatus">
+                            <option value="true">Hoạt động</option>
+                            <option value="false">Đã hủy</option>
+                        </select>
+                    </div>
+                </div>
 
-      <div class="search-information">
-        <input 
-          type="text" 
-          id="searchInformation" 
-          placeholder="Tìm kiếm thông tin theo tên..." 
-          oninput="filterInformation(event)" 
-        />
-      </div>
-      
-        <!-- Danh sách dịch vụ -->
-        <h2>Danh sách thông tin</h2>
-        <div id="informationList"></div> <!-- Đây là nơi sẽ hiển thị danh sách dịch vụ -->
+                <div class="btnAddFormGroup">
+                    <button class="btnInsertInfrormation" type="submit" id="submitInformationBtn">Thêm thông tin</button>
+                    <button class="btnClearForm" type="button" id="clearFormBtn" onclick="clearForm()">Nhập lại</button>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Danh sách thông tin -->
+        <div class="informationContainerView">
+            <div class="titleAddForm">
+                <h3>Danh sách thông tin</h3>
+            </div>
+            <div class="informationContainer">
+                <!-- Thanh tìm kiếm -->
+                <div class="search-view">
+                    <div class="search-container">
+                        <img src="../image/icons/ic-search-gray.svg" alt="Search Icon" />
+                        <input
+                            type="text"
+                            id="searchInformation"
+                            placeholder="Tìm kiếm thông tin..."
+                            oninput="filterInformation(event)" 
+                        />
+                    </div>
+                    <div class="search-actions">
+                        <img src="../image/icons/ic-sort.svg" alt="Sort Icon" />
+                        <img src="../image/icons/ic-fill.svg" alt="Fill Icon" />
+                    </div>
+                </div>
+
+                <div id="informationList"></div>
+            </div>
+        </div>
+
     </div>
-    
+
     <script src="../JavaScript/QuanLyThongTin.js" type="module"></script>
 </body>
 </html>
