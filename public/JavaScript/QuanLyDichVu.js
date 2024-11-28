@@ -209,12 +209,12 @@ async function handleFormSubmit(event) {
   const serviceStatus =
     document.getElementById("serviceStatus").value === "true"; // Convert về kiểu boolean
 
-
+  let hasError = false;
   // Kiểm tra tên dịch vụ
   if (!serviceName) {
     document.getElementById("serviceNameError").classList.remove("hidden");
     hasError = true;
-    return
+    return;
   } else {
     document.getElementById("serviceNameError").classList.add("hidden");
   }
@@ -222,7 +222,7 @@ async function handleFormSubmit(event) {
   if (!serviceIcon) {
     document.getElementById("serviceIconError").classList.remove("hidden");
     hasError = true;
-    return
+    return;
   } else {
     document.getElementById("serviceIconError").classList.add("hidden");
   }
@@ -235,9 +235,7 @@ async function handleFormSubmit(event) {
     document.getElementById("serviceUnitError").classList.add("hidden");
   }
 
-
   try {
-
     if (mode === "add") {
       // Thêm dịch vụ mới
       const servicesRef = collection(db, "DichVu");
@@ -273,7 +271,6 @@ async function handleFormSubmit(event) {
         fetchAllServices();
       });
     }
-
   } catch (e) {
     console.error("Lỗi khi xử lý form:", e);
     alert("Có lỗi xảy ra.");
@@ -337,7 +334,8 @@ function showDeleteConfirmModal(serviceId, deleteCallback) {
   };
 
   // Hủy bỏ xóa
-  document.getElementById("cancelDelete").onclick = () => hideModalDelete(modal);
+  document.getElementById("cancelDelete").onclick = () =>
+    hideModalDelete(modal);
 
   // Đóng modal khi nhấn ra ngoài
   window.onclick = function (event) {
@@ -346,7 +344,6 @@ function showDeleteConfirmModal(serviceId, deleteCallback) {
     }
   };
 }
-
 
 // Ẩn modal
 function hideModal() {
@@ -360,7 +357,6 @@ function hideModalDelete() {
   modal.classList.add("modalHidden");
   modal.style.display = "none";
 }
-
 
 function goBack() {
   if (document.referrer) {

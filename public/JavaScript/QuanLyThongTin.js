@@ -204,12 +204,31 @@ async function handleFormSubmit(event) {
   const informationIcon = document.getElementById("informationIcon").value;
   const informationStatus =
     document.getElementById("informationStatus").value === "true"; // Convert về kiểu boolean
+    let hasError = false
 
   // Kiểm tra xem các trường có hợp lệ không
-  if (!informationName || !informationUnit || !informationIcon) {
-    alert("Vui lòng điền đầy đủ thông tin!");
-    return;
+  if (!informationName) {
+    document.getElementById("informationNameError").classList.remove("hidden");
+    hasError = true;
+    return
+  } else {
+    document.getElementById("informationNameError").classList.add("hidden");
   }
+  if (!informationIcon) {
+    document.getElementById("informationIconError").classList.remove("hidden");
+    hasError = true;
+    return
+  } else {
+    document.getElementById("informationIconError").classList.add("hidden");
+  }
+  if (!informationUnit) {
+    document.getElementById("informationUnitError").classList.remove("hidden");
+    hasError = true;
+    return
+  } else {
+    document.getElementById("informationUnitError").classList.add("hidden");
+  }
+ 
 
   try {
     if (mode === "add") {
