@@ -192,6 +192,7 @@ async function deleteService(serviceId) {
     }
   }
 }
+
 async function handleFormSubmit(event) {
   event.preventDefault(); // Ngừng việc làm mới trang khi nhấn nút Submit
 

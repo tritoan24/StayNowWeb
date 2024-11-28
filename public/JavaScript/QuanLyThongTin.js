@@ -73,7 +73,7 @@ function renderInformationList(informations) {
 
   // Hiển thị dịch vụ hoạt động
   const activeInformationContainer = document.createElement("div");
-  activeInformationContainer.innerHTML = `<h3>Hoạt động</h3>`;
+  activeInformationContainer.innerHTML = `<h3 class="titleStatus">Hoạt động</h3>`;
   activeInformations.forEach((information) => {
     const informationDiv = document.createElement("div");
     informationDiv.className = "information";
@@ -87,7 +87,10 @@ function renderInformationList(informations) {
         <div class="information-info">
             <h3 class="information-title">${information.Ten_thongtin}</h3>
             <p class="information-unit">${information.Don_vi}</p>
-            <p class="information-status">Hoạt động</p>
+             <div class="status-layout">
+                 <img src="../image/icons/ic-dot-active.svg" alt="">
+                      <p class="service-status">Hoạt động</p>
+            </div>
            
             <div class="information-actions">
                 <button class="btn update" onclick="updateInformation('${information.id}')">Cập nhật</button>
@@ -101,7 +104,7 @@ function renderInformationList(informations) {
 
   // Hiển thị dịch vụ đã hủy
   const inactiveInformationsContainer = document.createElement("div");
-  inactiveInformationsContainer.innerHTML = `<h3>Đã hủy</h3>`;
+  inactiveInformationsContainer.innerHTML = `<h3 class="titleStatus">Đã hủy</h3>`;
   inactiveInformations.forEach((information) => {
     const informationDiv = document.createElement("div");
     informationDiv.className = "information";
@@ -115,7 +118,10 @@ function renderInformationList(informations) {
         <div class="information-info">
             <h3 class="information-title">${information.Ten_thongtin}</h3>
             <p class="information-unit">${information.Don_vi}</p>
-            <p class="information-status">Đã hủy</p>
+     <div class="status-layout">
+                 <img src="../image/icons/ic-dot-cancel.svg" alt="">
+            <p class="service-status">Đã hủy</p>
+            </div>
            
             <div class="information-actions">
                 <button class="btn activate" onclick="activateInformation('${information.id}')">Kích hoạt</button>
@@ -186,8 +192,11 @@ async function deleteInformation(informationId) {
   }
 }
 
-async function insertInformation(event) {
+async function handleFormSubmit(event) {
   event.preventDefault(); // Ngừng việc làm mới trang khi nhấn nút Submit
+
+  const form = document.getElementById("insertInformationForm");
+  const mode = form.getAttribute("data-mode"); // Lấy trạng thái của form (add hoặc update)
 
   // Lấy dữ liệu từ các trường input
   const informationName = document.getElementById("informationName").value;
@@ -203,39 +212,109 @@ async function insertInformation(event) {
   }
 
   try {
-    // Thêm dịch vụ mới vào Firestore
-    const informationsRef = collection(db, "ThongTin");
-    await addDoc(informationsRef, {
-      Ten_thongtin: informationName,
-      Don_vi: informationUnit,
-      Icon_thongtin: informationIcon,
-      Status: informationStatus,
-    });
-    console.log("Đã thêm thông tin mới");
-    alert("Đã thêm thông tin mới")
+    if (mode === "add") {
+      // Thêm dịch vụ mới
+      const informationsRef = collection(db, "ThongTin");
+      await addDoc(informationsRef, {
+        Ten_thongtin: informationName,
+        Don_vi: informationUnit,
+        Icon_dichvu: informationIcon,
+        Status: informationStatus,
+      });
+      alert("Đã thêm thông tin mới");
+    } else if (mode === "update") {
+      // Lấy ID dịch vụ đang được cập nhật (giả sử lưu trong form)
+      const informationId = form.getAttribute("data-information-id");
+      if (!informationId) {
+        alert("Không tìm thấy ID thông tin để cập nhật.");
+        return;
+      }
+
+      // Cập nhật dịch vụ
+      const informationRef = doc(db, "ThongTin", informationId);
+      await updateDoc(informationRef, {
+        Ten_thongtin: informationName,
+        Don_vi: informationUnit,
+        Icon_dichvu: informationIcon,
+        Status: informationStatus,
+      });
+      alert("Đã cập nhật thông tin");
+    }
 
     // Cập nhật lại danh sách dịch vụ
     fetchAllInformations();
 
-    // Reset form
-    document.getElementById("insertInformationForm").reset();
+    
+    clearForm();
   } catch (e) {
-    console.error("Lỗi khi thêm thông tin:", e);
-    alert("Có lỗi xảy ra khi thêm thông tin.");
+    console.error("Lỗi khi xử lý form:", e);
+    alert("Có lỗi xảy ra.");
   }
+}
+function updateInformation(informationId) {
+  // Tìm dịch vụ theo ID từ danh sách all
+  const selectedInformation = allInformations.find(
+    (information) => information.id === informationId
+  );
+
+  if (selectedInformation) {
+    // Điền thông tin vào form
+    document.getElementById("informationName").value =
+    selectedInformation.Ten_thongtin || "";
+    document.getElementById("informationUnit").value = selectedInformation.Don_vi || "";
+    document.getElementById("informationIcon").value =
+    selectedInformation.Icon_dichvu || "";
+    document.getElementById("informationStatus").value =
+    selectedInformation.Status.toString();
+
+    // Chuyển form sang chế độ cập nhật
+    const form = document.getElementById("insertInformationForm");
+    form.setAttribute("data-mode", "update");
+    form.setAttribute("data-information-id", informationId); // Lưu ID dịch vụ để cập nhật
+
+    // Thay đổi nút "Thêm dịch vụ" thành "Cập nhật dịch vụ"
+    const submitButton = document.getElementById("submitInformationBtn");
+    submitButton.textContent = "Cập nhật thông tin";
+  }
+}
+
+function goBack() {
+  if (document.referrer) {
+    window.history.back(); // Quay về trang trước nếu có trang trước
+  } else {
+    console.log("Không có trang trước để quay lại.");
+  }
+}
+function clearForm() {
+  document.getElementById("informationName").value = "";
+  document.getElementById("informationUnit").value = "";
+  document.getElementById("informationIcon").value = "";
+  document.getElementById("informationStatus").value = "true";
+
+  const form = document.getElementById("insertInformationForm");
+  form.setAttribute("data-mode", "add");
+  form.removeAttribute("data-information-id"); // Xóa ID dịch vụ nếu có
+
+  // Đặt lại nút submit về trạng thái "Thêm dịch vụ"
+  const submitButton = document.getElementById("submitInformationBtn");
+  submitButton.textContent = "Thêm thông tin mới";
 }
 
 // Lắng nghe sự kiện DOMContentLoaded và gọi hàm fetchAllRooms
 document.addEventListener("DOMContentLoaded", () => {
-  fetchAllInformations(); // Gọi hàm để tải danh sách phòng trọ khi trang tải xong
+  fetchAllInformations(); 
 });
 
 document
   .getElementById("submitInformationBtn")
-  .addEventListener("click", insertInformation);
+  .addEventListener("click", handleFormSubmit);
+
+document.getElementById("clearFormBtn").addEventListener("click", clearForm);
 
 window.cancelInformation = cancelInformation;
 window.activateInformation = activateInformation;
-window.insertInformation = insertInformation;
 window.deleteInformation = deleteInformation;
-window.filterInformation = filterInformation;
+window.goBack = goBack;
+window.clearForm = clearForm;
+window.handleFormSubmit = handleFormSubmit;
+window.updateInformation = updateInformation;
