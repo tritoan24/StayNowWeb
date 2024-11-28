@@ -318,3 +318,4 @@ window.goBack = goBack;
 window.clearForm = clearForm;
 window.handleFormSubmit = handleFormSubmit;
 window.updateInformation = updateInformation;
+window.filterInformation = filterInformation
