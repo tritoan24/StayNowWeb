@@ -110,7 +110,7 @@ h2 {
 }
 
 
-.insertInformationForm {
+.insertFurnitureForm {
   border: 1px solid #eaeff4;
   border-radius: 12px;
   display: flex;
@@ -128,7 +128,7 @@ h2 {
 .inputFormContainer {
   padding: 16px;
 }
-.informationContainerView{
+.furnitureContainerView{
   border: 1px solid #eaeff4;
   border-radius: 12px;
   display: flex;
@@ -136,7 +136,7 @@ h2 {
   margin-top: 3%;
 
 }
-.informationContainer{
+.furnitureContainer{
   padding: 16px;
 }
 
@@ -178,7 +178,7 @@ h2 {
   margin-top: 2%;
 }
 
-.btnInsertInfrormation{
+.btnInsertFurniture{
   padding: 10px;
   margin-inline: 3%;
   background-color: #471bc4;
@@ -209,7 +209,7 @@ h2 {
   gap: 5px;
 }
 /* Danh sách các phòng */
-#informationList {
+#furnitureList {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
@@ -217,7 +217,7 @@ h2 {
 }
 
 /* Container tổng cho từng phòng */
-.information-card {
+.furniture-card {
   width: 600px;
   display: flex;
   flex-direction: row; /* Sắp xếp theo chiều ngang */
@@ -232,13 +232,13 @@ h2 {
   margin-bottom: 20px;
 }
 
-.information-card:hover {
+.furniture-card:hover {
   transform: scale(1.02);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Hình ảnh của phòng */
-.information-image img {
+.furniture-image img {
   width: 120px;
   height: 120px;
   object-fit: cover;
@@ -246,32 +246,32 @@ h2 {
 }
 
 /* Thông tin phòng */
-.information-info {
+.furniture-info {
   flex: 1;
   margin-left: 15px; /* Khoảng cách giữa hình ảnh và thông tin */
 }
 
-.information-title {
+.furniture-title {
   font-size: 18px;
   font-weight: bold;
   color: #333;
 }
 
-.information-address {
+.furniture-address {
   font-size: 14px;
   color: #666;
   margin: 5px 0;
 }
 
 /* Khu vực hành động */
-.information-actions {
+.furniture-actions {
   display: flex;
   flex-direction: row;
   gap: 10px;
   align-items: flex-start;
 }
 
-.information-actions .btn {
+.furniture-actions .btn {
   padding: 6px 10px;
   font-size: 14px;
   border: none;
@@ -307,7 +307,7 @@ h2 {
 }
 
 /* Liên kết xem chi tiết */
-.infomation-details {
+.furniture-details {
   margin-top: 10px;
 }
 
@@ -349,7 +349,7 @@ h2 {
   margin-bottom: 20px;
 }
 
-#informationImages {
+#furnitureImages {
   width: 100%;
   margin-bottom: 20px;
   position: relative;
