@@ -11,10 +11,13 @@ document.getElementById('main').addEventListener('click', function (event) {
     if (event.target && event.target.id === 'btnthongtin') {
         navigateTo('QuanLyThongTin.html');
     }
-    if (event.target && event.target.id === 'btnDichVu') {
+    if (event.target && event.target.id === 'btndichvu') {
         navigateTo('QuanLyDichVu.html');
     }
-    if (event.target && event.target.id === 'btnTienIch') {
-        navigateTo('quanlytienich.html');
+    if (event.target && event.target.id === 'btntiennghi') {
+        navigateTo('QuanlyTienNghi.html');
+    }
+    if (event.target && event.target.id === 'btnnoihthat') {
+        navigateTo('QuanlyNoiThat.html');
     }
 });
