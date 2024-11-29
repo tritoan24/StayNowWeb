@@ -118,7 +118,7 @@ function renderFurnitureList(furnitures) {
             <h3 class="furniture-title">${furniture.Ten_noithat}</h3>
      <div class="status-layout">
                  <img src="../image/icons/ic-dot-cancel.svg" alt="">
-            <p class="service-status">Đã hủy</p>
+            <p class="furniture-status">Đã hủy</p>
             </div>
            
             <div class="furniture-actions">

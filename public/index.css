@@ -67,6 +67,7 @@ body {
 .nut {
   display: flex;
   align-items: center;
+  text-align: start;
   padding: 10px 15px;
   margin: 5px;
   cursor: pointer;
