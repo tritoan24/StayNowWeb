@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Thông Tin</title>
+    <link rel="stylesheet" href="./assets/css/QuanLyThongTinStyle.css">
+</head>
+<body>
+    <header>
+        <div class="back-button">
+            <button onclick="goBack()">Quay lại</button>
+        </div>
+        <h1>Quản Lý Thông Tin</h1>
+    </header>
+    
+    <div class="container">
+        
+        <!-- Form Thêm Thông Tin Mới -->
+        <form id="insertInformationForm" class="insertInformationForm" data-mode="add">
+            <div class="titleAddForm">
+                <h3>Thêm thông tin mới</h3>
+            </div>
+            <div class="inputFormContainer">
+                <div class="inputFormContent">
+                    <div class="inputForm">
+                        <label for="informationName">Tên thông tin:</label>
+                        <input type="text" id="informationName" placeholder="Tên thông tin" required />
+
+                        <label for="informationUnit">Đơn vị:</label>
+                        <input type="text" id="informationUnit" placeholder="Ví dụ: Phòng" required />
+                    </div>
+
+                    <div class="inputForm">
+                        <label for="informationIcon">URL Icon:</label>
+                        <input type="url" id="informationIcon" placeholder="URL Icon" required />
+
+                        <label for="informationStatus">Trạng thái:</label>
+                        <select id="informationStatus">
+                            <option value="true">Hoạt động</option>
+                            <option value="false">Đã hủy</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="btnAddFormGroup">
+                    <button class="btnInsertInfrormation" type="submit" id="submitInformationBtn">Thêm thông tin</button>
+                    <button class="btnClearForm" type="button" id="clearFormBtn" onclick="clearForm()">Nhập lại</button>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Danh sách thông tin -->
+        <div class="informationContainerView">
+            <div class="titleAddForm">
+                <h3>Danh sách thông tin</h3>
+            </div>
+            <div class="informationContainer">
+                <!-- Thanh tìm kiếm -->
+                <div class="search-view">
+                    <div class="search-container">
+                        <img src="./assets/imgs/icons/ic-search-gray.svg" alt="Search Icon" />
+                        <input
+                            type="text"
+                            id="searchInformation"
+                            placeholder="Tìm kiếm thông tin..."
+                            oninput="filterInformation(event)" 
+                        />
+                    </div>
+                    <div class="search-actions">
+                        <img src="./assets/imgs/icons/ic-sort.svg" alt="Sort Icon" />
+                        <img src="./assets/imgs/icons/ic-fill.svg" alt="Fill Icon" />
+                    </div>
+                </div>
+
+                <div id="informationList"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="./assets/js/QuanLyThongTin.js" type="module"></script>
+</body>
+</html>
