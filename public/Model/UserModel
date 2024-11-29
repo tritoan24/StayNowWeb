@@ -1,0 +1,14 @@
+class UserModel {
+    constructor(data) {
+        this.ho_ten = data.ho_ten;
+        this.sdt = data.sdt;
+        this.email = data.email;
+        this.anh_daidien = data.anh_daidien;
+        this.loai_taikhoan = data.loai_taikhoan;
+        this.ma_nguoidung = data.ma_nguoidung;
+        this.trang_thaitaikhoan = data.trang_thaitaikhoan;
+        this.ngay_taotaikhoan = data.ngay_taotaikhoan;
+        this.ngay_capnhat = data.ngay_capnhat;
+        this.so_luotdatlich = data.so_luotdatlich;
+    }
+}

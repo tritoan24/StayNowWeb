@@ -1,184 +1,259 @@
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
 body {
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f9;
+  color: #333;
 }
 
 .container {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
+  display: flex;
+  height: 100vh;
 }
 
-.div_trai{
-    width: 15%;
-    height: 100%;
-    background-color: #0e0e0e;
+/* Left Sidebar */
+.div_trai {
+  width: 20%;
+  background-color: #fff;
+  color: #2a3547;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  border-right: 2px solid rgba(228, 228, 228, 0.712);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-.div_logo{
-    width: 100%;
-    height: 100px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+
+.div_logo {
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  justify-content: center;
+  width: 100%;
 }
-.div_logo h3{
-    color: white;
-    font-size: 26px;
-    margin-left: 10px;
+
+.div_logo img {
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  height: auto;
+  object-fit: contain;
+  margin-right: 5px;
+  border: 2px solid #471bc4;
+  background-color: #fff;
 }
-.div_chucnang{
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+
+.div_logo h3 {
+  font-size: 1.3rem;
+  color: #2a3547;
 }
-.div_chucnangchinh{
-    width: 90%;
-    height: 300px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid #6c6c6c;
-    border-radius: 15px;
-    margin-top: 20%;
-}.div_chucnang .nut{
-    width: 73%;
-    height: 40px;
-    font-size: 16px;
-    margin-top: 10px;
-    cursor: pointer;
-    display: flex;
-    color: white;
-    background-color: transparent; 
-    border: none;
-    align-items: center;
-    padding-left: 10px;
+
+.div_chucnang {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 90% 10%;
 }
-.div_chucnang .nut.active {
-    background-color: #404040; 
-    color: white; 
-    border: 1px solid #f1f1f1;
-    border-radius: 10px;
+
+.div_chucnangchinh {
+  margin-top: 20px;
 }
+
+.div_chucnangphu div {
+  background-color: #fff;
+  border: 2px solid #471bc4;
+  color: #471bc4;
+}
+
+.nut {
+  display: flex;
+  align-items: center;
+  text-align: start;
+  padding: 10px 15px;
+  margin: 5px;
+  cursor: pointer;
+  background-color: transparent;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  color: #2a3547;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.nut img {
+  margin-right: 10px;
+}
+
 .nut p {
-    margin-left: 11px;
+  margin: 0;
+  font-size: 1rem;
 }
 
-
-.div_chucnangphu{
-    width: 14%;
-    height: 150px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid #4d4d4d;
-    border-radius: 15px;
-    position: fixed;
-    bottom: 10px;
-}
-.div_phai{
-    width: 85%;
-    height: 100%;
-    background-color: #f1f1f1;
+.nut:hover {
+  background-color: #481bc46d;
 }
 
-.div_header_phai{
-    width: 100%;
-    height: 15%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #bababa;
+.nut.active {
+  background-color: #471bc4;
+  color: #fff;
 }
-.dp_trai{
-    width: 50%;
-    height: 100%;
-    position: relative;
-}
-.dp_trai p{
-    font-size: 26px;
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-}
-.dp_phai{
-    width: 50%;
-    height: 100%;
-    justify-content: center;
-    align-items: center;
-}
-.taikhoan{
-    width: 100%;
-    height: 50px;
-    display: flex;
-    justify-content: flex-end;
-    padding-right: 50px;
-    padding-top: 10px;
-    
-    
-}
-.taikhoan img{
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    margin-right: 10px;
-}
-.dp_phai .div_timkiem{
-    width: 100%;
-    height: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-}
-.dp_phai .div_timkiem input{
-    width: 60%;
-    height: 30px;
-    border: 1px solid #d9d9d9;
-    border-radius: 5px;
-    padding-left: 10px;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
 
+/* Right Content */
+.div_phai {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
 }
-.dp_phai .div_timkiem button{
-    height: 30px;
-    background-color: #333333;
-    border: none;
-    display: flex;
-    border-radius: 5px;
-    margin-left: 5px;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    justify-content: center;
-    align-items: center;
 
+.div_header_phai {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: #fff;
+  border-bottom: 1px solid #ececec;
 }
-.div_content_phai{
-    overflow: hidden;
-    width: 100%;
-    height: 85%;
-    background-color: #bababa;
-    padding: 20px;
 
+.dp_trai p {
+  font-size: 1.2rem;
+  font-weight: bold;
 }
-.content{
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    background-color: #fff;
-    justify-content: center;
-    align-items: center;
-    border-radius: 10px;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
-    
+
+.dp_phai {
+  display: flex;
+  align-items: center;
+}
+
+.taikhoan {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.taikhoan img {
+  margin-left: 10px;
+  border-radius: 50%;
+}
+
+.div_timkiem {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* Tạo khoảng cách giữa các thành phần nếu cần */
+  background-color: #f7f9fc;
+  padding: 5px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  margin: auto; /* Căn giữa trong layout */
+}
+
+.div_timkiem input {
+  flex: 1; /* Đảm bảo input chiếm hết không gian còn lại */
+  padding: 10px 15px;
+  font-size: 1rem;
+  border: 1px solid #dfe6e9;
+  border-radius: 5px 0 0 5px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.div_timkiem input:focus {
+  border-color: #471bc4;
+  box-shadow: 0 0 4px rgba(71, 27, 196, 0.3);
+}
+
+.div_timkiem button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  background-color: #471bc4;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 0 5px 5px 0;
+  color: white;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.div_timkiem button:hover {
+  background-color: #5a35d4;
+  transform: scale(1.05);
+}
+
+.div_timkiem button:active {
+  transform: scale(0.95);
+}
+
+.div_timkiem button img {
+  width: 20px;
+  height: 20px;
+}
+
+/* Main Content */
+.div_content_phai {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.content p {
+  font-size: 1.1rem;
+  color: #7f8c8d;
+}
+
+/* Dialog */
+.dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.dialog-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.dialog-content img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.dialog-content p {
+  margin: 5px 0;
+  font-size: 1rem;
+  color: #2c3e50;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #7f8c8d;
+}
+
+.close:hover {
+  color: #c0392b;
 }

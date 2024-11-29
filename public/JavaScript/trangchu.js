@@ -6,15 +6,15 @@ function navigateTo(url) {
 
 document.getElementById('content').addEventListener('click', function (event) {
     if (event.target && event.target.id === 'btnPhongTro') {
-        navigateTo('./Html/QuanLyPhong.html');
+        navigateTo('./Html/QuanLyPhongTro.html');
     }
-    if (event.target && event.target.id === 'btnNguoiDung') {
-        navigateTo('quanlynguoidung.html');
+    if (event.target && event.target.id === 'btnThongTin') {
+        navigateTo('./Html/QuanLyThongTin.html');
     }
-    if (event.target && event.target.id === 'btnDonToCao') {
-        navigateTo('quanlydontocao.html');
+    if (event.target && event.target.id === 'btnDichVu') {
+        navigateTo('./Html/QuanLyDichVu.html');
     }
-    if (event.target && event.target.id === 'btnTienIch') {
-        navigateTo('quanlytienich.html');
+    if (event.target && event.target.id === 'btnNoiThat') {
+        navigateTo('./Html/QuanLyNoiThat.html');
     }
 });
