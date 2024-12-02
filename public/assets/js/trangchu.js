@@ -15,9 +15,9 @@ document.getElementById('main').addEventListener('click', function (event) {
         navigateTo('QuanLyDichVu.html');
     }
     if (event.target && event.target.id === 'btntiennghi') {
-        navigateTo('QuanlyTienNghi.html');
+        navigateTo('QuanLyTienNghi.html');
     }
     if (event.target && event.target.id === 'btnnoihthat') {
-        navigateTo('QuanlyNoiThat.html');
+        navigateTo('QuanLyNoiThat.html');
     }
 });
