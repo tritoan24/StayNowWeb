@@ -1,0 +1,568 @@
+/* Reset một số thuộc tính mặc định */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+  }
+  
+  header {
+    display: grid;
+    grid-template-columns: 10fr 90fr;
+    background-color: #471bc4;
+    color: white;
+    padding: 15px;
+    text-align: center;
+  }
+  
+  header .back-button button {
+    background-color: white;
+    color: #471bc4;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  header .back-button button:hover {
+    background-color: #cfc1ff;
+  }
+  
+  header h1 {
+    font-size: 24px;
+    margin-top: 10px;
+    margin-right: 10%;
+  }
+  
+  .container {
+    padding: 40px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 20px;
+    border-radius: 12px;
+    background-color: #fff;
+  }
+  
+  h2 {
+    margin-bottom: 20px;
+  }
+  
+  .search-view {
+    display: grid;
+    align-items: center;
+    grid-template-columns: 90% 10%;
+    margin-bottom: 2%;
+  }
+  
+  /* Container của thanh tìm kiếm */
+  .search-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 4px; /* Đường viền bo tròn */
+    padding: 5px 15px; /* Khoảng cách trong */
+    max-width: 100%; /* Độ rộng tối đa */
+    border: 1px solid #eaeff4;
+    margin-top: 2%;
+  }
+  
+  /* Biểu tượng tìm kiếm */
+  .search-container img:first-child {
+    width: 20px; /* Kích thước biểu tượng tìm kiếm */
+    height: 20px;
+    margin-right: 10px;
+  }
+  
+  /* Input tìm kiếm */
+  .search-container input {
+    flex: 1; /* Chiếm không gian còn lại trong container */
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none; /* Xóa viền */
+    border-radius: 4px; /* Đường viền bo tròn */
+    outline: none; /* Xóa viền focus */
+    background-color: transparent; /* Nền trong suốt */
+    color: #2a3547; /* Màu chữ */
+  }
+  
+  /* Phần chứa các biểu tượng (Sort, Fill) */
+  .search-actions {
+    display: flex;
+    gap: 10px; /* Khoảng cách giữa các biểu tượng */
+    justify-content: center;
+  }
+  
+  /* Biểu tượng Sort và Fill */
+  .search-actions img {
+    width: 20px; /* Kích thước biểu tượng */
+    height: 20px;
+    cursor: pointer; /* Hiển thị con trỏ khi hover */
+  }
+  
+  .search-actions img:hover {
+    opacity: 0.7; /* Hiệu ứng mờ khi hover */
+  }
+  
+  
+  .insertComfortForm {
+    border: 1px solid #eaeff4;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  
+  .titleAddForm {
+    color: #2a3547;
+    font-weight: 600;
+    font-size: 16px;
+    border-bottom: 1px solid #eaeff4;
+    padding: 16px;
+  }
+  .inputFormContainer {
+    padding: 16px;
+  }
+  .comfortContainerView{
+    border: 1px solid #eaeff4;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    margin-top: 3%;
+  
+  }
+  .comfortContainer{
+    padding: 16px;
+  }
+  
+  
+  .inputFormContent {
+    display: grid;
+    grid-template-columns: 45% 45%;
+    justify-content: space-around;
+  }
+  
+  .inputForm{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    color: #2a3547;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+  .inputForm label {
+    margin-top: 3%;
+  }
+  
+  
+  .inputForm input, select{
+    border: 1px solid #EAEFF4;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 1%;
+  }
+  
+  .inputForm input:hover, select:hover {
+    border: 1px solid #471bc4;
+  }
+  
+  .btnAddFormGroup{
+    width: 100%;
+    text-align: center;
+    margin-top: 2%;
+  }
+  
+  .btnInsertComfort{
+    padding: 10px;
+    margin-inline: 3%;
+    background-color: #471bc4;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    font-weight: 400;
+    font-size: 14px;
+  }
+  
+  .btnClearForm{
+    padding: 10px;
+    margin-inline: 3%;
+    background-color: #fff;
+    border: 1px solid #7C8FAC;
+    border-radius: 4px;
+    color: #7C8FAC;
+    font-weight: 400;
+    font-size: 14px;
+  }
+  .titleStatus{
+    margin-block: 10px;
+  }
+  
+  .status-layout{
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+  }
+  /* Danh sách các phòng */
+  #comfortList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+  }
+  
+  /* Container tổng cho từng phòng */
+  .comfort-card {
+    width: 600px;
+    display: flex;
+    flex-direction: row; /* Sắp xếp theo chiều ngang */
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 20px;
+  }
+  
+  .comfort-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Hình ảnh của phòng */
+  .comfort-image img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  /* Thông tin phòng */
+  .comfort-info {
+    flex: 1;
+    margin-left: 15px; /* Khoảng cách giữa hình ảnh và thông tin */
+  }
+  
+  .comfort-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .comfort-address {
+    font-size: 14px;
+    color: #666;
+    margin: 5px 0;
+  }
+  
+  /* Khu vực hành động */
+  .comfort-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  .comfort-actions .btn {
+    padding: 6px 10px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .active-column {
+    background-color: #e0ffe0; /* Màu nền nhẹ cho cột "Hoạt động" */
+  }
+  
+  .inactive-column {
+    background-color: #ffe0e0; /* Màu nền nhẹ cho cột "Đã hủy" */
+  }
+  
+  .btn.update {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .btn.approve:hover {
+    background-color: #45a049;
+  }
+  
+  .btn.cancel {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .btn.cancel:hover {
+    background-color: #d32f2f;
+  }
+  
+  /* Liên kết xem chi tiết */
+  .comfort-details {
+    margin-top: 10px;
+  }
+  
+  
+  /* Chi tiết phòng trọ */
+  #overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 1;
+  }
+  
+  #detailDialog {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 50%;
+    top: 0;
+    left: 0;
+    right: 0;
+    max-width: 800px;
+    margin: 5% auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: none;
+    position: absolute;
+    z-index: 2;
+  }
+  
+  #detailDialog h3 {
+    font-size: 24px;
+    margin-bottom: 15px;
+  }
+  
+  #comfortDetails {
+    margin-bottom: 20px;
+  }
+  
+  #comfortImages {
+    width: 100%;
+    margin-bottom: 20px;
+    position: relative;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  
+  .carousel-container {
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .carousel-images {
+    display: flex;
+    transition: transform 0.3s ease-in-out;
+    width: 60%;
+    height: 20%;
+  }
+  
+  .carousel-images img {
+    width: 100%;
+    border-radius: 8px;
+    margin: 0 5px;
+    max-width: 100%;
+  }
+  
+  button.prev,
+  button.next {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    border-radius: 50%;
+  }
+  
+  button.prev {
+    left: 10px;
+  }
+  
+  button.next {
+    right: 10px;
+  }
+  
+  button.prev:hover,
+  button.next:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  
+  .actions {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .actions button {
+    font-size: 16px;
+    padding: 10px 20px;
+    margin-right: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .actions .approve {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .actions .cancel {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  button.close {
+    background-color: #471bc4;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 15px;
+    display: block;
+    width: 100%;
+    font-size: 16px;
+  }
+  
+  button.close:hover {
+    background-color: #471bc4;
+  }
+  
+  
+  .error {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 3%;
+  }
+  .error-message {
+    margin: 3px;
+    font-size: 12px;
+    font-weight: 400;
+    color: #FA896B;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+  /* Kiểu dáng tổng quát cho modal */
+  .modal {
+    display: none; /* Ẩn mặc định */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6); /* Mờ nền */
+    backdrop-filter: blur(5px); /* Làm mờ nền */
+  }
+  
+  /* Kiểu dáng nội dung của modal */
+  .modal-content {
+    background: linear-gradient(135deg, #471bc4, #481bc48a); /* Hiệu ứng gradient */
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 10px; /* Góc bo tròn */
+    width: 35%;
+    max-width: 400px;
+    text-align: center;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.5s ease-in-out; /* Hiệu ứng xuất hiện */
+  }
+  
+  /* Hiệu ứng khi xuất hiện modal */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  /* Kiểu dáng nút đóng */
+  .close {
+    color: #fff;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    transition: color 0.3s;
+  }
+  
+  .close:hover {
+    color: #ff7979;
+  }
+  
+  /* Biểu tượng thành công */
+  .modal-icon img {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 15px;
+    animation: bounce 1s ease-in-out infinite; /* Hiệu ứng động */
+  }
+  
+  /* Hiệu ứng nhún cho biểu tượng */
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  
+  /* Tiêu đề modal */
+  .modal-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Nút hành động */
+  .modal-button {
+    background-color: #fff;
+    color: #471bc4;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s ease-in-out, transform 0.2s;
+  }
+  
+  .modal-button:hover {
+    background-color: #998db6;
+    color: #fff;
+    transform: scale(1.05);
+  }
+  
