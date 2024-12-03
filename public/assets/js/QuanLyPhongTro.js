@@ -4,7 +4,10 @@ import {
   collection,
   getDocs,
   getDoc,
-  doc
+  doc,
+  query, 
+  where,
+  updateDoc 
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
@@ -33,10 +36,18 @@ async function fetchAllRooms() {
   const roomsRef = collection(db, "PhongTro"); // Truy cập vào bộ sưu tập 'PhongTro'
 
   try {
-    const querySnapshot = await getDocs(roomsRef); // Lấy tất cả tài liệu trong bộ sưu tập 'PhongTro'
+    // Tạo truy vấn với điều kiện lọc: Trang_thaiphong = 'ChoDuyet' và Trang_luu = false
+    const roomsQuery = query(
+      roomsRef,
+      where("Trang_thaiduyet", "==", "ChoDuyet"),
+      where("Trang_thailuu", "==", false),
+      where("Trang_thaiphong", "==", false),
+    );
+
+    const querySnapshot = await getDocs(roomsQuery); // Lấy các tài liệu thỏa mãn điều kiện
 
     // Xử lý danh sách phòng trọ
-    rooms = []; // Reset lại danh sách
+    const rooms = []; // Reset lại danh sách
     querySnapshot.forEach((doc) => {
       rooms.push({ id: doc.id, ...doc.data() }); // Lưu dữ liệu phòng trọ vào mảng 'rooms'
     });
@@ -70,17 +81,19 @@ function renderRoomList(rooms) {
       <div class="room-info">
           <h3 class="room-title">${room.Ten_phongtro}</h3>
           <div class="room-address">
-          <img src="../image/icons/ic-ping.svg" alt="${room.Dia_chi}">
+          <img src="./assets/imgs/icons/ic-ping.svg" alt="${room.Dia_chi}">
                   <p>${room.Dia_chi}</p>
                     </div>
 
                     <div class="room-price">
-                    <img src="../image/icons/ic-monny.svg" alt="${room.Dia_chi}">
+                    <img src="./assets/imgs/icons/ic-monny.svg" alt="${room.Dia_chi}">
                      <p>${formattedPrice}</p>
                     </div>
           <div class="room-actions">
-              <button class="btn approve" onclick="approveRoom('${room.id}')">Duyệt</button>
-              <button class="btn cancel" onclick="cancelRoom('${room.id}')">Hủy</button>
+               <div class="room-actions">
+                <button class="btn approve">Duyệt</button>
+                <button class="btn cancel">Hủy</button>
+            </div>
           </div>
           <div class="room-details">
               <span class="details-link" onclick="viewDetails('${room.id}')">Xem chi tiết</span>
@@ -88,6 +101,13 @@ function renderRoomList(rooms) {
       </div>
     </div>
   `;
+    // Thêm sự kiện vào các nút "Duyệt" và "Hủy"
+    roomDiv.querySelector(".approve").addEventListener("click", function() {
+      approveRoom(room.id);
+    });
+    roomDiv.querySelector(".cancel").addEventListener("click", function() {
+      cancelRoom(room.id);
+    });
 
     roomListContainer.appendChild(roomDiv);
   });
@@ -231,6 +251,47 @@ function searchRooms() {
 document.addEventListener("DOMContentLoaded", () => {
   fetchAllRooms(); // Gọi hàm để tải danh sách phòng trọ khi trang tải xong
 });
+
+// Hàm duyệt phòng và cập nhật trạng thái trong Firestore
+function approveRoom(roomId) {
+  const roomRef = doc(db, 'PhongTro', roomId); // Lấy tham chiếu đến phòng
+
+  // Sử dụng updateDoc để cập nhật dữ liệu trong Firestore
+  updateDoc(roomRef, {
+    Trang_thaiduyet: 'DaDuyet',
+    Trang_thailuu: false,
+    Trang_thaiphong: false
+  })
+  .then(() => {
+    alert('Phòng đã được duyệt!');
+    // Cập nhật giao diện sau khi duyệt phòng thành công
+    document.querySelector(`#room-${roomId} .approve`).disabled = true;
+    document.querySelector(`#room-${roomId} .cancel`).disabled = true;
+  })
+  .catch((error) => {
+    console.error('Có lỗi xảy ra khi duyệt phòng: ', error);
+    alert('Đã có lỗi xảy ra, vui lòng thử lại.');
+  });
+}
+
+// Hàm hủy duyệt phòng và cập nhật trạng thái trong Firestore
+function cancelRoom(roomId) {
+  const roomRef = doc(db, 'PhongTro', roomId);
+
+  updateDoc(roomRef, {
+    Trang_thaiduyet: 'BiHuy',
+  })
+  .then(() => {
+    alert('Phòng đã bị hủy!');
+    // Cập nhật giao diện sau khi duyệt phòng thành công
+    document.querySelector(`#room-${roomId} .approve`).disabled = true;
+    document.querySelector(`#room-${roomId} .cancel`).disabled = true;
+  })
+  .catch((error) => {
+    console.error('Có lỗi xảy ra khi hủy phòng: ', error);
+    alert('Đã có lỗi xảy ra, vui lòng thử lại.');
+  });
+}
 
 window.viewDetails = viewDetails;
 window.closeDetails = closeDetails;
