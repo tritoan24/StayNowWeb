@@ -3,23 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quản Lý Thông Tin</title>
-    <link rel="stylesheet" href="../css/QuanLyThongTinStyle.css" />
-    <link rel="stylesheet" href="../css/style.css" />
+    <title>Quản Lý Tiện Nghi</title>
+    <link rel="stylesheet" href="./assets/css/QuanLyTienNghiStyle.css" />
   </head>
   <body>
     <header>
       <div class="back-button">
         <button onclick="goBack()">Quay lại</button>
       </div>
-      <h1>Quản Lý Thông Tin</h1>
+      <h1>Quản Lý Tiện Nghi</h1>
     </header>
 
     <div class="container">
       <!-- Form Thêm Thông Tin Mới -->
       <form
-        id="insertInformationForm"
-        class="insertInformationForm"
+        id="insertComfortForm"
+        class="insertComfortForm"
         data-mode="add"
       >
         <div class="titleAddForm">
@@ -28,46 +27,35 @@
         <div class="inputFormContainer">
           <div class="inputFormContent">
             <div class="inputForm">
-              <label for="informationName">Tên thông tin:</label>
+              <label for="comfortName">Tên tiện nghi:</label>
               <input
                 type="text"
-                id="informationName"
-                placeholder="Tên thông tin"
+                id="comfortName"
+                placeholder="Tên tiện nghi"
                 required
               />
-              <div id="informationNameError" class="error hidden">
-                <img src="../image/icons/ic-error.svg" alt="Error icon" />
-                <p class="error-message">Vui lòng điền tên thông tin!</p>
+              <div id="comfortNameError" class="error hidden">
+                <img src="./assets/imgs/icons/ic-error.svg" alt="Error icon" />
+                <p class="error-message">Vui lòng điền tên tiện nghi!</p>
               </div>
 
-              <label for="informationUnit">Đơn vị:</label>
+              <label for="comfortIcon">URL Icon:</label>
               <input
-                type="text"
-                id="informationUnit"
-                placeholder="Ví dụ: Phòng"
+                type="url"
+                id="comfortIcon"
+                placeholder="URL Icon"
                 required
               />
-              <div id="informationUnitError" class="error hidden">
-                <img src="../image/icons/ic-error.svg" alt="Error icon" />
-                <p class="error-message">Vui lòng điền đơn vị!</p>
+              <div id="comfortIconError" class="error hidden">
+                <img src="./assets/imgs/icons/ic-error.svg" alt="Error icon" />
+                <p class="error-message">Vui lòng điền url icon!</p>
               </div>
             </div>
 
             <div class="inputForm">
-              <label for="informationIcon">URL Icon:</label>
-              <input
-                type="url"
-                id="informationIcon"
-                placeholder="URL Icon"
-                required
-              />
-              <div id="informationIconError" class="error hidden">
-                <img src="../image/icons/ic-error.svg" alt="Error icon" />
-                <p class="error-message">Vui lòng điền url icon!</p>
-              </div>
 
-              <label for="informationStatus">Trạng thái:</label>
-              <select id="informationStatus">
+              <label for="comfortStatus">Trạng thái:</label>
+              <select id="comfortStatus">
                 <option value="true">Hoạt động</option>
                 <option value="false">Đã hủy</option>
               </select>
@@ -76,11 +64,11 @@
 
           <div class="btnAddFormGroup">
             <button
-              class="btnInsertInfrormation"
+              class="btnInsertComfort"
               type="submit"
-              id="submitInformationBtn"
+              id="submitComfortBtn"
             >
-              Thêm thông tin
+              Thêm tiện nghi
             </button>
             <button
               class="btnClearForm"
@@ -98,10 +86,10 @@
         <div class="modal-content">
           <span id="closeModal" class="close">&times;</span>
           <div class="modal-icon">
-            <img src="../image/icons/ic-tick-success.svg" alt="Success Icon" />
+            <img src="./assets/imgs/icons/ic-tick-success.svg" alt="Success Icon" />
           </div>
           <h2 class="modal-title">Thành công!</h2>
-          <p id="modalMessage">Thông tin đã được thêm thành công.</p>
+          <p id="modalMessage">Tiện nghi đã được thêm thành công.</p>
           <button id="modalAction" class="modal-button">OK</button>
         </div>
       </div>
@@ -109,7 +97,7 @@
       <div id="deleteConfirmModal" class="modal modalHidden">
         <div class="modal-content">
           <h2 class="modal-title">Xác nhận xóa</h2>
-          <p>Bạn có chắc chắn muốn xóa thông tin này không?</p>
+          <p>Bạn có chắc chắn muốn xóa tiện nghi này không?</p>
           <div class="modal-actions">
             <button id="confirmDelete" class="modal-button danger">Xóa</button>
             <button id="cancelDelete" class="modal-button">Hủy</button>
@@ -117,34 +105,34 @@
         </div>
       </div>
 
-      <!-- Danh sách thông tin -->
-      <div class="informationContainerView">
+      <!-- Danh sách nội thất -->
+      <div class="comfortContainerView">
         <div class="titleAddForm">
-          <h3>Danh sách thông tin</h3>
+          <h3>Danh sách tiện nghi</h3>
         </div>
-        <div class="informationContainer">
+        <div class="comfortContainer">
           <!-- Thanh tìm kiếm -->
           <div class="search-view">
             <div class="search-container">
-              <img src="../image/icons/ic-search-gray.svg" alt="Search Icon" />
+              <img src="./assets/imgs/icons/ic-search-gray.svg" alt="Search Icon" />
               <input
                 type="text"
-                id="searchInformation"
-                placeholder="Tìm kiếm thông tin..."
-                oninput="filterInformation(event)"
+                id="searchComfort"
+                placeholder="Tìm kiếm tiện nghi"
+                oninput="filterComfort(event)"
               />
             </div>
             <div class="search-actions">
-              <img src="../image/icons/ic-sort.svg" alt="Sort Icon" />
-              <img src="../image/icons/ic-fill.svg" alt="Fill Icon" />
+              <img src="./assets/imgs/icons/ic-sort.svg" alt="Sort Icon" />
+              <img src="./assets/imgs/icons/ic-fill.svg" alt="Fill Icon" />
             </div>
           </div>
 
-          <div id="informationList"></div>
+          <div id="comfortList"></div>
         </div>
       </div>
     </div>
 
-    <script src="../JavaScript/QuanLyThongTin.js" type="module"></script>
+    <script src="./assets/js/QuanLyTienNghi.js" type="module"></script>
   </body>
 </html>

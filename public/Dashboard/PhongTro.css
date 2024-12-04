@@ -1,0 +1,118 @@
+.container{
+    display: flex;
+    text-align: center;
+    justify-content: center;
+}
+
+.card{
+    width: 500px;
+    height: 500px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+}
+.card-body{
+    background: linear-gradient(135deg, #ece6f1, #a5c0ef); /* Tạo gradient từ tím đến xanh dương */
+    color: white; /* Đảm bảo văn bản nổi bật trên nền */
+    border-radius: 5.5px; /* Viền bo góc nhẹ */
+    padding: 20px; /* Khoảng cách bên trong */
+   
+
+
+}
+.back{
+    background: rgb(212, 42, 207); /* Tạo gradient từ tím đến xanh dương */
+    color: white; /* Đảm bảo văn bản nổi bật trên nền */
+    border-radius: 5.5px; /* Viền bo góc nhẹ */
+    padding: 20px; /* Khoảng cách bên trong */
+    margin: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    text-decoration: none;
+    
+}
+#select{
+    width: 100%;
+    height: 40px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: px;
+    background-color: rgb(215, 240, 250);
+    margin-left: 10px;
+    align-items: center;
+
+}
+.TopView{
+    position: fixed;
+    top: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: #ccc;
+    width: 27%;
+    height: 100vh;
+    overflow-y: auto;
+
+}
+/* Định dạng tổng quát cho bảng */
+
+  
+  .TopView h5 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #495057; /* Màu chữ tối */
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  
+  
+/* Container tổng cho từng phòng */
+.room-card {
+    display: flex;
+    flex-direction: row; /* Sắp xếp theo chiều ngang */
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin: 10px;
+  }
+  
+  .room-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Hình ảnh của phòng */
+  .room-image img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  /* Thông tin phòng */
+  .room-info {
+    flex: 1;
+    margin-left: 15px; /* Khoảng cách giữa hình ảnh và thông tin */
+  }
+  
+  .room-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2a3547;
+  }
+  
+  .room-address p, .room-price p {
+    font-size: 14px;
+    color: #666;
+    margin: 5px 0;
+    display: inline-block;
+    max-width: calc(100% - 28px); /* Đảm bảo văn bản không tràn ra ngoài */
+    word-wrap: break-word; /* Đảm bảo từ không bị tràn ra ngoài */
+  }
+  
