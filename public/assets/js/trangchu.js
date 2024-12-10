@@ -20,4 +20,7 @@ document.getElementById('main').addEventListener('click', function (event) {
     if (event.target && event.target.id === 'btnnoihthat') {
         navigateTo('QuanLyNoiThat.html');
     }
+    if (event.target && event.target.id === 'btnNhanVien') {
+        navigateTo('QuanLyNhanVien.html');
+    }
 });

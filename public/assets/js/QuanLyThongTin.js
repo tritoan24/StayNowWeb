@@ -88,7 +88,7 @@ function renderInformationList(informations) {
             <h3 class="information-title">${information.Ten_thongtin}</h3>
             <p class="information-unit">${information.Don_vi}</p>
              <div class="status-layout">
-                 <img src="../image/icons/ic-dot-active.svg" alt="">
+                 <img src="../../assets/imgs/icons/ic-dot-active.svg" alt="">
                       <p class="service-status">Hoạt động</p>
             </div>
            
@@ -119,7 +119,7 @@ function renderInformationList(informations) {
             <h3 class="information-title">${information.Ten_thongtin}</h3>
             <p class="information-unit">${information.Don_vi}</p>
      <div class="status-layout">
-                 <img src="../image/icons/ic-dot-cancel.svg" alt="">
+                 <img src="../../assets/imgs/icons/ic-dot-cancel.svg" alt="">
             <p class="service-status">Đã hủy</p>
             </div>
            
