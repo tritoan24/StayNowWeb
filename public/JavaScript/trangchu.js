@@ -14,7 +14,7 @@ document.getElementById('content').addEventListener('click', function (event) {
     if (event.target && event.target.id === 'btnDichVu') {
         navigateTo('./Html/QuanLyDichVu.html');
     }
-    if (event.target && event.target.id === 'btnTienIch') {
-        navigateTo('quanlytienich.html');
+    if (event.target && event.target.id === 'btnNoiThat') {
+        navigateTo('./Html/QuanLyNoiThat.html');
     }
 });

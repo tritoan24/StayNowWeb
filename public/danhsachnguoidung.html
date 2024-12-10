@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Admin Dashboard | Korsat X Parmaga</title>
-    <!-- ======= Styles ====== -->
-    <link rel="stylesheet" href="assets/css/style.css">
-
-
+    <title>Danh Sách Người Dùng</title>
+    <link rel="stylesheet" href="./assets/css/dsnguoidung.css">
+    <link rel="stylesheet" href="./assets/css/style.css">
 
 </head>
 
@@ -17,7 +13,6 @@
     <!-- =============== Navigation ================ -->
     <div class="container">
         <div class="navigation">
-            
             <ul>
                 <li>
                     <a href="#">
@@ -47,7 +42,7 @@
                 </li>
 
                 <li>
-                    <a href="./QuanLyTinNhanHoTro.html">
+                    <a href="#">
                         <span class="icon">
                             <ion-icon name="chatbubble-outline"></ion-icon>
                         </span>
@@ -99,81 +94,54 @@
                 <div class="toggle">
                     <ion-icon name="menu-outline"></ion-icon>
                 </div>
-
                 <div class="search">
                     <label>
-                        <input type="text" placeholder="Search here">
+                        <input type="text" id="search" placeholder="Search here">
                         <ion-icon name="search-outline"></ion-icon>
                     </label>
-                </div>
-
+                </div>                
                 <div class="user">
                     <img src="assets/imgs/customer01.jpg" alt="">
                 </div>
+
+                
             </div>
 
-            <!-- ======================= Cards ================== -->
-            <div class="cardBox">
-                <div class="card">
-                    <div>
-                        <div class="numbers"></div>
-                        <div class="cardName">Tổng số phòng</div>
-                    </div>
 
-                    <div class="iconBx">
-                        <ion-icon name="eye-outline"></ion-icon>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div>
-                        <div class="numbers">80</div>
-                        <div class="cardName">Sales</div>
-                    </div>
-
-                    <div class="iconBx">
-                        <ion-icon name="cart-outline"></ion-icon>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div>
-                        <div class="numbers">284</div>
-                        <div class="cardName">Comments</div>
-                    </div>
-
-                    <div class="iconBx">
-                        <ion-icon name="chatbubbles-outline"></ion-icon>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div>
-                        <div class="numbers">$7,842</div>
-                        <div class="cardName">Earning</div>
-                    </div>
-
-                    <div class="iconBx">
-                        <ion-icon name="cash-outline"></ion-icon>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================ Order Details List ================= -->
-
-
-           
+    
+        <!-- ============= Content ============= -->
+        <div id="content"></div>
+            
+      <div id="userDialog" class="dialog">
+        <div class="dialog-content">
+          <span class="close" id="closeDialog">&times;</span>
+          <h3 id="dialogName"></h3>
+          <img id="dialogAvatar" src="" alt="Avatar" />
+          <p id="dialogPhone"></p>
+          <p id="dialogEmail"></p>
+          <p id="dialogAccountType"></p>
+          <!-- Loại tài khoản -->
+          <p id="dialogUserId"></p>
+          <!-- Mã người dùng -->
+          <p id="dialogAccountStatus"></p>
+          <!-- Trạng thái tài khoản -->
+          <p id="dialogCreatedDate"></p>
+          <!-- Ngày tạo tài khoản -->
+          <p id="dialogUpdatedDate"></p>
+          <!-- Ngày cập nhật -->
+          <p id="dialogBookingCount"></p>
+          <!-- Số lượt đặt lịch -->
         </div>
+      </div>
     </div>
 
     <!-- =========== Scripts =========  -->
-    <script type="module"  src="assets/js/main.js"></script>
-    <script type="module"  src="assets/js/SignOut.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/SignOut.js"></script>
     <!-- ====== ionicons ======= -->
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-
-
+    <script  type="module"  src="./assets/js/dsnguoidung.js"></script>
+   
 </body>
-
 </html>
