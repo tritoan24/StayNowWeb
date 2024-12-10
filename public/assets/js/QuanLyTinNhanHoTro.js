@@ -7,6 +7,8 @@ import {
   update,
   set,
   push,
+  onChildAdded,
+  onChildChanged
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
 // Cấu hình Firebase
@@ -182,62 +184,63 @@ function fetchReceiverDetails(chatId) {
     });
 }
 function updateChatTitle(userDetails) {
-    const chatTitleElement = document.querySelector("#chat-title");
-    chatTitleElement.innerHTML = ""; // Xóa nội dung cũ
-  
-    // Avatar
-    const avatar = document.createElement("img");
-    avatar.src = userDetails.anh_daidien || "https://via.placeholder.com/50"; // Đường dẫn ảnh mặc định
-    avatar.alt = `Avatar của ${userDetails.ho_ten}`;
-    avatar.classList.add("chat-avatar");
-  
-    // Container thông tin
-    const infoContainer = document.createElement("div");
-    infoContainer.classList.add("chat-info");
-  
-    // Tên người nhận
-    const receiverName = document.createElement("span");
-    receiverName.textContent = userDetails.ho_ten || "Người nhận chưa cập nhật tên";
-    receiverName.classList.add("receiver-name");
-  
-    // Trạng thái
-    const status = document.createElement("span");
-    const now = Date.now();
-    const lastActiveTime = userDetails.lastActiveTime || 0;
-    const isOnline = now - lastActiveTime < 60000; // Nếu hoạt động trong 1 phút, coi là online
-  
-    if (isOnline) {
-      status.textContent = "Đang hoạt động";
-      status.classList.add("status-online");
-    } else {
-      status.textContent = `Ngoại tuyến ${formatLastActiveTime(lastActiveTime)}`;
-      status.classList.add("status-offline");
-    }
-  
-    // Gắn tên và trạng thái vào container thông tin
-    infoContainer.appendChild(receiverName);
-    infoContainer.appendChild(status);
-  
-    // Gắn avatar và container thông tin vào tiêu đề
-    chatTitleElement.appendChild(avatar);
-    chatTitleElement.appendChild(infoContainer);
+  const chatTitleElement = document.querySelector("#chat-title");
+  chatTitleElement.innerHTML = ""; // Xóa nội dung cũ
+
+  // Avatar
+  const avatar = document.createElement("img");
+  avatar.src = userDetails.anh_daidien || "https://via.placeholder.com/50"; // Đường dẫn ảnh mặc định
+  avatar.alt = `Avatar của ${userDetails.ho_ten}`;
+  avatar.classList.add("chat-avatar");
+
+  // Container thông tin
+  const infoContainer = document.createElement("div");
+  infoContainer.classList.add("chat-info");
+
+  // Tên người nhận
+  const receiverName = document.createElement("span");
+  receiverName.textContent =
+    userDetails.ho_ten || "Người nhận chưa cập nhật tên";
+  receiverName.classList.add("receiver-name");
+
+  // Trạng thái
+  const status = document.createElement("span");
+  const now = Date.now();
+  const lastActiveTime = userDetails.lastActiveTime || 0;
+  const isOnline = now - lastActiveTime < 60000; // Nếu hoạt động trong 1 phút, coi là online
+
+  if (isOnline) {
+    status.textContent = "Đang hoạt động";
+    status.classList.add("status-online");
+  } else {
+    status.textContent = `Ngoại tuyến ${formatLastActiveTime(lastActiveTime)}`;
+    status.classList.add("status-offline");
   }
-  
-  // Hàm định dạng thời gian hoạt động cuối cùng
-  function formatLastActiveTime(lastActiveTime) {
-    const elapsedMinutes = Math.floor((Date.now() - lastActiveTime) / 60000);
-    if (elapsedMinutes < 60) {
-      return `${elapsedMinutes} phút trước`;
-    }
-    const elapsedHours = Math.floor(elapsedMinutes / 60);
-    if (elapsedHours < 24) {
-      return `${elapsedHours} giờ trước`;
-    }
-    const elapsedDays = Math.floor(elapsedHours / 24);
-    return `${elapsedDays} ngày trước`;
+
+  // Gắn tên và trạng thái vào container thông tin
+  infoContainer.appendChild(receiverName);
+  infoContainer.appendChild(status);
+
+  // Gắn avatar và container thông tin vào tiêu đề
+  chatTitleElement.appendChild(avatar);
+  chatTitleElement.appendChild(infoContainer);
+}
+
+// Hàm định dạng thời gian hoạt động cuối cùng
+function formatLastActiveTime(lastActiveTime) {
+  const elapsedMinutes = Math.floor((Date.now() - lastActiveTime) / 60000);
+  if (elapsedMinutes < 60) {
+    return `${elapsedMinutes} phút trước`;
   }
-  
-  
+  const elapsedHours = Math.floor(elapsedMinutes / 60);
+  if (elapsedHours < 24) {
+    return `${elapsedHours} giờ trước`;
+  }
+  const elapsedDays = Math.floor(elapsedHours / 24);
+  return `${elapsedDays} ngày trước`;
+}
+
+
 
 function renderChatMessages(messageList, chatId) {
   const chatViewElement = document.querySelector(".chat-content");
@@ -269,17 +272,58 @@ function renderChatMessages(messageList, chatId) {
 
     messageItem.appendChild(messageContent);
     chatViewElement.appendChild(messageItem);
+    
   });
 
-  // Hiển thị modal
+  // Tự động cuộn xuống dưới
+  chatViewElement.scrollTop = chatViewElement.scrollHeight;
+
   document.querySelector(".chat-modal").style.display = "flex";
 }
+
 
 // Lắng nghe sự kiện quay lại
 document.getElementById("back-button").addEventListener("click", () => {
   const chatModal = document.querySelector(".chat-modal");
   chatModal.style.display = "none"; // Ẩn modal khi quay lại
 });
+
+
+// Hàm cập nhật danh sách chat
+function updateChatList(chatId, lastMessage, lastMessageTime, senderId) {
+  const chatListRefSender = ref(database, `ChatList/${senderId}/${chatId}`);
+  const otherUserId = chatId.replace(senderId, "").replace("_", "");
+  const chatListRefReceiver = ref(database, `ChatList/${otherUserId}/${chatId}`);
+
+  // Cập nhật lại tin nhắn mới và thời gian trong danh sách của người gửi
+  update(chatListRefSender, { lastMessage, lastMessageTime });
+
+  // Cập nhật danh sách chat của người nhận
+  get(chatListRefReceiver).then((snapshot) => {
+    const unreadCount = snapshot.exists() ? snapshot.val().unreadCount || 0 : 0;
+    update(chatListRefReceiver, {
+      lastMessage,
+      lastMessageTime,
+      unreadCount: unreadCount + 1,
+    });
+  });
+
+  // Cập nhật lại giao diện danh sách chat mà không tải lại toàn bộ
+  const messageListElement = document.querySelector(".message-list");
+  const messageItems = messageListElement.querySelectorAll(".message-item");
+
+  // Tìm item trong danh sách chat và cập nhật
+  messageItems.forEach((item) => {
+    if (item.dataset.chatId === chatId) {
+      const messageContent = item.querySelector(".message-content p");
+      const messageTime = item.querySelector("span");
+
+      // Cập nhật nội dung tin nhắn mới và thời gian
+      messageContent.textContent = lastMessage;
+      messageTime.textContent = formatTimestamp(lastMessageTime);
+    }
+  });
+}
 
 document.getElementById("send-button").addEventListener("click", () => {
   const messageInput = document.getElementById("message-input");
@@ -296,15 +340,19 @@ document.getElementById("send-button").addEventListener("click", () => {
     // Thêm tin nhắn vào Firebase Realtime Database
     const chatRef = ref(database, `Chats/${chatId}/messages`); // Tham chiếu đến trường messages trong cuộc hội thoại
     const newMessageRef = push(chatRef); // Tạo ID mới tự động cho tin nhắn
-
+    const timestamp = Date.now();
     // Ghi tin nhắn vào Firebase
     set(newMessageRef, {
       message: message,
       senderId: senderId,
-      timestamp: Date.now(),
+      timestamp: timestamp,
     })
       .then(() => {
-        fetchChatDetails(chatId); // Lấy lại chi tiết cuộc hội thoại sau khi gửi tin nhắn
+        // Cập nhật ChatList và làm mới giao diện
+        updateChatList(chatId, message, timestamp, senderId, () => {
+          fetchUserChatList(senderId); // Làm mới danh sách ChatList
+        });
+        fetchChatDetails(chatId); // Lấy lại chi tiết đoạn chat
         messageInput.value = ""; // Xóa nội dung ô nhập
       })
       .catch((error) => {
@@ -312,6 +360,89 @@ document.getElementById("send-button").addEventListener("click", () => {
       });
   }
 });
+
+
+function listenForNewChats(chatId) {
+  const chatRef = ref(database, `Chats/${chatId}/messages`);
+
+  onChildAdded(chatRef, (snapshot) => {
+    const message = snapshot.val();
+    renderChatMessages([message], chatId);  // Cập nhật giao diện với tin nhắn mới
+  });
+}
+
+
+function listenForAutoReply(chatId, adminId) {
+  const chatRef = ref(database, `Chats/${chatId}/messages`);
+  const chatMetaRef = ref(database, `Chats/${chatId}`);
+
+  onChildAdded(chatRef, async (snapshot) => {
+    const message = snapshot.val();
+
+    // Kiểm tra nếu tin nhắn này không phải từ admin
+    if (message.senderId !== adminId) {
+      const chatMeta = await get(chatMetaRef); // Lấy thông tin chat
+      const isReplied = chatMeta.exists() && chatMeta.val().isReplied;
+
+      if (!isReplied) {
+        sendAutoReply(chatId, adminId);
+
+        // Cập nhật trạng thái đã trả lời
+        update(chatMetaRef, { isReplied: true }).catch((error) => {
+          console.error("Lỗi khi cập nhật trạng thái isReplied:", error);
+        });
+      }
+    }
+  });
+}
+
+// Hàm gửi tin nhắn tự động
+function sendAutoReply(chatId, adminId) {
+  const chatRef = ref(database, `Chats/${chatId}/messages`);
+  const newMessageRef = push(chatRef);
+  const timestamp = Date.now();
+  const messageAuto = "Xin chào! Rất vui được gặp bạn. Bạn cần hỗ trợ gì không?"
+
+  set(newMessageRef, {
+    message: messageAuto,
+    senderId: adminId,
+    timestamp: timestamp,
+  })
+    .then(() => {
+      // Cập nhật ChatList và làm mới giao diện
+      updateChatList(chatId, messageAuto, timestamp, adminId, () => {
+        fetchUserChatList(adminId); // Làm mới danh sách ChatList
+      });
+      fetchChatDetails(chatId); // Lấy lại chi tiết đoạn chat
+      messageInput.value = ""; // Xóa nội dung ô nhập
+      console.log("Admin đã tự động gửi phản hồi.");
+    })
+    .catch((error) => {
+      console.error("Lỗi khi gửi phản hồi tự động từ admin:", error);
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const adminId = "BCvWcFi8M9PAeMnKLv2SefBzRe23"; // ID admin
+  const chatListRef = ref(database, "Chats");
+
+  // Lắng nghe các cuộc trò chuyện mới
+  onChildAdded(chatListRef, (snapshot) => {
+    const chatId = snapshot.key;
+
+    // Lắng nghe tin nhắn mới trong cuộc trò chuyện này
+    listenForAutoReply(chatId, adminId);
+  });
+
+
+  // Tùy chọn: Lắng nghe cập nhật danh sách chat (nếu cần)
+  onChildChanged(chatListRef, (snapshot) => {
+    console.log(`Chat ${snapshot.key} đã được cập nhật.`);
+  });
+
+  
+});
+
 
 // Gọi hàm với userId cụ thể khi trang tải
 document.addEventListener("DOMContentLoaded", () => {
