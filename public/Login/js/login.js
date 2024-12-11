@@ -87,6 +87,24 @@ function validateEmail(email) {
   return regex.test(email);
 }
 
+
+const passwordInput = document.getElementById("password")
+const togglePassword = document.getElementById("togglePassword");
+// Lắng nghe sự kiện click
+togglePassword.addEventListener("click", () => {
+  // Kiểm tra loại input hiện tại
+  const isPassword = passwordInput.type === "password";
+
+  // Đổi loại input thành text hoặc password
+  passwordInput.type = isPassword ? "text" : "password";
+
+  togglePassword.src = isPassword 
+  ? "./images/icons/ic-eye-hidden.png" 
+  : "./images/icons/ic-eye.svg";
+
+ 
+});
+
 document.getElementById("loginButton").addEventListener("click", function(event) {
     event.preventDefault();  // Ngăn chặn form submit
     loginUser();             // Gọi hàm đăng nhập

@@ -135,30 +135,47 @@ function formatTimestamp(timestamp) {
     return "Vừa xong";
   }
 }
+const displayedMessageIds = new Set(); // Lưu trữ các ID tin nhắn đã hiển thị
+
 function fetchChatDetails(chatId) {
   const chatRef = ref(database, `Chats/${chatId}/messages`);
 
+  // Lấy toàn bộ danh sách tin nhắn ban đầu
   get(chatRef)
     .then((snapshot) => {
       if (snapshot.exists()) {
         const messages = snapshot.val();
 
-        // Chuyển đổi các tin nhắn thành mảng
+        // Chuyển đổi thành mảng và render danh sách tin nhắn
         const messageList = Object.keys(messages).map((messageId) => {
+          displayedMessageIds.add(messageId); // Đánh dấu tin nhắn đã hiển thị
           return { id: messageId, ...messages[messageId] };
         });
 
-        // Gọi hàm render để hiển thị chi tiết tin nhắn trong modal
         renderChatMessages(messageList, chatId);
       } else {
         console.log("No messages found for this chat.");
-        renderChatMessages([], chatId); // Hiển thị đoạn chat rỗng
+        renderChatMessages([], chatId);
       }
     })
     .catch((error) => {
       console.error("Error fetching chat details:", error);
     });
+
+  // Lắng nghe tin nhắn mới
+  onChildAdded(chatRef, (snapshot) => {
+    const newMessageId = snapshot.key;
+
+    // Kiểm tra xem tin nhắn đã được hiển thị hay chưa
+    if (!displayedMessageIds.has(newMessageId)) {
+      const newMessage = { id: newMessageId, ...snapshot.val() };
+      displayedMessageIds.add(newMessageId); // Đánh dấu tin nhắn mới
+      addNewMessage(newMessage); // Thêm tin nhắn mới vào UI
+    }
+  });
 }
+
+
 function formatChatId(chatId, userId) {
   // Loại bỏ userId và dấu _
   return chatId.replace(userId, "").replace("_", "");
@@ -183,6 +200,7 @@ function fetchReceiverDetails(chatId) {
       console.error("Lỗi khi lấy thông tin người nhận:", error);
     });
 }
+
 function updateChatTitle(userDetails) {
   const chatTitleElement = document.querySelector("#chat-title");
   chatTitleElement.innerHTML = ""; // Xóa nội dung cũ
@@ -213,7 +231,7 @@ function updateChatTitle(userDetails) {
     status.textContent = "Đang hoạt động";
     status.classList.add("status-online");
   } else {
-    status.textContent = `Ngoại tuyến ${formatLastActiveTime(lastActiveTime)}`;
+    status.textContent = `Hoạt động ${formatLastActiveTime(lastActiveTime)}`;
     status.classList.add("status-offline");
   }
 
@@ -240,9 +258,34 @@ function formatLastActiveTime(lastActiveTime) {
   return `${elapsedDays} ngày trước`;
 }
 
+function addNewMessage(message) {
+  const chatViewElement = document.querySelector(".chat-content");
+
+  // Tạo div cho tin nhắn mới
+  const messageItem = document.createElement("div");
+  messageItem.classList.add("message-text-item");
+
+  const messageContent = document.createElement("p");
+  messageContent.classList.add("message-content");
+  messageContent.textContent = message.message;
+
+  // Phân loại tin nhắn gửi hoặc nhận
+  if (message.senderId === "BCvWcFi8M9PAeMnKLv2SefBzRe23") {
+    messageItem.classList.add("message-sender");
+  } else {
+    messageItem.classList.add("message-receiver");
+  }
+
+  messageItem.appendChild(messageContent);
+  chatViewElement.appendChild(messageItem);
+
+  // Tự động cuộn xuống cuối
+  chatViewElement.scrollTop = chatViewElement.scrollHeight;
+}
 
 
 function renderChatMessages(messageList, chatId) {
+  
   const chatViewElement = document.querySelector(".chat-content");
   chatViewElement.innerHTML = ""; // Xóa nội dung cũ
 
