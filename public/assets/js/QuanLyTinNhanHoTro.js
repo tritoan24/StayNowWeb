@@ -136,11 +136,16 @@ async function renderChatList(userChatData) {
     messageItem.appendChild(avatar);
     messageItem.appendChild(messageContent);
     messageItem.appendChild(messageTime);
+
+    const userId = chat.otherUserId;
     messageItem.addEventListener("click", () => {
+      console.log("id: ", userId);
+      
       const chatTitleElement = document.getElementById("chat-title");
       chatTitleElement.setAttribute("data-chat-id", chatId);
       fetchChatDetails(chatId); // Gọi hàm lấy chi tiết đoạn chat
     });
+    
     chatListElement.appendChild(messageItem);
   }
 }
@@ -338,7 +343,7 @@ function renderChatMessages(messageList, chatId) {
 
     // Tạo div cho tin nhắn gửi hoặc nhận
     if (message.senderId === currentUserId) {
-      // Giả sử ID của người gửi là "BCvWcFi8M9PAeMnKLv2SefBzRe23"
+
       messageItem.classList.add("message-sender"); // Tin nhắn của người gửi sẽ ở bên phải
     } else {
       messageItem.classList.add("message-receiver"); // Tin nhắn của người nhận sẽ ở bên trái
@@ -491,13 +496,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const adminId = localStorage.getItem("userId"); //id nguoi gui
   const chatListRef = ref(database, "Chats");
 
-  // Lắng nghe các cuộc trò chuyện mới
-  onChildAdded(chatListRef, (snapshot) => {
-    const chatId = snapshot.key;
-
-    // Lắng nghe tin nhắn mới trong cuộc trò chuyện này
-    listenForAutoReply(chatId, adminId);
-  });
+  
 
 
   // Tùy chọn: Lắng nghe cập nhật danh sách chat (nếu cần)
