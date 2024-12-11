@@ -78,7 +78,6 @@ function renderInformationList(informations) {
     const informationDiv = document.createElement("div");
     informationDiv.className = "information";
     informationDiv.id = `information${information.id}`;
-
     informationDiv.innerHTML = `
       <div class="information-card">
         <div class="information-image">
@@ -88,7 +87,7 @@ function renderInformationList(informations) {
             <h3 class="information-title">${information.Ten_thongtin}</h3>
             <p class="information-unit">${information.Don_vi}</p>
              <div class="status-layout">
-                 <img src="../../assets/imgs/icons/ic-dot-active.svg" alt="">
+                 <img src="../public/assets/imgs/icons/ic-dot-active.svg" alt="">
                       <p class="service-status">Hoạt động</p>
             </div>
            
@@ -119,7 +118,7 @@ function renderInformationList(informations) {
             <h3 class="information-title">${information.Ten_thongtin}</h3>
             <p class="information-unit">${information.Don_vi}</p>
      <div class="status-layout">
-                 <img src="../../assets/imgs/icons/ic-dot-cancel.svg" alt="">
+                 <img src="../public/assets/imgs/icons/ic-dot-cancel.svg" alt="">
             <p class="service-status">Đã hủy</p>
             </div>
            

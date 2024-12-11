@@ -86,7 +86,7 @@ function renderServiceList(services) {
             <h3 class="service-title">${service.Ten_dichvu}</h3>
             <p class="service-unit">${service.Don_vi}</p>
             <div class="status-layout">
-                 <img src="../image/icons/ic-dot-active.svg" alt="">
+                <img src="../public/assets/imgs/icons/ic-dot-active.svg" alt="">
                              <p class="service-status">Hoạt động</p>
             </div>
            
@@ -117,7 +117,7 @@ function renderServiceList(services) {
             <h3 class="service-title">${service.Ten_dichvu}</h3>
             <p class="service-unit">${service.Don_vi}</p>
             <div class="status-layout">
-                 <img src="../image/icons/ic-dot-cancel.svg" alt="">
+            <img src="../public/assets/imgs/icons/ic-dot-cancel.svg" alt="">
             <p class="service-status">Đã hủy</p>
             </div>
            

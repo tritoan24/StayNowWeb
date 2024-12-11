@@ -211,7 +211,7 @@ function formatChatId(chatId, userId) {
 }
 // Hàm lấy thông tin người nhận từ chatId
 function fetchReceiverDetails(chatId) {
-  const currentUserId = "BCvWcFi8M9PAeMnKLv2SefBzRe23"; // Thay bằng ID người dùng thực tế
+  const currentUserId = localStorage.getItem("userId"); //id nguoi gui
   const formattedChatId = formatChatId(chatId, currentUserId);
 
   // Gọi hàm fetchUserDetails để lấy thông tin người nhận
@@ -297,9 +297,10 @@ function addNewMessage(message) {
   const messageContent = document.createElement("p");
   messageContent.classList.add("message-content");
   messageContent.textContent = message.message;
+  const currentUserId = localStorage.getItem("userId"); //id nguoi gui
 
   // Phân loại tin nhắn gửi hoặc nhận
-  if (message.senderId === "BCvWcFi8M9PAeMnKLv2SefBzRe23") {
+  if (message.senderId === currentUserId) {
     messageItem.classList.add("message-sender");
   } else {
     messageItem.classList.add("message-receiver");
@@ -333,9 +334,10 @@ function renderChatMessages(messageList, chatId) {
     const messageContent = document.createElement("p");
     messageContent.classList.add("message-content");
     messageContent.textContent = message.message;
+    const currentUserId = localStorage.getItem("userId"); //id nguoi gui
 
     // Tạo div cho tin nhắn gửi hoặc nhận
-    if (message.senderId === "BCvWcFi8M9PAeMnKLv2SefBzRe23") {
+    if (message.senderId === currentUserId) {
       // Giả sử ID của người gửi là "BCvWcFi8M9PAeMnKLv2SefBzRe23"
       messageItem.classList.add("message-sender"); // Tin nhắn của người gửi sẽ ở bên phải
     } else {
@@ -407,8 +409,7 @@ document.getElementById("send-button").addEventListener("click", () => {
       .getAttribute("data-chat-id"); // Lấy chatId từ tiêu đề
     console.log("idd: ", chatId);
 
-    const senderId = "BCvWcFi8M9PAeMnKLv2SefBzRe23"; // ID người gửi (có thể lấy từ session hoặc user hiện tại)
-
+    const senderId = localStorage.getItem("userId"); //id nguoi gui
     // Thêm tin nhắn vào Firebase Realtime Database
     const chatRef = ref(database, `Chats/${chatId}/messages`); // Tham chiếu đến trường messages trong cuộc hội thoại
     const newMessageRef = push(chatRef); // Tạo ID mới tự động cho tin nhắn
@@ -434,14 +435,6 @@ document.getElementById("send-button").addEventListener("click", () => {
 });
 
 
-function listenForNewChats(chatId) {
-  const chatRef = ref(database, `Chats/${chatId}/messages`);
-
-  onChildAdded(chatRef, (snapshot) => {
-    const message = snapshot.val();
-    renderChatMessages([message], chatId);  // Cập nhật giao diện với tin nhắn mới
-  });
-}
 
 
 function listenForAutoReply(chatId, adminId) {
@@ -495,7 +488,7 @@ function sendAutoReply(chatId, adminId) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const adminId = "BCvWcFi8M9PAeMnKLv2SefBzRe23"; // ID admin
+  const adminId = localStorage.getItem("userId"); //id nguoi gui
   const chatListRef = ref(database, "Chats");
 
   // Lắng nghe các cuộc trò chuyện mới
@@ -518,7 +511,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Gọi hàm với userId cụ thể khi trang tải
 document.addEventListener("DOMContentLoaded", () => {
-  const userId = "BCvWcFi8M9PAeMnKLv2SefBzRe23"; // Thay ID người dùng ở đây
+  const userId = localStorage.getItem("userId"); // Thay ID người dùng ở đây
   fetchUserChatList(userId);
 });
 

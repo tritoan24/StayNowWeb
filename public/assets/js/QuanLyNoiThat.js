@@ -87,7 +87,7 @@ function renderFurnitureList(furnitures) {
         <div class="furniture-info">
             <h3 class="furniture-title">${furniture.Ten_noithat}</h3>
              <div class="status-layout">
-                 <img src="../image/icons/ic-dot-active.svg" alt="">
+               <img src="../public/assets/imgs/icons/ic-dot-active.svg" alt="">
                       <p class="furniture-status">Hoạt động</p>
             </div>
            
@@ -117,7 +117,7 @@ function renderFurnitureList(furnitures) {
         <div class="furniture-info">
             <h3 class="furniture-title">${furniture.Ten_noithat}</h3>
      <div class="status-layout">
-                 <img src="../image/icons/ic-dot-cancel.svg" alt="">
+                <img src="../public/assets/imgs/icons/ic-dot-cancel.svg" alt="">
             <p class="furniture-status">Đã hủy</p>
             </div>
            
