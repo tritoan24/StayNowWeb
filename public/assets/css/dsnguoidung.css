@@ -1,31 +1,14 @@
-  /* Căn chỉnh giao diện và chia thành hai cột */
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f2f5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-}
 
- button {
-    padding: 10px 20px;
-    font-size: 16px;
-    color: #fff;
-    background-color: #007bff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+
 #content{
     overflow-y: auto; 
     padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 60px;
 }
 
-button:hover {
-    background-color: #0056b3;
-}
+
 /* Giao diện tổng thể cho phần hiển thị người dùng */
 
 /* Mỗi phần tử người dùng */
@@ -40,11 +23,18 @@ button:hover {
     display: flex;
     align-items: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
 }
 
 .user-item:hover {
     transform: translateY(-3px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+.user-item button {
+    margin-left: 10px;
+    background-color: #007bff;
+    border: none;
+    color: #fff;
 }
 
 /* Ảnh đại diện */
@@ -57,12 +47,15 @@ button:hover {
     border: 2px solid #007bff;
 }
 
+
 /* Thông tin người dùng */
 .user-details h3 {
     margin: 10px 0 5px;
     font-size: 1.1em;
     color: #007bff;
     font-weight: 600;
+    vertical-align: middle; /* Đảm bảo tên thẳng hàng với hình tròn */
+
 }
 
 .user-details p {
@@ -70,6 +63,8 @@ button:hover {
     font-size: 0.9em;
     color: #555;
 }
+
+
 
 
 /* Cấu hình cho dialog */
@@ -135,6 +130,56 @@ button:hover {
     margin: 5px 0; /* Đặt khoảng cách */
     text-align: center; /* Canh giữa */
 }
+
+
+
+
+.status-circle {
+    display: inline-block;
+    width: 15px; /* Đường kính của hình tròn */
+    height: 15px;
+    border-radius: 50%; /* Làm tròn */
+    margin-left: 10px; /* Khoảng cách giữa các trạng thái */
+    margin-bottom: 12px;
+}
+
+/* Màu sắc cho trạng thái Online */
+.online {
+    background-color: #4CAF50; /* Màu xanh cho online */
+}
+
+/* Màu sắc cho trạng thái Offline */
+.offline {
+    background-color: #B0B0B0; /* Màu xám cho offline */
+}
+
+
+
+.offline-info {
+    font-size: 12px;
+    color: #999999;
+    margin-left: 25px;
+}
+/* Nút chi tiết (ẩn mặc định) */
+.detail-button {
+    position: absolute;
+    bottom: 10px; /* Đặt nút ở phía dưới cùng */
+    right: 10px; /* Đặt nút ở phía bên phải */
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: none; /* Ẩn nút khi không hover */
+    font-size: 0.9em;
+}
+
+/* Hiển thị nút khi hover vào phần tử */
+.user-item:hover .detail-button {
+    display: block;
+}
+
 
 /* Hiệu ứng fadeIn cho dialog */
 @keyframes fadeIn {
