@@ -32,15 +32,19 @@ const db = getFirestore(app);
 const dbRT = getDatabase(app);
 
 // Biến toàn cục để lưu trữ danh sách phòng trọ
-let rooms = [];
+
 let currentRoomId = null;
 let currentSlide = 0;
+
+let pendingRooms = [];
+let approvedRooms = [];
+let canceledRooms = [];
+
 
 async function fetchAllRooms() {
   const roomsRef = collection(db, "PhongTro");
 
   try {
-    // Lọc phòng với điều kiện `Trang_thailuu` và `Trang_thaiphong` đều false
     const roomsQuery = query(
       roomsRef,
       where("Trang_thailuu", "==", false),
@@ -48,9 +52,10 @@ async function fetchAllRooms() {
     );
     const querySnapshot = await getDocs(roomsQuery);
 
-    const approvedRooms = [];
-    const canceledRooms = [];
-    const pendingRooms = [];
+    // Đặt lại các mảng trước khi thêm dữ liệu mới
+    pendingRooms = [];
+    approvedRooms = [];
+    canceledRooms = [];
 
     querySnapshot.forEach((doc) => {
       const room = { id: doc.id, ...doc.data() };
@@ -72,9 +77,15 @@ async function fetchAllRooms() {
   }
 }
 
+
 function renderRoomList(rooms, containerId) {
   const roomListContainer = document.getElementById(containerId);
   roomListContainer.innerHTML = "";
+
+  if (!roomListContainer) {
+    console.error(`Không tìm thấy phần tử với id: ${containerId}`);
+    return;
+  }
 
   rooms.forEach((room) => {
     const formattedPrice = new Intl.NumberFormat("vi-VN", {
@@ -264,18 +275,38 @@ function goBack() {
 function searchRooms() {
   const searchInput = document
     .getElementById("searchInput")
-    .value.toLowerCase(); // Lấy giá trị tìm kiếm và chuyển thành chữ thường
+    .value.toLowerCase();
 
-  // Lọc các phòng trọ dựa trên tên hoặc địa chỉ (hoặc các thuộc tính khác)
-  const filteredRooms = rooms.filter(
+  // Gộp tất cả các danh sách
+  const allRooms = [...pendingRooms, ...approvedRooms, ...canceledRooms];
+
+  // Lọc danh sách dựa trên giá trị tìm kiếm
+  const filteredRooms = allRooms.filter(
     (room) =>
-      room.Ten_phongtro.toLowerCase().includes(searchInput) || // Tìm theo tên phòng
-      room.Dia_chi.toLowerCase().includes(searchInput) // Tìm theo địa chỉ
+      room.Ten_phongtro.toLowerCase().includes(searchInput) ||
+      room.Dia_chi.toLowerCase().includes(searchInput)
   );
 
-  // Gọi hàm render lại danh sách phòng trọ sau khi lọc
-  renderRoomList(filteredRooms);
+  // Xóa nội dung hiển thị cũ
+  document.getElementById("pendingRoomList").innerHTML = "";
+  document.getElementById("approvedRoomList").innerHTML = "";
+  document.getElementById("canceledRoomList").innerHTML = "";
+
+  // Hiển thị danh sách kết quả theo trạng thái
+  renderRoomList(
+    filteredRooms.filter((room) => room.Trang_thaiduyet === "ChoDuyet"),
+    "pendingRoomList"
+  );
+  renderRoomList(
+    filteredRooms.filter((room) => room.Trang_thaiduyet === "DaDuyet"),
+    "approvedRoomList"
+  );
+  renderRoomList(
+    filteredRooms.filter((room) => room.Trang_thaiduyet === "BiHuy"),
+    "canceledRoomList"
+  );
 }
+
 
 // Lắng nghe sự kiện DOMContentLoaded và gọi hàm fetchAllRooms
 document.addEventListener("DOMContentLoaded", () => {
