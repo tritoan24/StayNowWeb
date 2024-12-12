@@ -88,7 +88,7 @@ function renderServiceList(services) {
             <h3 class="service-title">${service.Ten_dichvu}</h3>
             <p class="service-unit">${service.Don_vi}</p>
             <div class="status-layout">
-                 <img src="../image/icons/ic-dot-active.svg" alt="">
+                <img src="../public/assets/imgs/icons/ic-dot-active.svg" alt="">
                              <p class="service-status">Hoạt động</p>
             </div>
            
@@ -119,7 +119,7 @@ function renderServiceList(services) {
             <h3 class="service-title">${service.Ten_dichvu}</h3>
             <p class="service-unit">${service.Don_vi}</p>
             <div class="status-layout">
-                 <img src="../image/icons/ic-dot-cancel.svg" alt="">
+            <img src="../public/assets/imgs/icons/ic-dot-cancel.svg" alt="">
             <p class="service-status">Đã hủy</p>
             </div>
            
@@ -180,19 +180,19 @@ async function activateService(serviceId) {
 }
 
 async function deleteService(serviceId) {
-  if (confirm("Bạn có chắc chắn muốn xóa dịch vụ này không?")) {
+  showDeleteConfirmModal(serviceId, async (id) => {
     try {
-      const serviceDocRef = doc(db, "DichVu", serviceId);
-      await deleteDoc(serviceDocRef); // Xóa dịch vụ trong Firestore
+      const serviceDocRef = doc(db, "DichVu", id);
+      await deleteDoc(serviceDocRef);
 
       // Cập nhật danh sách dịch vụ
       fetchAllServices();
-      alert("Dịch vụ đã được xóa thành công.");
+      showSuccessModal("Dịch vụ đã được xóa thành công.");
     } catch (error) {
       console.error("Lỗi khi xóa dịch vụ:", error);
       alert("Có lỗi xảy ra khi xóa dịch vụ.");
     }
-  }
+  });
 }
 
 async function handleFormSubmit(event) {
@@ -203,18 +203,38 @@ async function handleFormSubmit(event) {
 
   // Lấy dữ liệu từ các trường input
   const serviceName = document.getElementById("serviceName").value;
-  const serviceUnit = document
-    .getElementById("serviceUnit")
-    .value.split(",")
-    .map((unit) => unit.trim());
+  const serviceUnitValue = document.getElementById("serviceUnit").value.trim(); // Lấy giá trị và loại bỏ khoảng trắng
+  const serviceUnit = serviceUnitValue
+    ? serviceUnitValue.split(",").map((unit) => unit.trim())
+    : [];
   const serviceIcon = document.getElementById("serviceIcon").value;
   const serviceStatus =
     document.getElementById("serviceStatus").value === "true"; // Convert về kiểu boolean
 
-  // Kiểm tra xem các trường có hợp lệ không
-  if (!serviceName || !serviceUnit || !serviceIcon) {
-    alert("Vui lòng điền đầy đủ thông tin!");
+  let hasError = false;
+  // Kiểm tra tên dịch vụ
+  if (!serviceName) {
+    document.getElementById("serviceNameError").classList.remove("hidden");
+    hasError = true;
     return;
+  } else {
+    document.getElementById("serviceNameError").classList.add("hidden");
+  }
+
+  if (!serviceIcon) {
+    document.getElementById("serviceIconError").classList.remove("hidden");
+    hasError = true;
+    return;
+  } else {
+    document.getElementById("serviceIconError").classList.add("hidden");
+  }
+
+  if (serviceUnit.length === 0 || serviceUnit.some((unit) => unit === "")) {
+    document.getElementById("serviceUnitError").classList.remove("hidden");
+    hasError = true;
+    return;
+  } else {
+    document.getElementById("serviceUnitError").classList.add("hidden");
   }
 
   try {
@@ -227,7 +247,11 @@ async function handleFormSubmit(event) {
         Icon_dichvu: serviceIcon,
         Status: serviceStatus,
       });
-      alert("Đã thêm dịch vụ mới");
+      // Hiển thị modal thành công
+      showSuccessModal("Dịch vụ đã được thêm thành công.", () => {
+        clearForm();
+        fetchAllServices();
+      });
     } else if (mode === "update") {
       // Lấy ID dịch vụ đang được cập nhật (giả sử lưu trong form)
       const serviceId = form.getAttribute("data-service-id");
@@ -244,19 +268,17 @@ async function handleFormSubmit(event) {
         Icon_dichvu: serviceIcon,
         Status: serviceStatus,
       });
-      alert("Đã cập nhật dịch vụ");
+      showSuccessModal("Dịch vụ đã được cập nhật thành công.", () => {
+        clearForm();
+        fetchAllServices();
+      });
     }
-
-    // Cập nhật lại danh sách dịch vụ
-    fetchAllServices();
-
-    // Reset form và đặt lại về chế độ thêm mới
-    clearForm();
   } catch (e) {
     console.error("Lỗi khi xử lý form:", e);
     alert("Có lỗi xảy ra.");
   }
 }
+
 function updateService(serviceId) {
   // Tìm dịch vụ theo ID từ danh sách allServices
   const selectedService = allServices.find(
@@ -282,6 +304,60 @@ function updateService(serviceId) {
     const submitButton = document.getElementById("submitServiceBtn");
     submitButton.textContent = "Cập nhật dịch vụ";
   }
+}
+
+// Hiển thị modal với thông báo tùy chỉnh
+function showSuccessModal(message, callback = null) {
+  const modal = document.getElementById("successModal");
+  const modalMessage = document.getElementById("modalMessage");
+  const modalAction = document.getElementById("modalAction");
+
+  modalMessage.textContent = message;
+  modal.classList.remove("modalHidden");
+  modal.style.display = "block";
+
+  modalAction.onclick = () => {
+    hideModal(modal);
+    if (callback) callback();
+  };
+
+  document.getElementById("closeModal").onclick = () => hideModal(modal);
+}
+
+function showDeleteConfirmModal(serviceId, deleteCallback) {
+  const modal = document.getElementById("deleteConfirmModal");
+  modal.classList.remove("modalHidden");
+  modal.style.display = "block";
+
+  // Xác nhận xóa
+  document.getElementById("confirmDelete").onclick = async function () {
+    await deleteCallback(serviceId);
+    hideModalDelete(modal);
+  };
+
+  // Hủy bỏ xóa
+  document.getElementById("cancelDelete").onclick = () =>
+    hideModalDelete(modal);
+
+  // Đóng modal khi nhấn ra ngoài
+  window.onclick = function (event) {
+    if (event.target === modal) {
+      hideModalDelete(modal);
+    }
+  };
+}
+
+// Ẩn modal
+function hideModal() {
+  const modal = document.getElementById("successModal");
+  modal.classList.add("modalHidden");
+  modal.style.display = "none";
+}
+
+function hideModalDelete() {
+  const modal = document.getElementById("deleteConfirmModal");
+  modal.classList.add("modalHidden");
+  modal.style.display = "none";
 }
 
 function goBack() {

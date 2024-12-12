@@ -87,7 +87,7 @@ function renderComfortList(comforts) {
         <div class="comfort-info">
             <h3 class="comfort-title">${comfort.Ten_tiennghi}</h3>
              <div class="status-layout">
-                 <img src="../image/icons/ic-dot-active.svg" alt="">
+              <img src="../public/assets/imgs/icons/ic-dot-active.svg" alt="">
                       <p class="comfort-status">Hoạt động</p>
             </div>
            
@@ -117,7 +117,7 @@ function renderComfortList(comforts) {
         <div class="comfort-info">
             <h3 class="comfort-title">${comfort.Ten_tiennghi}</h3>
      <div class="status-layout">
-                 <img src="../image/icons/ic-dot-cancel.svg" alt="">
+              <img src="../public/assets/imgs/icons/ic-dot-cancel.svg" alt="">
             <p class="comfort-status">Đã hủy</p>
             </div>
            
