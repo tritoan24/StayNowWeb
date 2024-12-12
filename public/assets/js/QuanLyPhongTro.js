@@ -5,11 +5,15 @@ import {
   getDocs,
   getDoc,
   doc,
-  query, 
+  query,
   where,
-  updateDoc 
+  updateDoc,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+import {
+  getDatabase,
+  ref,
+  get,
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
 // Cấu hình Firebase
 const firebaseConfig = {
@@ -33,81 +37,107 @@ let currentRoomId = null;
 let currentSlide = 0;
 
 async function fetchAllRooms() {
-  const roomsRef = collection(db, "PhongTro"); // Truy cập vào bộ sưu tập 'PhongTro'
+  const roomsRef = collection(db, "PhongTro");
 
   try {
-    // Tạo truy vấn với điều kiện lọc: Trang_thaiphong = 'ChoDuyet' và Trang_luu = false
+    // Lọc phòng với điều kiện `Trang_thailuu` và `Trang_thaiphong` đều false
     const roomsQuery = query(
       roomsRef,
-      where("Trang_thaiduyet", "==", "ChoDuyet"),
       where("Trang_thailuu", "==", false),
-      where("Trang_thaiphong", "==", false),
+      where("Trang_thaiphong", "==", false)
     );
+    const querySnapshot = await getDocs(roomsQuery);
 
-    const querySnapshot = await getDocs(roomsQuery); // Lấy các tài liệu thỏa mãn điều kiện
+    const approvedRooms = [];
+    const canceledRooms = [];
+    const pendingRooms = [];
 
-    // Xử lý danh sách phòng trọ
-    const rooms = []; // Reset lại danh sách
     querySnapshot.forEach((doc) => {
-      rooms.push({ id: doc.id, ...doc.data() }); // Lưu dữ liệu phòng trọ vào mảng 'rooms'
+      const room = { id: doc.id, ...doc.data() };
+      if (room.Trang_thaiduyet === "DaDuyet") {
+        approvedRooms.push(room);
+      } else if (room.Trang_thaiduyet === "BiHuy") {
+        canceledRooms.push(room);
+      } else if (room.Trang_thaiduyet === "ChoDuyet") {
+        pendingRooms.push(room);
+      }
     });
 
-    console.log("Danh sách phòng trọ:", rooms); // In danh sách phòng trọ ra console
-    renderRoomList(rooms); // Gọi hàm render để hiển thị danh sách phòng trọ
+    // Hiển thị danh sách phòng trọ theo từng trạng thái
+    renderRoomList(approvedRooms, "approvedRoomList");
+    renderRoomList(canceledRooms, "canceledRoomList");
+    renderRoomList(pendingRooms, "pendingRoomList");
   } catch (e) {
     console.error("Lỗi khi lấy danh sách phòng trọ:", e);
   }
 }
 
-function renderRoomList(rooms) {
-  const roomListContainer = document.getElementById("roomList");
-  roomListContainer.innerHTML = ""; // Xóa nội dung cũ
+function renderRoomList(rooms, containerId) {
+  const roomListContainer = document.getElementById(containerId);
+  roomListContainer.innerHTML = "";
 
   rooms.forEach((room) => {
-    const roomDiv = document.createElement("div");
-    roomDiv.className = "room";
-    roomDiv.id = `room${room.id}`;
-
-    // Định dạng giá phòng thành VND
     const formattedPrice = new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
     }).format(room.Gia_phong);
+
+    const roomDiv = document.createElement("div");
+    roomDiv.className = "room";
+
+    // Thêm logic hiển thị nút theo trạng thái
+    let actionButtons = "";
+    if (room.Trang_thaiduyet === "ChoDuyet") {
+      actionButtons = `
+        <button class="btn approve">Duyệt</button>
+        <button class="btn cancel">Hủy</button>
+      `;
+    } else if (room.Trang_thaiduyet === "BiHuy") {
+      actionButtons = `
+        <button class="btn revert">Duyệt lại</button>
+      `;
+    }
+
     roomDiv.innerHTML = `
-    <div class="room-card">
-      <div class="room-image">
+      <div class="room-card">
+        <div class="room-image">
           <img src="${room.imageUrls[0]}" alt="${room.Ten_phongtro}" />
-      </div>
-      <div class="room-info">
+        </div>
+        <div class="room-info">
           <h3 class="room-title">${room.Ten_phongtro}</h3>
           <div class="room-address">
-          <img src="./assets/imgs/icons/ic-ping.svg" alt="${room.Dia_chi}">
-                  <p>${room.Dia_chi}</p>
-                    </div>
-
-                    <div class="room-price">
-                    <img src="./assets/imgs/icons/ic-monny.svg" alt="${room.Dia_chi}">
-                     <p>${formattedPrice}</p>
-                    </div>
-          <div class="room-actions">
-               <div class="room-actions">
-                <button class="btn approve">Duyệt</button>
-                <button class="btn cancel">Hủy</button>
-            </div>
+            <img src="./assets/imgs/icons/ic-ping.svg" alt="${room.Dia_chi}">
+            <p>${room.Dia_chi}</p>
+          </div>
+          <div class="room-price">
+            <img src="./assets/imgs/icons/ic-monny.svg" alt="${room.Dia_chi}">
+            <p>${formattedPrice}</p>
           </div>
           <div class="room-details">
-              <span class="details-link" onclick="viewDetails('${room.id}')">Xem chi tiết</span>
+            <span class="details-link" onclick="viewDetails('${room.id}')">Xem chi tiết</span>
           </div>
+          <div class="room-actions">${actionButtons}</div>
+        </div>
       </div>
-    </div>
-  `;
-    // Thêm sự kiện vào các nút "Duyệt" và "Hủy"
-    roomDiv.querySelector(".approve").addEventListener("click", function() {
-      approveRoom(room.id);
-    });
-    roomDiv.querySelector(".cancel").addEventListener("click", function() {
-      cancelRoom(room.id);
-    });
+    `;
+
+    // Thêm sự kiện cho các nút hành động
+    if (room.Trang_thaiduyet !== "DaDuyet") {
+      roomDiv
+        .querySelector(".approve")
+        ?.addEventListener("click", () => approveRoom(room.id));
+    }
+    if (room.Trang_thaiduyet !== "BiHuy") {
+      roomDiv
+        .querySelector(".cancel")
+        ?.addEventListener("click", () => cancelRoom(room.id));
+    }
+
+    if (room.Trang_thaiduyet !== "ChoDuyet") {
+      roomDiv
+        .querySelector(".revert")
+        ?.addEventListener("click", () => revertToPending(room.id));
+    }
 
     roomListContainer.appendChild(roomDiv);
   });
@@ -115,21 +145,21 @@ function renderRoomList(rooms) {
 
 // Hàm lấy thông tin người dùng từ Realtime Database
 async function getUserInfo(maNguoiDung) {
-    try {
-      const userRef = ref(dbRT, `NguoiDung/${maNguoiDung}`); // Tham chiếu đến nút "NguoiDung/{Ma_nguoidung}" trong Realtime Database
-      const snapshot = await get(userRef); // Lấy dữ liệu từ Realtime Database
-  
-      if (snapshot.exists()) {
-        return snapshot.val(); // Trả về dữ liệu người dùng
-      } else {
-        console.error("Không tìm thấy người dùng với Ma_nguoidung:", maNguoiDung);
-        return null;
-      }
-    } catch (error) {
-      console.error("Lỗi khi lấy thông tin người dùng:", error);
+  try {
+    const userRef = ref(dbRT, `NguoiDung/${maNguoiDung}`); // Tham chiếu đến nút "NguoiDung/{Ma_nguoidung}" trong Realtime Database
+    const snapshot = await get(userRef); // Lấy dữ liệu từ Realtime Database
+
+    if (snapshot.exists()) {
+      return snapshot.val(); // Trả về dữ liệu người dùng
+    } else {
+      console.error("Không tìm thấy người dùng với Ma_nguoidung:", maNguoiDung);
       return null;
     }
+  } catch (error) {
+    console.error("Lỗi khi lấy thông tin người dùng:", error);
+    return null;
   }
+}
 
 // Hàm hiển thị chi tiết phòng trọ
 async function viewDetails(roomId) {
@@ -138,7 +168,7 @@ async function viewDetails(roomId) {
 
   if (room) {
     try {
-          // Lấy thông tin người dùng từ Realtime Database
+      // Lấy thông tin người dùng từ Realtime Database
       const userInfo = await getUserInfo(room.Ma_nguoidung);
 
       const loaiPhongRef = doc(db, "LoaiPhong", room.Ma_loaiphong); // Truy cập tài liệu trong bộ sưu tập 'LoaiPhong'
@@ -254,43 +284,55 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Hàm duyệt phòng và cập nhật trạng thái trong Firestore
 function approveRoom(roomId) {
-  const roomRef = doc(db, 'PhongTro', roomId); // Lấy tham chiếu đến phòng
+  const roomRef = doc(db, "PhongTro", roomId); // Lấy tham chiếu đến phòng
 
   // Sử dụng updateDoc để cập nhật dữ liệu trong Firestore
   updateDoc(roomRef, {
-    Trang_thaiduyet: 'DaDuyet',
+    Trang_thaiduyet: "DaDuyet",
     Trang_thailuu: false,
-    Trang_thaiphong: false
+    Trang_thaiphong: false,
   })
-  .then(() => {
-    alert('Phòng đã được duyệt!');
-    // Cập nhật giao diện sau khi duyệt phòng thành công
-    document.querySelector(`#room-${roomId} .approve`).disabled = true;
-    document.querySelector(`#room-${roomId} .cancel`).disabled = true;
-  })
-  .catch((error) => {
-    console.error('Có lỗi xảy ra khi duyệt phòng: ', error);
-    alert('Đã có lỗi xảy ra, vui lòng thử lại.');
-  });
+    .then(() => {
+      alert("Phòng đã được duyệt!");
+      fetchAllRooms();
+    })
+    .catch((error) => {
+      console.error("Có lỗi xảy ra khi duyệt phòng: ", error);
+      alert("Đã có lỗi xảy ra, vui lòng thử lại.");
+    });
 }
 
 // Hàm hủy duyệt phòng và cập nhật trạng thái trong Firestore
 function cancelRoom(roomId) {
-  const roomRef = doc(db, 'PhongTro', roomId);
+  const roomRef = doc(db, "PhongTro", roomId);
 
   updateDoc(roomRef, {
-    Trang_thaiduyet: 'BiHuy',
+    Trang_thaiduyet: "BiHuy",
   })
-  .then(() => {
-    alert('Phòng đã bị hủy!');
-    // Cập nhật giao diện sau khi duyệt phòng thành công
-    document.querySelector(`#room-${roomId} .approve`).disabled = true;
-    document.querySelector(`#room-${roomId} .cancel`).disabled = true;
+    .then(() => {
+      alert("Phòng đã bị hủy!");
+      fetchAllRooms(); // Tải lại danh sách phòng trọ để cập nhật giao diện
+    })
+    .catch((error) => {
+      console.error("Có lỗi xảy ra khi hủy phòng: ", error);
+      alert("Đã có lỗi xảy ra, vui lòng thử lại.");
+    });
+}
+
+function revertToPending(roomId) {
+  const roomRef = doc(db, "PhongTro", roomId);
+
+  updateDoc(roomRef, {
+    Trang_thaiduyet: "ChoDuyet",
   })
-  .catch((error) => {
-    console.error('Có lỗi xảy ra khi hủy phòng: ', error);
-    alert('Đã có lỗi xảy ra, vui lòng thử lại.');
-  });
+    .then(() => {
+      alert("Phòng đã chuyển về trạng thái Chờ duyệt!");
+      fetchAllRooms(); // Tải lại danh sách phòng trọ để cập nhật giao diện
+    })
+    .catch((error) => {
+      console.error("Có lỗi xảy ra khi chuyển trạng thái: ", error);
+      alert("Đã có lỗi xảy ra, vui lòng thử lại.");
+    });
 }
 
 window.viewDetails = viewDetails;
