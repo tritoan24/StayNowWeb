@@ -32,14 +32,13 @@ const db = getFirestore(app);
 const dbRT = getDatabase(app);
 
 // Biến toàn cục để lưu trữ danh sách phòng trọ
-
+let rooms = [];
 let currentRoomId = null;
 let currentSlide = 0;
 
 let pendingRooms = [];
 let approvedRooms = [];
 let canceledRooms = [];
-
 
 async function fetchAllRooms() {
   const roomsRef = collection(db, "PhongTro");
@@ -51,6 +50,9 @@ async function fetchAllRooms() {
       where("Trang_thaiphong", "==", false)
     );
     const querySnapshot = await getDocs(roomsQuery);
+    querySnapshot.forEach((doc) => {
+      rooms.push({ id: doc.id, ...doc.data() });
+    });
 
     // Đặt lại các mảng trước khi thêm dữ liệu mới
     pendingRooms = [];
@@ -76,7 +78,6 @@ async function fetchAllRooms() {
     console.error("Lỗi khi lấy danh sách phòng trọ:", e);
   }
 }
-
 
 function renderRoomList(rooms, containerId) {
   const roomListContainer = document.getElementById(containerId);
@@ -172,6 +173,78 @@ async function getUserInfo(maNguoiDung) {
   }
 }
 
+async function getNoiThatByPhongTro(maPhongTro) {
+  const q = query(
+    collection(db, "PhongTroNoiThat"),
+    where("ma_phongtro", "==", maPhongTro)
+  );
+  const querySnapshot = await getDocs(q);
+  const noiThat = [];
+  querySnapshot.forEach((doc) => {
+    noiThat.push(doc.data().ma_noithat); // Lấy ma_noithat
+  });
+  return noiThat;
+}
+
+async function getNoiThatData(noiThatIds) {
+  const noiThatData = [];
+  for (let noiThatId of noiThatIds) {
+    const noiThatRef = doc(db, "NoiThat", noiThatId); // Lấy từng document ID
+    const noiThatSnapshot = await getDoc(noiThatRef); // Lấy dữ liệu từ Firestore
+    if (noiThatSnapshot.exists()) {
+      noiThatData.push(noiThatSnapshot.data()); // Lưu dữ liệu vào mảng
+    } else {
+      console.log(`No data found for noiThatId: ${noiThatId}`);
+    }
+  }
+  return noiThatData;
+}
+
+// Hàm render danh sách Ten_noithat
+function renderNoiThatList(noiThatData) {
+  if (noiThatData && Array.isArray(noiThatData) && noiThatData.length > 0) {
+    return noiThatData.map((item) => `<p>${item.Ten_noithat}</p>`).join(", ");
+  } else {
+    return "<p>Không có nội thất</p>";
+  }
+}
+
+async function getTienNghiByPhongTro(maPhongTro) {
+  const q = query(
+    collection(db, "PhongTroTienNghi"),
+    where("ma_phongtro", "==", maPhongTro)
+  );
+  const querySnapshot = await getDocs(q);
+  const tienNghi = [];
+  querySnapshot.forEach((doc) => {
+    tienNghi.push(doc.data().ma_tiennghi); // Lấy ma_tiennghi
+  });
+  return tienNghi;
+}
+
+async function getTienNghiData(tienNghiIds) {
+  const tienNghiData = [];
+  for (let tienNghiId of tienNghiIds) {
+    const tienNghiRef = doc(db, "TienNghi", tienNghiId); // Lấy từng document ID
+    const tienNghiSnapshot = await getDoc(tienNghiRef); // Lấy dữ liệu từ Firestore
+    if (tienNghiSnapshot.exists()) {
+      tienNghiData.push(tienNghiSnapshot.data()); // Lưu dữ liệu vào mảng
+    } else {
+      console.log(`No data found for tienNghiId: ${tienNghiId}`);
+    }
+  }
+  return tienNghiData;
+}
+
+// Hàm render danh sách Ten_noithat
+function renderTienNghiList(tienNghiData) {
+  if (tienNghiData && Array.isArray(tienNghiData) && tienNghiData.length > 0) {
+    return tienNghiData.map((item) => `<p>${item.Ten_tiennghi}</p>`).join(", ");
+  } else {
+    return "<p>Không có tiện nghi</p>";
+  }
+}
+
 // Hàm hiển thị chi tiết phòng trọ
 async function viewDetails(roomId) {
   const room = rooms.find((r) => r.id === roomId);
@@ -179,63 +252,262 @@ async function viewDetails(roomId) {
 
   if (room) {
     try {
-      // Lấy thông tin người dùng từ Realtime Database
+      
+      // Lấy thông tin người dùng và loại phòng (như trong đoạn code trước)
       const userInfo = await getUserInfo(room.Ma_nguoidung);
-
-      const loaiPhongRef = doc(db, "LoaiPhong", room.Ma_loaiphong); // Truy cập tài liệu trong bộ sưu tập 'LoaiPhong'
+      const loaiPhongRef = doc(db, "LoaiPhong", room.Ma_loaiphong);
       const loaiPhongSnapshot = await getDoc(loaiPhongRef);
 
-      // Lấy thông tin giới tính
-      const gioiTinhRef = doc(db, "GioiTinh", room.Ma_gioiTinh); // Truy cập tài liệu trong bộ sưu tập 'GioiTinh'
+      const gioiTinhRef = doc(db, "GioiTinh", room.Ma_gioiTinh);
       const gioiTinhSnapshot = await getDoc(gioiTinhRef);
+      const gioiTinhData = gioiTinhSnapshot.data();
 
-      if (loaiPhongSnapshot.exists() && gioiTinhSnapshot.exists()) {
+      // Lấy danh sách ma_noithat từ PhongTroNoiThat
+      const noiThatIds = await getNoiThatByPhongTro(currentRoomId);
+      // Lấy dữ liệu nội thất từ Firestore
+      const noiThatData = await getNoiThatData(noiThatIds);
+
+      // Lấy danh sách ma_tiennghi từ PhongTroNoiThat
+      const tienNghiIds = await getTienNghiByPhongTro(currentRoomId);
+      // Lấy dữ liệu nội thất từ Firestore
+      const tienNghiData = await getTienNghiData(tienNghiIds);
+
+      // Render thông tin nội thất
+
+      if (loaiPhongSnapshot.exists()) {
         const loaiPhongData = loaiPhongSnapshot.data();
-        const gioiTinhData = gioiTinhSnapshot.data();
 
         const roomDetails = document.getElementById("roomDetails");
         roomDetails.innerHTML = `
-            <strong>Tên phòng:</strong> ${room.Ten_phongtro} <br>
-            <strong>Địa chỉ:</strong> ${room.Dia_chi} <br>
-            <strong>Giá phòng:</strong> ${new Intl.NumberFormat("vi-VN", {
-              style: "currency",
-              currency: "VND",
-            }).format(room.Gia_phong)} <br>
-            <strong>Mô tả chi tiết:</strong> ${room.Mota_chitiet} <br>
-            <strong>Số lượt xem:</strong> ${room.So_luotxemphong} <br>
-            <strong>Loại phòng:</strong> ${loaiPhongData.Ten_loaiphong} <br>
-            <strong>Giới tính:</strong> ${gioiTinhData.Ten_gioitinh} <br> 
-             <strong>Tên người dùng:</strong> ${userInfo.ho_ten} 
+          <p class="room-name">${room.Ten_phongtro}</p>    <br>
+           <p class="room-address-detail">${room.Dia_chi}</p>  <br>
+           <div class="line-detail"></div>
+           <div class="grid-price">
+              <div class="room-price-detail">
+                 <strong>Mức giá</strong> <br>
+                 <p>
+                  ${new Intl.NumberFormat("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  }).format(room.Gia_phong)} / tháng
+                 </p>
+                
+              </div>
+               <div class="room-acreage-detail">
+                  <strong>Diện tích</strong> <br>
+                  <p>
+                  300m
+                  </p>
+                  
+               </div>
+            
+           </div>
+           <div class="room-description-detail">
+              <strong>Thông tin mô tả</strong> <br> <br> 
+              <p>${room.Mota_chitiet}</p> <br>
+            </div>
+
+            <div class"describe-container">
+             <strong>Đặc điểm bất động sản</strong> <br> <br> 
+
+             <div class="grid-describe">
+             
+                <div class="describe-column">
+                  <div class="line-detail"></div>
+                  <div class="item-column">
+                   <div class="item-content">
+                      <img class="ic-item" src="../public/assets/imgs/icons/ic-room-type.png" alt="" />
+                      <h5>Loại phòng</h5>
+                   </div>
+                    <div class="item-content">
+                      <p>${loaiPhongData.Ten_loaiphong}</p>  <br>
+                    </div>
+                  </div>
+                   <div class="line-detail"></div>
+                  <div class="item-column">
+                   <div class="item-content">
+                      <img class="ic-item" src="../public/assets/imgs/icons/ic-interior.png" alt="" />
+                      <h5>Nội thất</h5>
+                   </div>
+                    <div class="item-content">
+                   ${renderNoiThatList(noiThatData)}
+                    </div>
+                  </div>
+                  <div class="line-detail"></div>
+                  <div class="item-column">
+                   <div class="item-content">
+                      <img class="ic-item" src="../public/assets/imgs/icons/ic-calendar.png" alt="" />
+                      <h5>Thời giạn tạo</h5>
+                   </div>
+                    <div class="item-content">
+                      <p>${formatFirebaseTime(room.ThoiGian_taophong)}</p>  <br>
+                    </div>
+                  </div>
+
+                     <div class="line-detail"></div>
+                  <div class="item-column">
+                   <div class="item-content">
+                      <img class="ic-item" src="../public/assets/imgs/icons/ic-see.png" alt="" />
+                      <h5>Số lượt xem phòng</h5>
+                   </div>
+                    <div class="item-content">
+                      <p>${room.So_luotxemphong}</p>  <br>
+                    </div>
+                  </div>
+                </div>
+                 
+        
+                 <div class="describe-column">
+                  <div class="line-detail"></div>
+                  <div class="item-column">
+                   <div class="item-content">
+                      <img class="ic-item" src="../public/assets/imgs/icons/ic-gender.png" alt="" />
+                      <h5>Giới tính</h5>
+                   </div>
+                    <div class="item-content">
+                      <img class="ic-item" src="${
+                        gioiTinhData.ImgUrl_gioitinh
+                      }" alt="" />
+                      <p>${gioiTinhData.Ten_gioitinh}</p>  <br>
+                    </div>
+                  </div>
+                   <div class="line-detail"></div>
+                  <div class="item-column">
+                   <div class="item-content">
+                      <img class="ic-item" src="../public/assets/imgs/icons/ic-armchair.png" alt="" />
+                      <h5>Tiện nghi</h5>
+                   </div>
+                    <div class="item-content">
+                      <p class="room-type">${renderTienNghiList(
+                        tienNghiData
+                      )}</p>  <br>
+                    </div>
+                  </div>
+
+                  <div class="line-detail"></div>
+                  <div class="item-column">
+                   <div class="item-content">
+                      <img class="ic-item" src="../public/assets/imgs/icons/ic-calendar.png" alt="" />
+                      <h5>Ngày cập nhật</h5>
+                   </div>
+                    <div class="item-content">
+                      <p>${formatFirebaseTime(room.Ngay_capnhat)}</p>  <br>
+                    </div>
+                  </div>
+
+                </div>
+             </div>
+            </div>
+    
         `;
 
         const imageContainer = document.getElementById("roomImages");
         const carouselImages = imageContainer.querySelector(".carousel-images");
+        const thumbnailsContainer = imageContainer.querySelector(".thumbnails");
         carouselImages.innerHTML = ""; // Xóa ảnh cũ
+        thumbnailsContainer.innerHTML = ""; // Xóa ảnh thu nhỏ cũ
 
-        // Thêm ảnh vào slide
-        room.imageUrls.forEach((url) => {
+        // Thêm ảnh vào slide và ảnh thu nhỏ
+        room.imageUrls.forEach((url, index) => {
+          // Ảnh trong slide
           const imgElement = document.createElement("img");
           imgElement.src = url;
           imgElement.alt = room.Ten_phongtro;
           carouselImages.appendChild(imgElement);
+
+          // Ảnh thu nhỏ
+          const thumbElement = document.createElement("img");
+          thumbElement.src = url;
+          thumbElement.alt = `Thumbnail ${index + 1}`;
+          thumbElement.onclick = () => goToSlide(index); // Xử lý click để chuyển đến slide tương ứng
+          if (index === 0) thumbElement.classList.add("active"); // Slide đầu tiên được chọn mặc định
+          thumbnailsContainer.appendChild(thumbElement);
         });
 
-        // Hiển thị hộp thoại và lớp phủ mờ
+        // Hiển thị thông tin người dùng
+        const userInfoContainer = document.querySelector(
+          ".user-info-container"
+        );
+        userInfoContainer.querySelector(".img-avt-user").src =
+          userInfo.anh_daidien || "./assets/imgs/default-avatar.png";
+        userInfoContainer.querySelector(".user-name").textContent =
+          userInfo.ho_ten;
+        userInfoContainer.querySelector(
+          ".late-time-stamp"
+        ).textContent = `${formatTimestamp(userInfo.lastActiveTime)}`;
+        userInfoContainer.querySelector(".user-phone").textContent = `${
+          userInfo.sdt || "Không có"
+        } Hiện số`;
+
+          // Điều kiện ẩn/hiện các nút Duyệt và Hủy
+      const actionsContainer = document.querySelector(".actions");
+      if (room.Trang_thaiduyet === "ChoDuyet") {
+        actionsContainer.innerHTML = `
+          <button class="btn approve" onclick="approveRoom('${roomId}')">Duyệt</button>
+          <button class="btn cancel" onclick="cancelRoom('${roomId}')">Hủy</button>
+        `;
+      } else if (room.Trang_thaiduyet === "BiHuy") {
+        actionsContainer.innerHTML = `
+          <button class="btn revert" onclick="revertToPending('${roomId}')">Duyệt lại</button>
+        `;
+      } else {
+        actionsContainer.innerHTML = `
+         
+        `;
+      }
+
+        // Hiển thị chi tiết phòng
         document.getElementById("detailDialog").style.display = "block";
         document.getElementById("overlay").style.display = "block";
 
         // Reset slide về ảnh đầu tiên
         currentSlide = 0;
         updateSlidePosition();
-      } else {
-        console.error(
-          "Không tìm thấy loại phòng với Ma_loaiphong:",
-          room.Ma_loaiphong
-        );
       }
     } catch (error) {
-      console.error("Lỗi khi lấy thông tin loại phòng:", error);
+      console.error("Lỗi khi lấy thông tin phòng:", error);
     }
+  }
+}
+
+function formatFirebaseTime(times) {
+  if (!times) return "Không có dữ liệu thời gian";
+
+  // Kiểm tra nếu timestamp là kiểu đối tượng của Firebase
+  const date = times.toDate ? times.toDate() : new Date(times);
+
+  // Định dạng ngày tháng
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Tháng bắt đầu từ 0
+  const year = date.getFullYear();
+
+  // Định dạng giờ phút giây
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  // Kết hợp ngày tháng và giờ
+  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+}
+
+// Hàm định dạng thời gian
+function formatTimestamp(timestamp) {
+  const messageDate = new Date(timestamp);
+  const now = new Date();
+
+  const diffMs = now - messageDate;
+  const diffMinutes = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffDays > 0) {
+    return diffDays === 1 ? "Hôm qua" : `${diffDays} ngày trước`;
+  } else if (diffHours > 0) {
+    return `${diffHours} giờ trước`;
+  } else if (diffMinutes > 0) {
+    return `${diffMinutes} phút trước`;
+  } else {
+    return "Đang hoạt động";
   }
 }
 
@@ -256,7 +528,24 @@ function updateSlidePosition() {
   const carouselImages = imageContainer.querySelector(".carousel-images");
 
   // Di chuyển ảnh theo chỉ số slide hiện tại
-  carouselImages.style.transform = `translateX(-${currentSlide * 100}%)`;
+  carouselImages.style.transform = `translateX(-${currentSlide * 20}%)`;
+
+  // Cập nhật trạng thái active cho thumbnail
+  const thumbnails = document.querySelectorAll(".thumbnails img");
+  thumbnails.forEach((thumb, index) => {
+    thumb.classList.toggle("active", index === currentSlide);
+  });
+}
+
+function goToSlide(slideIndex) {
+  currentSlide = slideIndex;
+  updateSlidePosition();
+
+  // Cập nhật trạng thái active cho thumbnail
+  const thumbnails = document.querySelectorAll(".thumbnails img");
+  thumbnails.forEach((thumb, index) => {
+    thumb.classList.toggle("active", index === slideIndex);
+  });
 }
 
 // Hàm đóng dialog khi người dùng nhấn "Đóng"
@@ -306,7 +595,6 @@ function searchRooms() {
     "canceledRoomList"
   );
 }
-
 
 // Lắng nghe sự kiện DOMContentLoaded và gọi hàm fetchAllRooms
 document.addEventListener("DOMContentLoaded", () => {
@@ -371,3 +659,6 @@ window.closeDetails = closeDetails;
 window.changeSlide = changeSlide;
 window.goBack = goBack;
 window.searchRooms = searchRooms;
+window.cancelRoom = cancelRoom
+window.revertToPending = revertToPending
+window.approveRoom = approveRoom
