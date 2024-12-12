@@ -1,0 +1,25 @@
+tr{
+    display: flex;
+    width: 40%;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    color: rgb(12, 4, 4); /* Đảm bảo văn bản nổi bật trên nền */
+    border-radius: 5.5px; /* Viền bo góc nhẹ */
+    padding: 20px; /* Khoảng cách bên trong */
+    flex-wrap: wrap;
+}
+td{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 5px;
+    padding: 10px;
+    color: rgb(20, 12, 12); /* Đảm bảo văn bản nổi bật trên nền */
+    border-radius: 5.5px; /* Viền bo góc nhẹ */
+    padding: 2px; /* Khoảng cách bên trong */
+}
