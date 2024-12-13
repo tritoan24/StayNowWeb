@@ -79,6 +79,23 @@ async function fetchAllRooms() {
   }
 }
 
+function redirectToChat(element) {
+  // Lấy id từ data-user-id
+  const userId = element.getAttribute('data-user-id');
+
+  if (userId) {
+    // Lưu userId vào localStorage hoặc sessionStorage
+    localStorage.setItem('chatUserId', userId);
+
+    // Chuyển hướng đến trang chat
+    window.location.href = '../../public/QuanLyTinNhanHoTro.html';
+  } else {
+    console.error('User ID not found!');
+  }
+}
+
+
+
 function renderRoomList(rooms, containerId) {
   const roomListContainer = document.getElementById(containerId);
   roomListContainer.innerHTML = "";
@@ -89,6 +106,7 @@ function renderRoomList(rooms, containerId) {
   }
 
   rooms.forEach((room) => {
+    
     const formattedPrice = new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
@@ -509,6 +527,12 @@ async function viewDetails(roomId) {
           userInfo.sdt || "Không có"
         }`;
 
+        const userChatWithUser = document.querySelector(
+          ".chat-with-user-container"
+        );
+        userChatWithUser.setAttribute('data-user-id', room.Ma_nguoidung);
+        userChatWithUser.onclick = () => redirectToChat(userChatWithUser);
+
           // Điều kiện ẩn/hiện các nút Duyệt và Hủy
       const actionsContainer = document.querySelector(".actions");
       if (room.Trang_thaiduyet === "ChoDuyet") {
@@ -732,3 +756,4 @@ window.searchRooms = searchRooms;
 window.cancelRoom = cancelRoom
 window.revertToPending = revertToPending
 window.approveRoom = approveRoom
+window.redirectToChat = redirectToChat

@@ -247,6 +247,7 @@ body {
 .chat-content {
   scrollbar-width: thin;
   scrollbar-color: #471BC4 transparent;
+
 }
 
 .chat-content::-webkit-scrollbar {
@@ -260,5 +261,33 @@ body {
 
 .chat-content::-webkit-scrollbar-track {
   background: transparent;
+}
+
+.chat-null-view{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.chat-null-view p {
+  color: #2a3547;
+  font-size: 14px;
+  font-weight: 400;
+}
+.chat-null-view img{
+  width: 24px;
+  height: 24px;
+}
+
+.chat-null-view.hidden {
+  display: none;
+}
+.chat-null-view.visible {
+  display: block;
+  display: flex;
+  flex-direction: row;
 }
 
