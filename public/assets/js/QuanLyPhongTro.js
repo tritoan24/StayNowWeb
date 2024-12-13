@@ -457,8 +457,8 @@ async function viewDetails(roomId) {
                     <div class="line-detail"></div>
                   <div class="item-column">
                    <div class="item-content">
-                      <img class="ic-item" src="../public/assets/imgs/icons/ic-calendar.png" alt="" />
-                      <h5>Ngày cập nhật</h5>
+                      <img class="ic-item" src="../public/assets/imgs/icons/ic-location.png" alt="" />
+                      <h5>Địa chỉ chi tiết</h5>
                    </div>
                     <div class="item-content">
                       <p>${room.Dia_chichitiet}</p>  <br>
