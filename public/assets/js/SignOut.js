@@ -20,8 +20,7 @@ const auth = getAuth(app); // Khởi tạo Authentication
 document.getElementById("logoutButton").addEventListener("click", function () {
   signOut(auth)
     .then(() => {
-      localStorage.removeItem("is_logged_in");
-      localStorage.removeItem("accountType");
+      localStorage.removeItem("userId");
 
       alert("Bạn đã đăng xuất thành công.");
       window.location.href = "../public/Login/Login.html";

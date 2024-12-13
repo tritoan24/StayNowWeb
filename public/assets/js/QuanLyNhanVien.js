@@ -6,8 +6,10 @@ import {
   get,
   update,
   set,
-  push
+  push,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
 // Cấu hình Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBmpKO0lDHFiYb3zklAJ2zz6qC-iQrypw0",
@@ -22,6 +24,7 @@ document.getElementById("userDialog").style.display = "none";
 
 // Khởi tạo Firebase
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const database = getDatabase(app);
 
 // Biến toàn cục để lưu trữ danh sách phòng trọ
@@ -386,7 +389,7 @@ async function handleFormSubmit(event) {
     document.getElementById("nameErrorMessage").textContent =
       "Họ tên không được để trống";
     hasError = true;
-    return
+    return;
   } else {
     document.getElementById("staffNameError").classList.add("hidden");
   }
@@ -396,7 +399,7 @@ async function handleFormSubmit(event) {
       "Số điện thoại không hợp lệ (yêu cầu 10 chữ số)";
     document.getElementById("staffPhoneError").classList.remove("hidden");
     hasError = true;
-    return
+    return;
   } else {
     document.getElementById("staffPhoneError").classList.add("hidden");
   }
@@ -406,7 +409,7 @@ async function handleFormSubmit(event) {
       "Vui lòng thêm url ảnh đại diện";
     document.getElementById("staffAvtError").classList.remove("hidden");
     hasError = true;
-    return
+    return;
   } else {
     document.getElementById("staffAvtError").classList.add("hidden");
   }
@@ -416,7 +419,7 @@ async function handleFormSubmit(event) {
     document.getElementById("emailErrorMessage").textContent =
       "Email không hợp lệ";
     hasError = true;
-    return
+    return;
   } else {
     document.getElementById("staffEmailError").classList.add("hidden");
   }
@@ -426,7 +429,7 @@ async function handleFormSubmit(event) {
       "Mật khẩu phải có ít nhất 6 ký tự";
     document.getElementById("staffPasswordError").classList.remove("hidden");
     hasError = true;
-    return
+    return;
   } else {
     document.getElementById("staffPasswordError").classList.add("hidden");
   }
@@ -436,48 +439,52 @@ async function handleFormSubmit(event) {
       "Mật khẩu xác nhận không khớp";
     document.getElementById("staffRePasswordError").classList.remove("hidden");
     hasError = true;
-    return
+    return;
   } else {
     document.getElementById("staffRePasswordError").classList.add("hidden");
   }
 
   if (hasError) return; // Nếu có lỗi, dừng xử lý
 
-  const staffRef = ref(database, 'NguoiDung');
-
-  // Tạo ID nhân viên tự động và thêm vào Firebase
-  const newStaffRef = push(staffRef);
-
   try {
-    // Tạo thông tin nhân viên
+    // Tạo người dùng với email và mật khẩu trong Firebase Auth
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      staffEmail,
+      staffPassword
+    );
+
+    const userId = userCredential.user.uid;
+
+    // Lưu thông tin nhân viên vào Realtime Database
+    const staffRef = ref(database, `NguoiDung/${userId}`);
     const newStaff = {
-      ma_nguoidung: newStaffRef.key,
+      ma_nguoidung: userId,
       ho_ten: staffName,
       sdt: staffPhone,
       anh_daidien: staffAvt || null, // Ảnh đại diện có thể để trống
       email: staffEmail,
-      mat_khau: staffPassword, // Lưu mật khẩu vào database (không khuyến khích, nên mã hóa)
       loai_taikhoan: "NhanVien",
       trang_thaitaikhoan: "HoatDong",
       ngay_taotaikhoan: new Date().toISOString(),
       ngay_capnhat: new Date().toISOString(),
       lastActiveTime: new Date().getTime(),
-
     };
 
-
-    await set(newStaffRef, newStaff);
+    await set(staffRef, newStaff);
 
     // Thông báo thành công
     showSuccessModal("Nhân viên đã được thêm thành công.", () => {
       clearForm();
       fetchStaffs(); // Tải lại danh sách nhân viên
     });
+
   } catch (error) {
     console.error("Lỗi khi thêm nhân viên:", error);
     alert("Có lỗi xảy ra khi thêm nhân viên. Vui lòng thử lại.");
   }
 }
+
 
 
 

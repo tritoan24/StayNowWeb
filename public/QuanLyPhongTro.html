@@ -35,27 +35,63 @@
       </div>
 
       <!-- Danh sách phòng trọ -->
-      <div id="roomList"></div>
+      <div id="columns">
+        <div id="approvedRooms" class="column">
+          <h3>Phòng đã duyệt</h3>
+          <div id="approvedRoomList"></div>
+        </div>
+        <div id="canceledRooms" class="column">
+          <h3>Phòng bị hủy</h3>
+          <div id="canceledRoomList"></div>
+        </div>
+        <div id="pendingRooms" class="column">
+          <h3>Phòng đang chờ duyệt</h3>
+          <div id="pendingRoomList"></div>
+        </div>
+      </div>
+
       <!-- Đây là nơi sẽ hiển thị danh sách phòng trọ -->
     </div>
 
+<!-- chi tiet phong  -->
     <div id="overlay" onclick="closeDetails()"></div>
     <div id="detailDialog">
-      <h3>Chi tiết phòng</h3>
-      <div id="roomImages" class="image-carousel">
-        <div class="carousel-container">
-          <button class="prev" onclick="changeSlide(-1)">&#10094;</button>
-          <div class="carousel-images">
-            <!-- Các ảnh sẽ được hiển thị ở đây -->
-          </div>
-          <button class="next" onclick="changeSlide(1)">&#10095;</button>
-        </div>
+      <div>
+        <button onclick="closeDetails()" id="back-button" class="back-button">&larr;</button>
       </div>
+
+      <!-- slide ảnh -->
+       <div class="grid-slide-and-user-container">
+        <div id="roomImages" class="image-carousel">
+          <div class="carousel-container">
+            <button class="prev" onclick="changeSlide(-1)">&#10094;</button>
+            <div class="carousel-images">
+              <!-- Các ảnh slide sẽ được hiển thị ở đây -->
+            </div>
+            <button class="next" onclick="changeSlide(1)">&#10095;</button>
+          </div>
+          <div class="thumbnails">
+            <!-- Ảnh thu nhỏ sẽ được hiển thị ở đây -->
+          </div>
+        </div>
+  
+        <div class="user-info-container">
+          <img class="img-avt-user" src="" alt="">
+          <p class="user-name"></p>
+          <p class="late-time-stamp"></p>
+          <div class="user-phone-container">
+            <p class="user-phone">Hiện số</p>
+          </div>
+          <div class="chat-with-user-container">
+            <p>Chat với người dùng</p>
+          </div>
+        </div>
+       </div>
+      
       <div id="roomDetails"></div>
 
       <div class="actions">
-        <button class="approve" onclick="approveRoomDetail()">Duyệt</button>
-        <button class="cancel" onclick="cancelRoomDetail()">Hủy</button>
+     
       </div>
       <button class="close" onclick="closeDetails()">Đóng</button>
     </div>

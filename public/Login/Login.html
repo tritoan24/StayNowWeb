@@ -46,9 +46,10 @@
 						<span class="focus-input100" data-placeholder="&#xf207;"></span>
 					</div>
 
-					<div class="wrap-input100 validate-input" data-validate="Enter password">
+					<div class="wrap-input100 validate-input password-input" data-validate="Enter password">
 						<input id="password" class="input100" type="password" name="pass" placeholder="Mật khẩu">
 						<span class="focus-input100" data-placeholder="&#xf191;"></span>
+						<img id="togglePassword" src="./images/icons/ic-eye.svg" alt="">
 					</div>
 
 					<div class="contact100-form-checkbox">
@@ -91,3 +92,19 @@
 
 </body>
 </html>
+
+<style>
+.password-input{
+	display: flex;
+	flex-direction: row;
+}
+.password-input img {
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+}
+</style>

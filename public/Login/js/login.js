@@ -43,42 +43,25 @@ function loginUser() {
 
   // Đăng nhập với Firebase Authentication
   signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      const currentUser = userCredential.user;
+  .then((userCredential) => {
+    console.log("User credential:", userCredential); // Kiểm tra userCredential
+    const currentUser = userCredential.user;
 
-      if (currentUser) {
-        // Truy cập vào thông tin người dùng trong Realtime Database
-        const userRef = ref(database, "NguoiDung/" + currentUser.uid);
+    if (currentUser) {
+      console.log("Current user:", currentUser); // Kiểm tra đối tượng user
+      localStorage.setItem("userId", currentUser.uid);
+      alert("Đăng nhập thành công!");
+      window.location.href = "../../../public/index.html";
+    } else {
+      console.error("Current user is null");
+      alert("Không thể lấy thông tin người dùng.");
+    }
+  })
+  .catch((error) => {
+    console.error("Lỗi đăng nhập:", error.message); // Hiển thị lỗi chi tiết
+    alert("Email hoặc mật khẩu không đúng: " + error.message);
+  });
 
-        get(userRef)
-          .then((snapshot) => {
-            if (snapshot.exists()) {
-              const data = snapshot.val();
-              const status = data.trang_thaitaikhoan || "HoatDong";
-              const accountType = data.loai_taikhoan;
-
-              if (status === "HoatDong") {
-                // Lưu thông tin đăng nhập vào localStorage
-                localStorage.setItem("is_logged_in", "true");
-                localStorage.setItem("accountType", accountType);
-                alert("Đăng nhập thành công");
-                // Chuyển đến trang chính
-                window.location.href = "../../../public/index.html";
-              } else {
-                alert("Tài khoản của bạn đã bị khóa");
-              }
-            } else {
-              alert("Không tìm thấy thông tin người dùng");
-            }
-          })
-          .catch((error) => {
-            alert("Lỗi kết nối đến máy chủ: " + error.message);
-          });
-      }
-    })
-    .catch((error) => {
-      alert("Email hoặc mật khẩu không đúng: " + error.message);
-    });
 }
 
 // Kiểm tra email hợp lệ
@@ -86,6 +69,24 @@ function validateEmail(email) {
   const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   return regex.test(email);
 }
+
+
+const passwordInput = document.getElementById("password")
+const togglePassword = document.getElementById("togglePassword");
+// Lắng nghe sự kiện click
+togglePassword.addEventListener("click", () => {
+  // Kiểm tra loại input hiện tại
+  const isPassword = passwordInput.type === "password";
+
+  // Đổi loại input thành text hoặc password
+  passwordInput.type = isPassword ? "text" : "password";
+
+  togglePassword.src = isPassword 
+  ? "./images/icons/ic-eye-hidden.png" 
+  : "./images/icons/ic-eye.svg";
+
+ 
+});
 
 document.getElementById("loginButton").addEventListener("click", function(event) {
     event.preventDefault();  // Ngăn chặn form submit
