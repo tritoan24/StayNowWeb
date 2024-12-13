@@ -584,3 +584,20 @@ button.close:hover {
   font-weight: 400;
   color: #2a3547;
 }
+
+.item-dichvu{
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+  margin-bottom: 2%;
+}
+.item-dichvu p{
+  color: #2a3547;
+  font-size: 14px;
+  font-weight: 400;
+}
+.ic-dichvu{
+  width: 24px;
+  height: 24px;
+}
