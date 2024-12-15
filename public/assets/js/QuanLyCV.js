@@ -14,9 +14,6 @@ import {
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
 
 
-// import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
-
-
 // Cấu hình Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBmpKO0lDHFiYb3zklAJ2zz6qC-iQrypw0",
@@ -32,8 +29,38 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Khởi tạo auth
-const auth = getAuth();
+const auth = getAuth(app); // Đảm bảo truyền app vào
+
+let currentUserId = null;
+
+function checkAuthStatus() {
+  return new Promise((resolve) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      unsubscribe(); // Hủy listener sau khi được gọi
+      if (user) {
+        currentUserId = user.uid; // Gán giá trị global
+        resolve(user.uid);
+      } else {
+        console.log('Chưa đăng nhập');
+        resolve(null);
+      }
+    });
+  });
+}
+
+async function initializeStaynowApp() {
+  try {
+    const userId = await checkAuthStatus();
+    if (userId) {
+      currentUserId = userId;
+      // await fetchContracts(userId);
+    } else {
+      console.log('Không thể lấy user ID');
+    }
+  } catch (error) {
+    console.error('Lỗi khởi tạo ứng dụng:', error);
+  }
+}
 
 // Modal functionality
 const modal = document.getElementById("contractModal");
@@ -140,10 +167,13 @@ const promises = assignmentSnapshot.docs.map(async (assignmentDoc) => {
 
     const trangThai = assignmentData.trangThai;
     const thoigian = assignmentData.thoigian; // Thời gian bắt đầu công việc (timestamp)
-
+    
     // Tính toán thời gian kết thúc công việc
     const endTime = new Date(thoigian);
-    endTime.setMinutes(endTime.getMinutes());
+    endTime.setMinutes(endTime.getMinutes() + 5); // Thêm 5 phút
+    
+    console.log(`Thời gian kết thúc: ${endTime}`);
+    
 
 
     // Xác định danh sách mục tiêu dựa trên trạng thái
@@ -250,6 +280,21 @@ window.thanhToan = async function (contractId) {
       console.log(`No tasks found for contract ${contractId}`);
       return false;
     }
+    const idPhong = contractData.thongtinphong.maPhongTro|| '';
+    console.log(`ID phòng: ${idPhong}`);
+    const phongRef = doc(db, 'PhongTro', idPhong);
+    const phongDoc = await getDoc(phongRef);
+
+    const phongData = {
+      id: phongDoc.id,
+      ...phongDoc.data()
+    };
+
+    const DcQuanHuyen = phongData.Dc_quanhuyen || '';
+    const DcTinhThanhPho = phongData.Dc_tinhtp || '';
+
+    console.log(`Địa chỉ quận huyện: ${dcQuanHuyen}`);
+    console.log(`Địa chỉ tỉnh thành phố: ${DcTinhThanhPho}`);
 
     const batch = writeBatch(db);
 
@@ -265,12 +310,14 @@ window.thanhToan = async function (contractId) {
 
         // Prepare payment history data
     const paymentHistoryData = {
-      idNhanVien: contractData.idNhanVien || '',
+      idNhanVien: currentUserId || '',
       idHopDong: contractId,
       idCongViec: phanChiaCVSnapshot.docs[0].id,
       tongHoaDon: tongHoaDon,
       tongTienDaTru: tongTienDaTru,
       tongTienDaGui: tongTienDaGui,
+      Dc_quanhuyen: DcQuanHuyen,
+      Dc_tinhthanhpho: DcTinhThanhPho,
       nguoiThue: {
         maNguoiDung: contractData.nguoiThue?.maNguoiDung || '',
         hoTen: contractData.nguoiThue?.hoTen || 'Không rõ'
@@ -390,7 +437,7 @@ window.openPaymentConfirmationDialog = async function(contractId){
           alert('Thanh toán thành công!');
           closeModal();
           [waitingList, paidList, canceledList].forEach(list => list.innerHTML = "");
-          fetchContracts("oYVXhrF4MphAyX073s7pZOtJqAk1");
+          fetchContracts(currentUserId);
           
         } else {
           alert('Thanh toán thất bại. Vui lòng thử lại.');
@@ -410,29 +457,6 @@ window.openPaymentConfirmationDialog = async function(contractId){
 }
 
 
-
-
-// // Lấy thông tin người dùng hiện tại và hiển thị danh sách
-// onAuthStateChanged(auth, (user) => {
-//   if (user) {
-//     const userId = user.uid;
-//     // Fetch contracts cho user hiện tại
-//     fetchContracts(userId);
-
-//   } else {
-//     console.log("Người dùng chưa đăng nhập.");
-    
-//     // Xử lý trường hợp không có người dùng đăng nhập
-//     // Ví dụ: clear danh sách hợp đồng, hiển thị thông báo
-//     const waitingList = document.getElementById("waiting-contract-list");
-//     const paidList = document.getElementById("paid-contract-list");
-//     const canceledList = document.getElementById("canceled-contract-list");
-    
-//     waitingList.innerHTML = "<tr><td colspan='3'>Vui lòng đăng nhập</td></tr>";
-//     paidList.innerHTML = "<tr><td colspan='3'>Vui lòng đăng nhập</td></tr>";
-//     canceledList.innerHTML = "<tr><td colspan='3'>Vui lòng đăng nhập</td></tr>";
-//   }
-// });
 
 function createCountdown(endTime, elementId) {
   const updateCountdown = () => {
@@ -463,5 +487,13 @@ function createCountdown(endTime, elementId) {
   const intervalId = setInterval(updateCountdown, 1000);
   updateCountdown(); // Initial update
 }
+// fetchContracts(currentUserId);   // Sử dụng biến này
 
-fetchContracts('oYVXhrF4MphAyX073s7pZOtJqAk1');
+console.log( "mã người dùng: "+currentUserId);
+
+
+initializeStaynowApp().then(() => {
+  if (currentUserId) {
+    fetchContracts(currentUserId);
+  }
+});
