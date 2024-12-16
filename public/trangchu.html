@@ -123,6 +123,22 @@
         </ul>
       </div>
 
+      <div id="logoutConfirmModal" class="modal modalHidden">
+        <div class="modal-content">
+          <h2 class="modal-title">Xác nhận đăng xuất</h2>
+          <p>Bạn có chắc chắn muốn đăng xuất tài khoản không?</p>
+          <div class="modal-actions">
+            <button id="confirmLogout" class="modal-button danger">
+              Đồng ý
+            </button>
+            <button id="cancelLogout" class="modal-button">Hủy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- toast dang xuat thanh cong -->
+      <div id="toastContainer" class="toast-container"></div>
+
       <!-- ========================= Main ==================== -->
       <div class="main" id="main">
         <div class="topbar">
@@ -163,7 +179,10 @@
       </div>
     </div>
 
+    <script type="module" src="./assets/js/FireBaseConfig.js"></script>
     <script type="module" src="./assets/js/trangchu.js"></script>
+    <script type="module" src="./assets/js/SignOut.js"></script>
+    
 
     <!-- ====== ionicons ======= -->
     <script

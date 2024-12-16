@@ -1,6 +1,5 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { db, database } from "./FireBaseConfig.js";
 import {
-  getFirestore,
   collection,
   getDocs,
   getDoc,
@@ -10,26 +9,11 @@ import {
   updateDoc,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import {
-  getDatabase,
   ref,
   get,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-// Cấu hình Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBmpKO0lDHFiYb3zklAJ2zz6qC-iQrypw0",
-  authDomain: "staynowapp1.firebaseapp.com",
-  projectId: "staynowapp1",
-  storageBucket: "staynowapp1.appspot.com",
-  messagingSenderId: "918655571270",
-  appId: "1:918655571270:web:94abfaf87fbbb3e4ecc147",
-  measurementId: "G-PQP9CTPKGT",
-};
 
-// Khởi tạo Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const dbRT = getDatabase(app);
 
 // Biến toàn cục để lưu trữ danh sách phòng trọ
 let rooms = [];
@@ -176,7 +160,7 @@ function renderRoomList(rooms, containerId) {
 // Hàm lấy thông tin người dùng từ Realtime Database
 async function getUserInfo(maNguoiDung) {
   try {
-    const userRef = ref(dbRT, `NguoiDung/${maNguoiDung}`); // Tham chiếu đến nút "NguoiDung/{Ma_nguoidung}" trong Realtime Database
+    const userRef = ref(database, `NguoiDung/${maNguoiDung}`); // Tham chiếu đến nút "NguoiDung/{Ma_nguoidung}" trong Realtime Database
     const snapshot = await get(userRef); // Lấy dữ liệu từ Realtime Database
 
     if (snapshot.exists()) {

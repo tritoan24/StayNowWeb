@@ -77,7 +77,7 @@
           </div>
           <div class="search">
             <label>
-              <input type="text" id="search" placeholder="Search here" />
+              <input type="text" id="search" placeholder="Tìm kiếm" />
               <ion-icon name="search-outline"></ion-icon>
             </label>
           </div>
@@ -103,13 +103,7 @@
               <button id="back-button" class="back-button">&larr;</button>
               <h2 id="chat-title" class="chat-header"></h2>
             </div>
-            <div class="chat-content">
-             
-            </div>
-            <!-- <div class="chat-null-view">
-              <img src="./assets/imgs/icons/ic-chat-null.png" alt="" />
-              <p>Hãy bắt đầu một cuộc trò chuyện mới</p>
-            </div> -->
+            <div class="chat-content"></div>
             <div class="chat-footer">
               <input
                 id="message-input"
@@ -123,6 +117,19 @@
       </div>
     </div>
 
+  	<div id="toastContainer" class="toast-container"></div>
+
+    <div id="logoutConfirmModal" class="modal modalHidden">
+      <div class="modal-content">
+        <h2 class="modal-title">Xác nhận đăng xuất</h2>
+        <p>Bạn có chắc chắn muốn đăng xuất tài khoản không?</p>
+        <div class="modal-actions">
+          <button id="confirmLogout" class="modal-button danger">Đồng ý</button>
+          <button id="cancelLogout" class="modal-button">Hủy</button>
+        </div>
+      </div>
+    </div>
+
     <!-- ====== ionicons ======= -->
     <script
       type="module"
@@ -132,6 +139,9 @@
       nomodule
       src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
     ></script>
+
+    <script type="module" src="./assets/js/FireBaseConfig.js"></script>
     <script type="module" src="./assets/js/QuanLyTinNhanHoTro.js"></script>
+    <script type="module" src="./assets/js/SignOut.js"></script>
   </body>
 </html>

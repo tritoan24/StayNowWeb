@@ -1,24 +1,11 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+import { db, database, auth } from "./FireBaseConfig.js";
+import {  ref, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 import {
     getAuth,
     signOut,
   } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-const firebaseConfig = {
-    apiKey: "AIzaSyBmpKO0lDHFiYb3zklAJ2zz6qC-iQrypw0",
-    authDomain: "staynowapp1.firebaseapp.com",
-    databaseURL: "https://staynowapp1-default-rtdb.firebaseio.com",
-    projectId: "staynowapp1",
-    storageBucket: "staynowapp1.appspot.com",
-    messagingSenderId: "918655571270",
-    appId: "1:918655571270:web:94abfaf87fbbb3e4ecc147",
-    measurementId: "G-PQP9CTPKGT"
-};
 
-// Khởi tạo Firebase
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
-const auth = getAuth(app); // Khởi tạo Authentication
+
 
 
 // add hovered class to selected list item
@@ -106,15 +93,3 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   });
 
-  document.getElementById("logoutButton").addEventListener("click", function () {
-    signOut(auth)
-      .then(() => {
-        localStorage.removeItem("userId");
-  
-        alert("Bạn đã đăng xuất thành công.");
-        window.location.href = "../public/Login/Login.html";
-      })
-      .catch((error) => {
-        alert("Đã xảy ra lỗi khi đăng xuất: " + error.message);
-      });
-  });
