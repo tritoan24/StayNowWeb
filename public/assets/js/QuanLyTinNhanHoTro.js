@@ -8,7 +8,7 @@ import {
   set,
   push,
   onChildAdded,
-  onChildChanged,
+  onValue,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 import {
   getAuth,
@@ -72,22 +72,18 @@ function fetchUserDetails(userId) {
     });
 }
 
-// Hàm lấy danh sách chat của người dùng cụ thể
-function fetchUserChatList(userId) {
-  const userChatListRef = ref(database, `ChatList/${userId}`);
 
-  get(userChatListRef)
-    .then((snapshot) => {
-      if (snapshot.exists()) {
-        const userChatData = snapshot.val();
-        renderChatList(userChatData); // Gọi hàm render danh sách chat
-      } else {
-        console.log("No chat data found for this user.");
-      }
-    })
-    .catch((error) => {
-      console.error("Error fetching user chat data:", error);
-    });
+// Hàm lắng nghe danh sách chat
+function listenToChatList(senderId) {
+  const chatListRef = ref(database, `ChatList/${senderId}`);
+
+  // Lắng nghe sự thay đổi trong danh sách chat
+  onValue(chatListRef, (snapshot) => {
+    if (snapshot.exists()) {
+      const chatListData = snapshot.val();
+      renderChatList(chatListData); // Cập nhật giao diện
+    }
+  });
 }
 
 // Hàm hiển thị danh sách chat
@@ -370,6 +366,7 @@ document.getElementById("back-button").addEventListener("click", () => {
   chatModal.style.display = "none"; // Ẩn modal khi quay lại
 });
 
+
 // Hàm cập nhật danh sách chat
 function updateChatList(chatId, lastMessage, lastMessageTime, senderId) {
   const chatListRefSender = ref(database, `ChatList/${senderId}/${chatId}`);
@@ -433,7 +430,7 @@ document.getElementById("send-button").addEventListener("click", () => {
       .then(() => {
         // Cập nhật ChatList và làm mới giao diện
         updateChatList(chatId, message, timestamp, senderId, () => {
-          fetchUserChatList(senderId); // Làm mới danh sách ChatList
+          listenToChatList(senderId); // Làm mới danh sách ChatList
         });
         fetchChatDetails(chatId); // Lấy lại chi tiết đoạn chat
         messageInput.value = ""; // Xóa nội dung ô nhập
@@ -447,7 +444,7 @@ document.getElementById("send-button").addEventListener("click", () => {
 // Gọi hàm với userId cụ thể khi trang tải
 document.addEventListener("DOMContentLoaded", () => {
   const userId = localStorage.getItem("userId"); // Thay ID người dùng ở đây
-  fetchUserChatList(userId);
+listenToChatList(userId);
 });
 
 //lấy thông tin người dùng
@@ -511,42 +508,51 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatsRef = ref(database, `Chats/${chatId}`);
     const chatListIds = ref(database, `ChatList/${currentUserId}`);
     const timestamp = Date.now();
-
+   
+    let checkId = false
     get(chatListIds)
-    .then((snapshot) => {
-      if (snapshot.exists()) {
-        const chats = snapshot.val();  // Dữ liệu của tất cả các chat
-        const chatIds = Object.keys(chats);  // Lấy ra danh sách chatId từ các khóa của đối tượng chats      
-        let checkId = false
-        chatIds.forEach(id => {
-          if(id == chatId || id == chatId2) {
-            localStorage.removeItem("chatUserId");
-            console.log("lấy thành công đoạn chat với id: ", id);
-            fetchChatDetails(id)
-            checkId = true
-            return
-          }  else {
-            checkId = false
-          }
-        }); 
+      .then((snapshot) => {
+        
+        if (snapshot.exists()) {
+          const chats = snapshot.val();  // Dữ liệu của tất cả các chat
+          const chatIds = Object.keys(chats);  // Lấy ra danh sách chatId từ các khóa của đối tượng chats      
 
-        if(checkId == false) {
+          for (const id of chatIds) {
+            if (id === chatId || id === chatId2) {
+              localStorage.removeItem("chatUserId");
+              console.log("Lấy thành công đoạn chat với id: ", id);
+              const chatTitleElement = document.getElementById("chat-title");
+              chatTitleElement.setAttribute("data-chat-id", id);
+              fetchChatDetails(id);
+              checkId = true;
+              break; // Thoát sớm khỏi vòng lặp
+            }
+          }
+
+          if (checkId == false) {
+            console.log("Không có chat nào trong bảng Chats.");
+
+
+          }
+        }
+        if (checkId == false) {
           console.log("tao thanh cong doan chat moi");
+
           set(chatListRef, {
             chatId: chatId,
             otherUserId: userChatId,
             unreadCount: 0,
           });
-      
+
           set(chatsRef, {
             messages: [],
           });
-      
+
           const chatRef = ref(database, `Chats/${chatId}/messages`); // Tham chiếu đến trường messages trong cuộc hội thoại
           const newMessageRef = push(chatRef); // Tạo ID mới tự động cho tin nhắn
           const messageInput = document.getElementById("message-input");
           const message = messageInput.value.trim();
-      
+
           // Ghi tin nhắn vào Firebase
           set(newMessageRef, {
             message: "Admin xin chào!",
@@ -556,10 +562,10 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(() => {
               // Cập nhật ChatList và làm mới giao diện
               updateChatList(chatId, message, timestamp, currentUserId, () => {
-                fetchUserChatList(currentUserId); // Làm mới danh sách ChatList
+                listenToChatList(currentUserId); // Làm mới danh sách ChatList
               });
-      
-      
+
+
               // Gọi fetchChatDetails với chatId, nếu lỗi thì thử với chatId2
               fetchChatDetails(chatId)
                 .then(() => {
@@ -570,7 +576,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 })
                 .catch((error) => {
                   console.error("Không lấy được đoạn chat với chatId:", error);
-      
+
                   // Thử lại với chatId2
                   fetchChatDetails(chatId2)
                     .then(() => {
@@ -583,21 +589,19 @@ document.addEventListener("DOMContentLoaded", () => {
                       console.error("Không lấy được đoạn chat với chatId2:", err);
                     });
                 });
-      
+
               messageInput.value = ""; // Xóa nội dung ô nhập
             })
             .catch((error) => {
               console.error("Error sending message:", error);
             });
-        }
-      } else {
-        console.log("Không có chat nào trong bảng Chats.");
 
-      }
-    })
-    .catch((error) => {
-      console.error("Lỗi khi lấy danh sách chatId:", error);
-    });
+
+        }
+      })
+      .catch((error) => {
+        console.error("Lỗi khi lấy danh sách chatId:", error);
+      });
 
   }
 });
