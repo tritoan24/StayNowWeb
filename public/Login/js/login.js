@@ -1,44 +1,42 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { db, auth } from "../../assets/js/FireBaseConfig.js";
 import {
-  getAuth,
   signInWithEmailAndPassword,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import {
-  getDatabase,
-  ref,
-  get,
-} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-
-// Cấu hình Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBmpKO0lDHFiYb3zklAJ2zz6qC-iQrypw0",
-  authDomain: "staynowapp1.firebaseapp.com",
-  projectId: "staynowapp1",
-  storageBucket: "staynowapp1.appspot.com",
-  messagingSenderId: "918655571270",
-  appId: "1:918655571270:web:94abfaf87fbbb3e4ecc147",
-  measurementId: "G-PQP9CTPKGT",
-  databaseURL: "https://staynowapp1-default-rtdb.firebaseio.com/", // URL Realtime Database
-};
-
-// Khởi tạo Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app); // Khởi tạo Firebase Authentication
-const database = getDatabase(app); // Khởi tạo Firebase Realtime Database
 
 // Hàm đăng nhập
 function loginUser() {
   const email = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value.trim();
-
-  if (!email || !password) {
-    alert("Vui lòng nhập đầy đủ thông tin!");
+  
+  let hasError = false;
+  if (!email) {
+    document.getElementById("emailError").classList.remove("hidden");
+    document.getElementById("error-message-email").textContent =
+      "Vui lòng nhập tên tài khoản";
+    hasError = true;
     return;
+  } else {
+    document.getElementById("emailError").classList.add("hidden");
   }
 
   if (!validateEmail(email)) {
-    alert("Email không hợp lệ");
+    document.getElementById("emailError").classList.remove("hidden");
+    document.getElementById("error-message-email").textContent =
+      "Email không hợp lệ";
+    hasError = true;
     return;
+  } else {
+    document.getElementById("emailError").classList.add("hidden");
+  }
+
+  if (!password) {
+    document.getElementById("passwordError").classList.remove("hidden");
+    document.getElementById("error-message-password-name").textContent =
+      "Vui lòng nhập mật khẩu!";
+    hasError = true;
+    return;
+  } else {
+    document.getElementById("passwordError").classList.add("hidden");
   }
 
   // Đăng nhập với Firebase Authentication
@@ -50,8 +48,13 @@ function loginUser() {
     if (currentUser) {
       console.log("Current user:", currentUser); // Kiểm tra đối tượng user
       localStorage.setItem("userId", currentUser.uid);
-      alert("Đăng nhập thành công!");
-      window.location.href = "../../../public/index.html";
+      showToast("Đăng nhập thành công!");
+
+        
+      // Delay chuyển hướng sau khi Toast hiển thị
+      setTimeout(() => {
+        window.location.href = "../../../public/index.html"; // Chuyển hướng về trang chính
+      }, 1500); // Chờ 3 giây để Toast hiển thị
     } else {
       console.error("Current user is null");
       alert("Không thể lấy thông tin người dùng.");
@@ -59,7 +62,7 @@ function loginUser() {
   })
   .catch((error) => {
     console.error("Lỗi đăng nhập:", error.message); // Hiển thị lỗi chi tiết
-    alert("Email hoặc mật khẩu không đúng: " + error.message);
+    showToastFalse("Tên tài khoản hoặc mật khẩu không đúng!")
   });
 
 }
@@ -92,3 +95,40 @@ document.getElementById("loginButton").addEventListener("click", function(event)
     event.preventDefault();  // Ngăn chặn form submit
     loginUser();             // Gọi hàm đăng nhập
   });
+
+
+  function showToast(message) {
+    const toastContainer = document.getElementById("toastContainer");
+  
+    // Tạo toast
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.textContent = message;
+  
+    // Thêm toast vào container
+    toastContainer.appendChild(toast);
+  
+    // Xóa toast sau khi animation kết thúc
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
+  }
+
+  
+  function showToastFalse(message) {
+    const toastContainer = document.getElementById("toastContainerFalse");
+  
+    // Tạo toast
+    const toast = document.createElement("div");
+    toast.className = "toast-false";
+    toast.textContent = message;
+  
+    // Thêm toast vào container
+    toastContainer.appendChild(toast);
+  
+    // Xóa toast sau khi animation kết thúc
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
+  }
+  

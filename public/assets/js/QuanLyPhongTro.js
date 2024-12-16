@@ -1,6 +1,5 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { db, database } from "./FireBaseConfig.js";
 import {
-  getFirestore,
   collection,
   getDocs,
   getDoc,
@@ -10,26 +9,11 @@ import {
   updateDoc,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import {
-  getDatabase,
   ref,
   get,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-// Cấu hình Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBmpKO0lDHFiYb3zklAJ2zz6qC-iQrypw0",
-  authDomain: "staynowapp1.firebaseapp.com",
-  projectId: "staynowapp1",
-  storageBucket: "staynowapp1.appspot.com",
-  messagingSenderId: "918655571270",
-  appId: "1:918655571270:web:94abfaf87fbbb3e4ecc147",
-  measurementId: "G-PQP9CTPKGT",
-};
 
-// Khởi tạo Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const dbRT = getDatabase(app);
 
 // Biến toàn cục để lưu trữ danh sách phòng trọ
 let rooms = [];
@@ -79,6 +63,23 @@ async function fetchAllRooms() {
   }
 }
 
+function redirectToChat(element) {
+  // Lấy id từ data-user-id
+  const userId = element.getAttribute('data-user-id');
+
+  if (userId) {
+    // Lưu userId vào localStorage hoặc sessionStorage
+    localStorage.setItem('chatUserId', userId);
+
+    // Chuyển hướng đến trang chat
+    window.location.href = '../../public/QuanLyTinNhanHoTro.html';
+  } else {
+    console.error('User ID not found!');
+  }
+}
+
+
+
 function renderRoomList(rooms, containerId) {
   const roomListContainer = document.getElementById(containerId);
   roomListContainer.innerHTML = "";
@@ -89,6 +90,7 @@ function renderRoomList(rooms, containerId) {
   }
 
   rooms.forEach((room) => {
+    
     const formattedPrice = new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
@@ -158,7 +160,7 @@ function renderRoomList(rooms, containerId) {
 // Hàm lấy thông tin người dùng từ Realtime Database
 async function getUserInfo(maNguoiDung) {
   try {
-    const userRef = ref(dbRT, `NguoiDung/${maNguoiDung}`); // Tham chiếu đến nút "NguoiDung/{Ma_nguoidung}" trong Realtime Database
+    const userRef = ref(database, `NguoiDung/${maNguoiDung}`); // Tham chiếu đến nút "NguoiDung/{Ma_nguoidung}" trong Realtime Database
     const snapshot = await get(userRef); // Lấy dữ liệu từ Realtime Database
 
     if (snapshot.exists()) {
@@ -245,6 +247,59 @@ function renderTienNghiList(tienNghiData) {
   }
 }
 
+
+
+async function getDichVuByPhongTro(maPhongTro) {
+  const q = query(
+    collection(db, "ChiTietThongTin"),
+    where("ma_phongtro", "==", maPhongTro)
+  );
+  const querySnapshot = await getDocs(q);
+  const dichVuData = [];
+  querySnapshot.forEach((doc) => {
+    dichVuData.push(doc.data()); // Lấy dich vu
+  });
+  return dichVuData;
+}
+
+function renderDichVuList(dichVuData) {
+  if (dichVuData && Array.isArray(dichVuData) && dichVuData.length > 0) {
+    return dichVuData.map((item) => `
+    <div class="item-dichvu">
+      <img class="ic-dichvu" src="${item.icon_thongtin}" alt="">
+      <p>${item.ten_thongtin}: ${item.so_luong_donvi} ${item.don_vi}</p>
+    </div>
+      `).join(" ");
+  } else {
+    return "<p>Không có dịch vụ</p>";
+  }
+}
+
+async function getDienTichPhongTro(maPhongTro) {
+  const q = query(
+    collection(db, "ChiTietThongTin"),
+    where("ma_phongtro", "==", maPhongTro),
+    where("ten_thongtin", "==", "Diện tích")
+  );
+  const dienTichData = []
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    dienTichData.push(doc.data()); // Lấy dich vu
+  });
+  return dienTichData;
+}
+
+function renderDienTich(dienTichData) {
+  if (dienTichData && Array.isArray(dienTichData) && dienTichData.length > 0) {
+    return dienTichData.map((item) => `<p>${item.so_luong_donvi}${item.don_vi}</p>`);
+  } else {
+    return "<p>Không có dịch vụ</p>";
+  }
+}
+
+
+
+
 // Hàm hiển thị chi tiết phòng trọ
 async function viewDetails(roomId) {
   const room = rooms.find((r) => r.id === roomId);
@@ -274,6 +329,10 @@ async function viewDetails(roomId) {
 
       // Render thông tin nội thất
 
+      const dichVuData = await getDichVuByPhongTro(currentRoomId)
+
+      const dienTichData = await getDienTichPhongTro(currentRoomId)
+
       if (loaiPhongSnapshot.exists()) {
         const loaiPhongData = loaiPhongSnapshot.data();
 
@@ -296,7 +355,7 @@ async function viewDetails(roomId) {
                <div class="room-acreage-detail">
                   <strong>Diện tích</strong> <br>
                   <p>
-                  300m
+                  ${renderDienTich(dienTichData)}
                   </p>
                   
                </div>
@@ -309,6 +368,8 @@ async function viewDetails(roomId) {
 
             <div class"describe-container">
              <strong>Đặc điểm bất động sản</strong> <br> <br> 
+
+             <div>${renderDichVuList(dichVuData)} </div>
 
              <div class="grid-describe">
              
@@ -395,6 +456,17 @@ async function viewDetails(roomId) {
                     </div>
                   </div>
 
+                    <div class="line-detail"></div>
+                  <div class="item-column">
+                   <div class="item-content">
+                      <img class="ic-item" src="../public/assets/imgs/icons/ic-location.png" alt="" />
+                      <h5>Địa chỉ chi tiết</h5>
+                   </div>
+                    <div class="item-content">
+                      <p>${room.Dia_chichitiet}</p>  <br>
+                    </div>
+                  </div>
+
                 </div>
              </div>
             </div>
@@ -437,7 +509,13 @@ async function viewDetails(roomId) {
         ).textContent = `${formatTimestamp(userInfo.lastActiveTime)}`;
         userInfoContainer.querySelector(".user-phone").textContent = `${
           userInfo.sdt || "Không có"
-        } Hiện số`;
+        }`;
+
+        const userChatWithUser = document.querySelector(
+          ".chat-with-user-container"
+        );
+        userChatWithUser.setAttribute('data-user-id', room.Ma_nguoidung);
+        userChatWithUser.onclick = () => redirectToChat(userChatWithUser);
 
           // Điều kiện ẩn/hiện các nút Duyệt và Hủy
       const actionsContainer = document.querySelector(".actions");
@@ -662,3 +740,4 @@ window.searchRooms = searchRooms;
 window.cancelRoom = cancelRoom
 window.revertToPending = revertToPending
 window.approveRoom = approveRoom
+window.redirectToChat = redirectToChat
