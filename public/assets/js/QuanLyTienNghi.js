@@ -13,9 +13,82 @@ import {
 // Biến toàn cục để lưu trữ danh sách phòng trọ
 let comforts = [];
 let allComforts = []; // Danh sách gốc
+let isLoading = false
+
+
+function showToast(message) {
+  const toastContainer = document.getElementById("toastContainer");
+
+  // Tạo toast
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+
+  // Thêm toast vào container
+  toastContainer.appendChild(toast);
+
+  // Xóa toast sau khi animation kết thúc
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+
+function showToastFalse(message) {
+  const toastContainer = document.getElementById("toastContainerFalse");
+
+  // Tạo toast
+  const toast = document.createElement("div");
+  toast.className = "toast-false";
+  toast.textContent = message;
+
+  // Thêm toast vào container
+  toastContainer.appendChild(toast);
+
+  // Xóa toast sau khi animation kết thúc
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+
+function updateLoadingState() {
+  const loadingElement = document.getElementById("loadingSpinner");
+  const serveListContainer = document.getElementById("comfortList");
+
+  if (isLoading) {
+    loadingElement.style.display = "block"; // Hiển thị loading
+    serveListContainer.style.display = "none"; // Ẩn danh sách
+  } else {
+    loadingElement.style.display = "none"; // Ẩn loading
+    serveListContainer.style.display = "grid"; // Hiển thị danh sách
+  }
+}
+
+function removeVietnameseTones(str) {
+  return str
+    .normalize("NFD") // Tách dấu khỏi ký tự
+    .replace(/[\u0300-\u036f]/g, "") // Loại bỏ các ký tự dấu
+    .replace(/đ/g, "d") // Thay đ thành d
+    .replace(/Đ/g, "D") // Thay Đ thành D
+    .toLowerCase(); // Chuyển về chữ thường
+}
+
+function showNoResultMessage() {
+  const informationListContainer = document.getElementById("comfortList");
+  informationListContainer.innerHTML = `
+    <div class="no-result-message">
+        <img src="../public/assets/imgs/icons/ic-sad-face.png" alt="">
+      <p>Không tìm thấy kết quả phù hợp.</p>
+    </div>
+  `;
+}
+
 
 async function fetchAllComfort() {
   const comfortsRef = collection(db, "TienNghi");
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
 
   try {
     const querySnapshot = await getDocs(comfortsRef);
@@ -31,19 +104,26 @@ async function fetchAllComfort() {
     renderComfortList(comforts); // Hiển thị danh sách
   } catch (e) {
     console.error("Lỗi khi lấy danh sách tiện nghi!:", e);
+  } finally {
+    isLoading = false; // Kết thúc loading
+    updateLoadingState(); // Ẩn giao diện loading
   }
 }
 
-function filterComfort(event) {
-  const keyword = event.target.value.toLowerCase(); // Lấy từ khóa và chuyển về chữ thường
 
+function filterComfort(event) {
+  const keyword = removeVietnameseTones(event.target.value); // Từ khóa không dấu
   // Lọc danh sách gốc để tìm dịch vụ phù hợp
   const filteredComforts = allComforts.filter((comfort) =>
-    comfort.Ten_tiennghi.toLowerCase().includes(keyword)
+    removeVietnameseTones(comfort.Ten_tiennghi).includes(keyword)
   );
 
-  // Hiển thị danh sách đã lọc
-  renderComfortList(filteredComforts);
+    // Kiểm tra nếu không có kết quả
+    if (filteredComforts.length === 0) {
+      showNoResultMessage(); // Hiển thị thông báo không tìm thấy
+    } else {
+      renderComfortList(filteredComforts); // Hiển thị danh sách đã lọc
+    }
 }
 
 function renderComfortList(comforts) {
@@ -123,6 +203,8 @@ function renderComfortList(comforts) {
 
 async function cancelComfort(comfortId) {
   const comfort = comforts.find((s) => s.id === comfortId);
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
 
   if (comfort) {
     try {
@@ -133,15 +215,20 @@ async function cancelComfort(comfortId) {
       comfort.Status = false;
       // Làm mới giao diện để hiển thị trạng thái mới
       renderComfortList(comforts);
+      showToastFalse("Huỷ tiện nghi thành công")
     } catch (e) {
       console.error("Lỗi khi cập nhật trạng thái tiện nghi:", e);
+    } finally {
+      isLoading = false; // Kết thúc loading
+      updateLoadingState(); // Ẩn giao diện loading
     }
   }
 }
 
 async function activateComfort(comfortId) {
   const comfort = comforts.find((s) => s.id === comfortId);
-
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
   if (comfort) {
     try {
       // Cập nhật trạng thái trong Firestore
@@ -152,8 +239,12 @@ async function activateComfort(comfortId) {
 
       // Làm mới giao diện để hiển thị trạng thái mới
       renderComfortList(comforts);
+      showToast("Kích hoạt tiện nghi thành công")
     } catch (e) {
       console.error("Lỗi khi kích hoạt lại trạng thái tiện nghi:", e);
+    } finally {
+      isLoading = false; // Kết thúc loading
+      updateLoadingState(); // Ẩn giao diện loading
     }
   }
 }

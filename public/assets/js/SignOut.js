@@ -55,12 +55,6 @@ async function logoutUser() {
 }
 
 
-// Hàm ẩn modal thành công
-function hideModal(modal) {
-  modal.classList.add("modalHidden");
-  modal.style.display = "none";
-}
-
 
 
 function showToast(message) {

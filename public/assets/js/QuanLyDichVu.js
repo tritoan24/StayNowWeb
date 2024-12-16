@@ -13,9 +13,82 @@ import {
 // Biến toàn cục để lưu trữ danh sách phòng trọ
 let services = [];
 let allServices = []; // Danh sách gốc
+let isLoading = true; // Bắt đầu loading
+
+function showToast(message) {
+  const toastContainer = document.getElementById("toastContainer");
+
+  // Tạo toast
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+
+  // Thêm toast vào container
+  toastContainer.appendChild(toast);
+
+  // Xóa toast sau khi animation kết thúc
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+
+function showToastFalse(message) {
+  const toastContainer = document.getElementById("toastContainerFalse");
+
+  // Tạo toast
+  const toast = document.createElement("div");
+  toast.className = "toast-false";
+  toast.textContent = message;
+
+  // Thêm toast vào container
+  toastContainer.appendChild(toast);
+
+  // Xóa toast sau khi animation kết thúc
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+
+function updateLoadingState() {
+  const loadingElement = document.getElementById("loadingSpinner");
+  const serveListContainer = document.getElementById("serviceList");
+
+  if (isLoading) {
+    loadingElement.style.display = "block"; // Hiển thị loading
+    serveListContainer.style.display = "none"; // Ẩn danh sách
+  } else {
+    loadingElement.style.display = "none"; // Ẩn loading
+    serveListContainer.style.display = "grid"; // Hiển thị danh sách
+  }
+}
+
+function removeVietnameseTones(str) {
+  return str
+    .normalize("NFD") // Tách dấu khỏi ký tự
+    .replace(/[\u0300-\u036f]/g, "") // Loại bỏ các ký tự dấu
+    .replace(/đ/g, "d") // Thay đ thành d
+    .replace(/Đ/g, "D") // Thay Đ thành D
+    .toLowerCase(); // Chuyển về chữ thường
+}
+
+function showNoResultMessage() {
+  const informationListContainer = document.getElementById("serviceList");
+  informationListContainer.innerHTML = `
+    <div class="no-result-message">
+        <img src="../public/assets/imgs/icons/ic-sad-face.png" alt="">
+      <p>Không tìm thấy kết quả phù hợp.</p>
+    </div>
+  `;
+}
+
+
 
 async function fetchAllServices() {
   const servicesRef = collection(db, "DichVu");
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
 
   try {
     const querySnapshot = await getDocs(servicesRef);
@@ -31,20 +104,27 @@ async function fetchAllServices() {
     renderServiceList(services); // Hiển thị danh sách
   } catch (e) {
     console.error("Lỗi khi lấy danh sách dịch vụ:", e);
+  } finally {
+    isLoading = false; // Kết thúc loading
+    updateLoadingState(); // Ẩn giao diện loading
   }
 }
 
 function filterServices(event) {
-  const keyword = event.target.value.toLowerCase(); // Lấy từ khóa và chuyển về chữ thường
-
+  const keyword = removeVietnameseTones(event.target.value); // Từ khóa không dấu
   // Lọc danh sách gốc để tìm dịch vụ phù hợp
   const filteredServices = allServices.filter((service) =>
-    service.Ten_dichvu.toLowerCase().includes(keyword)
+    removeVietnameseTones(service.Ten_dichvu).includes(keyword)
   );
 
-  // Hiển thị danh sách đã lọc
-  renderServiceList(filteredServices);
+    // Kiểm tra nếu không có kết quả
+    if (filteredServices.length === 0) {
+      showNoResultMessage(); // Hiển thị thông báo không tìm thấy
+    } else {
+      renderServiceList(filteredServices); // Hiển thị danh sách đã lọc
+    }
 }
+
 
 function renderServiceList(services) {
   const serviceListContainer = document.getElementById("serviceList");
@@ -84,6 +164,7 @@ function renderServiceList(services) {
       </div>
     `;
     activeServicesContainer.appendChild(serviceDiv);
+
   });
 
   // Hiển thị dịch vụ đã hủy
@@ -119,11 +200,14 @@ function renderServiceList(services) {
 
   serviceListContainer.appendChild(activeServicesContainer);
   serviceListContainer.appendChild(inactiveServicesContainer);
+
 }
 
 async function cancelService(serviceId) {
   // Tìm dịch vụ trong mảng services
   const service = services.find((s) => s.id === serviceId);
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
 
   if (service) {
     try {
@@ -136,8 +220,12 @@ async function cancelService(serviceId) {
 
       // Làm mới giao diện để hiển thị trạng thái mới
       renderServiceList(services);
+      showToastFalse("Huỷ dịch vụ thành công")
     } catch (e) {
       console.error("Lỗi khi cập nhật trạng thái dịch vụ:", e);
+    } finally {
+      isLoading = false; // Kết thúc loading
+      updateLoadingState(); // Ẩn giao diện loading
     }
   }
 }
@@ -145,6 +233,8 @@ async function cancelService(serviceId) {
 async function activateService(serviceId) {
   // Tìm dịch vụ trong mảng services
   const service = services.find((s) => s.id === serviceId);
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
 
   if (service) {
     try {
@@ -157,8 +247,12 @@ async function activateService(serviceId) {
 
       // Làm mới giao diện để hiển thị trạng thái mới
       renderServiceList(services);
+      showToast("Kích hoạt dịch vụ thành công")
     } catch (e) {
       console.error("Lỗi khi kích hoạt lại trạng thái dịch vụ:", e);
+    } finally {
+      isLoading = false; // Kết thúc loading
+      updateLoadingState(); // Ẩn giao diện loading
     }
   }
 }

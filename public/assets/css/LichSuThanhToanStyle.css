@@ -70,7 +70,6 @@ h2 {
   padding: 5px 15px; /* Khoảng cách trong */
   max-width: 100%; /* Độ rộng tối đa */
   border: 1px solid #eaeff4;
-  margin-top: 2%;
 }
 
 /* Biểu tượng tìm kiếm */
@@ -110,130 +109,48 @@ h2 {
   opacity: 0.7; /* Hiệu ứng mờ khi hover */
 }
 
-.addServiceForm {
-  border: 1px solid #eaeff4;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
+
+
+.column {
+  margin-top: 5%;
+  float: left;
+  width: 33%;
+  padding: 10px;
+  box-sizing: border-box;
 }
-.serviceContainerView{
-  border: 1px solid #eaeff4;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
+
+.column div{
   margin-top: 3%;
-
 }
 
-.titleAddForm {
+.column h3{
   color: #2a3547;
-  font-weight: 600;
   font-size: 16px;
-  border-bottom: 1px solid #eaeff4;
-  padding: 16px;
-}
-.inputFormContainer {
-  padding: 16px;
-}
-.serviceContainer {
-  padding: 16px;
-}
-
-.inputFormContent {
-  display: grid;
-  grid-template-columns: 45% 45%;
-  justify-content: space-around;
-}
-
-.inputForm{
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  color: #2a3547;
-  font-size: 14px;
   font-weight: 600;
-}
-
-.inputForm label {
-  margin-top: 3%;
-}
-
-
-
-.inputForm input, select{
-  border: 1px solid #EAEFF4;
-  border-radius: 8px;
-  padding: 10px;
-  margin-top: 1%;
-}
-
-.inputForm input:hover, select:hover {
-  border: 1px solid #471bc4;
-}
-
-.btnAddFormGroup{
-  width: 100%;
-  text-align: center;
-  margin-top: 2%;
-}
-
-.btnAddService{
-  padding: 10px;
-  margin-inline: 3%;
-  background-color: #471bc4;
-  border: none;
-  border-radius: 4px;
-  color: #fff;
-  font-weight: 400;
-  font-size: 14px;
-}
-
-.btnClearForm{
-  padding: 10px;
-  margin-inline: 3%;
-  background-color: #fff;
-  border: 1px solid #7C8FAC;
-  border-radius: 4px;
-  color: #7C8FAC;
-  font-weight: 400;
-  font-size: 14px;
-}
-.titleStatus{
-  margin-block: 10px;
-}
-
-/* Danh sách các phòng */
-#serviceList {
-  display: grid;
-  grid-template-columns: 45% 45%;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: space-between;
 }
 
 /* Container tổng cho từng phòng */
-.service-card {
+.room-card {
   width: 100%;
   display: flex;
   flex-direction: row; /* Sắp xếp theo chiều ngang */
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
   padding: 15px;
   border: 1px solid #ccc;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   background-color: #fff;
   transition: transform 0.2s, box-shadow 0.2s;
-  margin-bottom: 20px;
 }
 
-.service-card:hover {
+.room-card:hover {
   transform: scale(1.02);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Hình ảnh của phòng */
-.service-image img {
+.room-image img {
   width: 120px;
   height: 120px;
   object-fit: cover;
@@ -241,32 +158,41 @@ h2 {
 }
 
 /* Thông tin phòng */
-.service-info {
+.room-info {
   flex: 1;
   margin-left: 15px; /* Khoảng cách giữa hình ảnh và thông tin */
 }
 
-.service-title {
+.room-title {
   font-size: 18px;
   font-weight: bold;
-  color: #333;
+  color: #2a3547;
 }
 
-.service-address {
+.room-address, .room-price {
+  display: flex;
+  align-items: center; /* Căn giữa các phần tử theo chiều dọc */
+  flex-direction: row; /* Hiển thị theo chiều ngang */
+}
+
+.room-address p, .room-price p {
   font-size: 14px;
   color: #666;
   margin: 5px 0;
+  display: inline-block;
+  max-width: calc(100% - 28px); /* Đảm bảo văn bản không tràn ra ngoài */
+  word-wrap: break-word; /* Đảm bảo từ không bị tràn ra ngoài */
 }
 
 /* Khu vực hành động */
-.service-actions {
+.room-actions {
   display: flex;
   flex-direction: row;
   gap: 10px;
   align-items: flex-start;
 }
 
-.service-actions .btn {
+.room-actions .btn {
   padding: 6px 10px;
   font-size: 14px;
   border: none;
@@ -275,21 +201,22 @@ h2 {
   transition: background-color 0.3s, color 0.3s;
 }
 
-.active-column {
-  background-color: #e0ffe0; /* Màu nền nhẹ cho cột "Hoạt động" */
-}
 
-.inactive-column {
-  background-color: #ffe0e0; /* Màu nền nhẹ cho cột "Đã hủy" */
-}
-
-.btn.update {
+.btn.approve {
   background-color: #4caf50;
   color: white;
 }
 
 .btn.approve:hover {
-  background-color: #45a049;
+  background-color: #e4e4e4;
+}
+.btn.revert{
+  background-color: #dddddd;
+  color: #2a3547
+}
+.btn.revert:hover{
+  background-color: #2a3547;
+  color: #dddddd
 }
 
 .btn.cancel {
@@ -302,14 +229,33 @@ h2 {
 }
 
 /* Liên kết xem chi tiết */
-.service-details {
+.room-details {
   margin-top: 10px;
 }
 
-.status-layout{
-  display: flex;
-  flex-direction: row;
-  gap: 5px;
+.details-link {
+  color: #007bff;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.details-link:hover {
+  color: #0056b3;
+}
+
+/* Nút quay lại */
+.back-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #555;
+}
+
+.back-button:hover {
+  color: #000;
 }
 
 /* Chi tiết phòng trọ */
@@ -327,12 +273,10 @@ h2 {
 #detailDialog {
   background-color: white;
   padding: 30px;
-  border-radius: 8px;
-  width: 50%;
+  width: 100%;
   top: 0;
   left: 0;
   right: 0;
-  max-width: 800px;
   margin: 5% auto;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   display: none;
@@ -345,11 +289,11 @@ h2 {
   margin-bottom: 15px;
 }
 
-#serviceDetails {
+#roomDetails {
   margin-bottom: 20px;
 }
 
-#serviceImages {
+#roomImages {
   width: 100%;
   margin-bottom: 20px;
   position: relative;
@@ -359,25 +303,125 @@ h2 {
 
 .carousel-container {
   width: 100%;
+  height: 400px;
+  border-radius: 8px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: white;
+  padding: 16px;
+  border: 1px solid #eaeff4;
 }
 
+.grid-slide-and-user-container {
+  display: grid;
+  grid-template-columns: 5fr 1fr; 
+  gap: 20px; /* Khoảng cách giữa các cột */
+  align-items: center; /* Căn giữa nội dung theo chiều dọc */
+  margin-top: 20px; /* Khoảng cách trên cùng */
+  background-color: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 3%;
+}
 .carousel-images {
   display: flex;
   transition: transform 0.3s ease-in-out;
-  width: 60%;
-  height: 20%;
+  width: 100%;
+  height: 100%;
 }
 
 .carousel-images img {
   width: 100%;
-  border-radius: 8px;
   margin: 0 5px;
   max-width: 100%;
 }
+
+.user-info-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #eaeff4;
+  height: 100%;
+}
+
+.img-avt-user{
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 100px;
+  margin-bottom: 10px;
+}
+
+.user-name{
+  color: #2a3547;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.late-time-stamp{
+  color: rgb(163, 163, 163);
+  font-weight: 400;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.user-phone-container{
+  width: 100%;
+  background-color: #471bc4;
+  border-radius: 8px;
+  color: #fff;
+  padding: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-size: 14px;
+  text-align: center;
+}
+.user-phone-container:hover{
+  background-color: white;
+  border: 1px solid #471bc4;
+  color: #471bc4;
+}
+
+.chat-with-user-container{
+  width: 100%;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: white;
+  border: 1px solid #eaeff4;
+  color: #2a3547;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+}
+.chat-with-user-container:hover {
+  background-color: #471bc4;
+  color: #fff;
+}
+.thumbnails {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  gap: 5px;
+}
+
+.thumbnails img {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  object-fit: cover;
+  border: 2px solid transparent;
+}
+
+.thumbnails img.active {
+  border-color: #007bff; /* Màu xanh khi được chọn */
+}
+
 
 button.prev,
 button.next {
@@ -418,6 +462,7 @@ button.next:hover {
   margin-right: 10px;
   cursor: pointer;
   border-radius: 5px;
+  border: none;
 }
 
 .actions .approve {
@@ -447,192 +492,112 @@ button.close:hover {
   background-color: #471bc4;
 }
 
-.error {
-  display: flex;
-  flex-direction: row;
-  margin-bottom: 3%;
+.room-name{
+  font-size: 20px;
+  color: #2a3547;
+  font-weight: 600;
 }
-.error-message {
-  margin: 3px;
-  font-size: 12px;
+.room-type, .room-address-detail{
+  font-size: 14px;
+  color: #2a3547;
   font-weight: 400;
-  color: #FA896B;
 }
 
-.hidden {
-  display: none;
-}
-
-/* Kiểu dáng tổng quát cho modal */
-.modal {
-  display: none; /* Ẩn mặc định */
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
+.line-detail{
   width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.6); /* Mờ nền */
-  backdrop-filter: blur(5px); /* Làm mờ nền */
+  height: 1px;
+  background-color: #eaeff4;
 }
 
-/* Kiểu dáng nội dung của modal */
-.modal-content {
-  background: linear-gradient(135deg, #471bc4, #481bc48a); /* Hiệu ứng gradient */
-  margin: 10% auto;
-  padding: 20px;
-  border-radius: 10px; /* Góc bo tròn */
-  width: 35%;
-  max-width: 400px;
-  text-align: center;
-  color: #fff;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  animation: fadeIn 0.5s ease-in-out; /* Hiệu ứng xuất hiện */
+.grid-price{
+  display: grid;
+  width: 30%;
+  grid-template-columns: 10fr 10fr;
+  margin-bottom: 3%;
+  margin-top: 2%;
 }
 
-/* Hiệu ứng khi xuất hiện modal */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.room-price-detail strong{
+  font-size: 14px;
+  color: #666;
+  font-weight: 400;
 }
 
-/* Kiểu dáng nút đóng */
-.close {
-  color: #fff;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  transition: color 0.3s;
-}
-
-.close:hover {
-  color: #ff7979;
-}
-
-/* Biểu tượng thành công */
-.modal-icon img {
-  width: 60px;
-  height: 60px;
-  margin-bottom: 15px;
-  animation: bounce 1s ease-in-out infinite; /* Hiệu ứng động */
-}
-
-/* Hiệu ứng nhún cho biểu tượng */
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-/* Tiêu đề modal */
-.modal-title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-/* Nút hành động */
-.modal-button {
-  background-color: #fff;
-  border: none;
-  color: #471bc4;
-  padding: 10px 20px;
-  border-radius: 5px;
+.room-price-detail, .room-acreage-detail p{
   font-size: 16px;
-  cursor: pointer;
-  margin-top: 15px;
-  transition: background-color 0.3s ease-in-out, transform 0.2s;
+  color: #2a3547;
+  font-weight: 600;
 }
 
-.modal-button:hover {
-  background-color: #998db6;
-  transform: scale(1.05);
+.room-acreage-detail strong{
+  font-size: 14px;
+  color: #666;
+  font-weight: 400;
 }
 
+.room-description-detail p{
+  font-size: 14px;
+  font-weight: 400;
+  color: #2a3547;
+}
 
-.no-result-message {
+.describe-container{
+  background-color: white;
+}
+.grid-describe{
+  display: grid;
+  grid-template-columns: 45% 45%;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.describe-column{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+}
+
+.ic-item{
+  width: 24px;
+  height: 24px;
+  margin-right: 16px;
+}
+
+.item-column{
+  display: grid;
+  grid-template-columns: 45% 45%;
+  width: 100%;
+  justify-content: space-between;
+  margin-block: 3%;
+}
+
+.item-content{
+  width: 100%;
   display: flex;
   flex-direction: row;
-  gap: 10px;
-  text-align: center;
-  font-size: 16px;
-  color: #999;
-  margin-top: 20px;
   align-items: center;
 }
 
-.no-result-message img{
-  width: 25px;
-  height: 25px;
-}
-
-
-
-.toast-container-false {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.toast-false {
-  background-color: #FA896B;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+.item-content p{
   font-size: 14px;
-  animation: fadeInOut 3s forwards;
+  font-weight: 400;
+  color: #2a3547;
 }
 
-.toast-container {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
+.item-dichvu{
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  gap: 5px;
   align-items: center;
-  gap: 10px;
+  margin-bottom: 2%;
 }
-
-.toast {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+.item-dichvu p{
+  color: #2a3547;
   font-size: 14px;
-  animation: fadeInOut 3s forwards;
+  font-weight: 400;
 }
-
-@keyframes fadeInOut {
-  0%, 90% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
+.ic-dichvu{
+  width: 24px;
+  height: 24px;
 }

@@ -1,9 +1,6 @@
 import { db, database, auth } from "./FireBaseConfig.js";
 import {  ref, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-import {
-    getAuth,
-    signOut,
-  } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
 
 
 
@@ -48,12 +45,15 @@ document.getElementById('main').addEventListener('click', function (event) {
     if (event.target && event.target.id === 'btntiennghi') {
         navigateTo('QuanLyTienNghi.html');
     }
-    if (event.target && event.target.id === 'btnnoihthat') {
+    if (event.target && event.target.id === 'btnnoithat') {
         navigateTo('QuanLyNoiThat.html');
     }
     if (event.target && event.target.id === 'btnNhanVien') {
         navigateTo('QuanLyNhanVien.html');
     }
+    if (event.target && event.target.id === 'btnLichSuThanhToan') {
+      navigateTo('LichSuThanhToan.html');
+  }
 });
 
 

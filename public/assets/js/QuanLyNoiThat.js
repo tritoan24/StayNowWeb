@@ -13,9 +13,82 @@ import {
 // Biến toàn cục để lưu trữ danh sách phòng trọ
 let furnitures = [];
 let allFurnitures = []; // Danh sách gốc
+let isLoading = false;
+
+
+function showToast(message) {
+  const toastContainer = document.getElementById("toastContainer");
+
+  // Tạo toast
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+
+  // Thêm toast vào container
+  toastContainer.appendChild(toast);
+
+  // Xóa toast sau khi animation kết thúc
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+
+function showToastFalse(message) {
+  const toastContainer = document.getElementById("toastContainerFalse");
+
+  // Tạo toast
+  const toast = document.createElement("div");
+  toast.className = "toast-false";
+  toast.textContent = message;
+
+  // Thêm toast vào container
+  toastContainer.appendChild(toast);
+
+  // Xóa toast sau khi animation kết thúc
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+
+function updateLoadingState() {
+  const loadingElement = document.getElementById("loadingSpinner");
+  const serveListContainer = document.getElementById("furnitureList");
+
+  if (isLoading) {
+    loadingElement.style.display = "block"; // Hiển thị loading
+    serveListContainer.style.display = "none"; // Ẩn danh sách
+  } else {
+    loadingElement.style.display = "none"; // Ẩn loading
+    serveListContainer.style.display = "grid"; // Hiển thị danh sách
+  }
+}
+
+function removeVietnameseTones(str) {
+  return str
+    .normalize("NFD") // Tách dấu khỏi ký tự
+    .replace(/[\u0300-\u036f]/g, "") // Loại bỏ các ký tự dấu
+    .replace(/đ/g, "d") // Thay đ thành d
+    .replace(/Đ/g, "D") // Thay Đ thành D
+    .toLowerCase(); // Chuyển về chữ thường
+}
+
+function showNoResultMessage() {
+  const informationListContainer = document.getElementById("furnitureList");
+  informationListContainer.innerHTML = `
+    <div class="no-result-message">
+        <img src="../public/assets/imgs/icons/ic-sad-face.png" alt="">
+      <p>Không tìm thấy kết quả phù hợp.</p>
+    </div>
+  `;
+}
+
 
 async function fetchAllFurniture() {
   const furnituresRef = collection(db, "NoiThat");
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
 
   try {
     const querySnapshot = await getDocs(furnituresRef);
@@ -31,19 +104,25 @@ async function fetchAllFurniture() {
     renderFurnitureList(furnitures); // Hiển thị danh sách
   } catch (e) {
     console.error("Lỗi khi lấy danh sách nội thất!:", e);
+  }  finally {
+    isLoading = false; // Kết thúc loading
+    updateLoadingState(); // Ẩn giao diện loading
   }
 }
 
 function filterFurniture(event) {
-  const keyword = event.target.value.toLowerCase(); // Lấy từ khóa và chuyển về chữ thường
-
+  const keyword = removeVietnameseTones(event.target.value); // Từ khóa không dấu
   // Lọc danh sách gốc để tìm dịch vụ phù hợp
   const filteredFurnitures = allFurnitures.filter((furniture) =>
-    furniture.Ten_noithat.toLowerCase().includes(keyword)
+    removeVietnameseTones(furniture.Ten_noithat).includes(keyword)
   );
 
-  // Hiển thị danh sách đã lọc
-  renderFurnitureList(filteredInformations);
+    // Kiểm tra nếu không có kết quả
+    if (filteredFurnitures.length === 0) {
+      showNoResultMessage(); // Hiển thị thông báo không tìm thấy
+    } else {
+      renderFurnitureList(filteredFurnitures); // Hiển thị danh sách đã lọc
+    }
 }
 
 function renderFurnitureList(furnitures) {
@@ -123,7 +202,8 @@ function renderFurnitureList(furnitures) {
 
 async function cancelFurniture(furnitureId) {
   const furniture = furnitures.find((s) => s.id === furnitureId);
-
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
   if (furniture) {
     try {
       // Cập nhật trạng thái trong Firestore
@@ -133,15 +213,20 @@ async function cancelFurniture(furnitureId) {
       furniture.Status = false;
       // Làm mới giao diện để hiển thị trạng thái mới
       renderFurnitureList(furnitures);
+      showToastFalse("Huỷ nội thất thành công")
     } catch (e) {
       console.error("Lỗi khi cập nhật trạng thái nội thất:", e);
+    }  finally {
+      isLoading = false; // Kết thúc loading
+      updateLoadingState(); // Ẩn giao diện loading
     }
   }
 }
 
 async function activateFurniture(furnitureId) {
   const furniture = furnitures.find((s) => s.id === furnitureId);
-
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
   if (furniture) {
     try {
       // Cập nhật trạng thái trong Firestore
@@ -152,8 +237,12 @@ async function activateFurniture(furnitureId) {
 
       // Làm mới giao diện để hiển thị trạng thái mới
       renderFurnitureList(furnitures);
+      showToast("Kích hoạt nội thất thành công")
     } catch (e) {
       console.error("Lỗi khi kích hoạt lại trạng thái nội thất:", e);
+    }  finally {
+      isLoading = false; // Kết thúc loading
+      updateLoadingState(); // Ẩn giao diện loading
     }
   }
 }
