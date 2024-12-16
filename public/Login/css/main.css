@@ -546,6 +546,29 @@ iframe {
   }
 }
 
+
+.toast-container-false {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.toast-false {
+  background-color: #FA896B;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  animation: fadeInOut 3s forwards;
+}
+
 .toast-container {
   position: fixed;
   top: 20px;
@@ -578,3 +601,19 @@ iframe {
   }
 }
 
+
+
+.error {
+  display: flex;
+  flex-direction: row;
+}
+.error-message-email, .error-message-password-name {
+  margin: 3px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #FA896B;
+}
+
+.hidden {
+  display: none;
+}
