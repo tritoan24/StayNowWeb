@@ -126,8 +126,6 @@ function filterInformation(event) {
 
 
 function renderInformationList(informations) {
-  isLoading = true; // Bắt đầu loading
-  updateLoadingState();
   const informationListContainer = document.getElementById("informationList");
   informationListContainer.innerHTML = ""; // Xóa nội dung cũ
 
@@ -166,9 +164,6 @@ function renderInformationList(informations) {
       </div>
     `;
     activeInformationContainer.appendChild(informationDiv);
-
-      isLoading = false; // Kết thúc loading
-      updateLoadingState(); // Ẩn giao diện loading
     
   });
 
