@@ -53,7 +53,7 @@ function loginUser() {
         
       // Delay chuyển hướng sau khi Toast hiển thị
       setTimeout(() => {
-        window.location.href = "../../../public/index.html"; // Chuyển hướng về trang chính
+        window.location.href = "../../../public/ThongKe.html"; // Chuyển hướng về trang chính
       }, 1500); // Chờ 3 giây để Toast hiển thị
     } else {
       console.error("Current user is null");
