@@ -83,6 +83,10 @@
         background: linear-gradient(135deg, #ff5722, #e64a19);
       }
 
+      .lichsugiaodich {
+        background: linear-gradient(135deg, #2252ff, #2019e6);
+      }
+
       /* Icon setup */
       .card .icon {
         width: 60px;
@@ -117,6 +121,10 @@
           width: 95%;
         }
       }
+
+      .hidden {
+        display: none !important;
+      }
     </style>
   </head>
   <body>
@@ -132,7 +140,7 @@
               <span class="title">StayNow</span>
             </a>
           </li>
-  
+
           <li>
             <a href="./ThongKe.html">
               <span class="icon">
@@ -149,7 +157,7 @@
               <span class="title">Quản lý</span>
             </a>
           </li>
-  
+
           <li>
             <a href="./QuanLyTinNhanHoTro.html">
               <span class="icon">
@@ -158,8 +166,8 @@
               <span class="title">Tin nhắn hỗ trợ</span>
             </a>
           </li>
-  
-          <li>
+
+          <li id="li-congviec">
             <a href="./QuanLyCV.html">
               <span class="icon">
                 <ion-icon name="briefcase-outline"></ion-icon>
@@ -167,7 +175,7 @@
               <span class="title">Công việc</span>
             </a>
           </li>
-  
+
           <li>
             <a href="./danhsachnguoidung.html">
               <span class="icon">
@@ -176,7 +184,7 @@
               <span class="title">Người Dùng</span>
             </a>
           </li>
-  
+
           <li>
             <a href="#" id="logoutButton">
               <span class="icon">
@@ -284,11 +292,13 @@
               /></span>
               <span class="text">Lịch sử thanh toán</span>
             </button>
-            <button id="btnNhanVien" class="card nhanvien">
+            <button id="btnLichSuGiaoDich" class="card lichsugiaodich">
               <span class="icon"
-                ><img src="./assets/imgs/icons/ic-people.png" alt="Staff Icon"
+                ><img
+                  src="./assets/imgs/icons/ic-exchange.png"
+                  alt="Staff Icon"
               /></span>
-              <span class="text">Quản Lý Nhân Viên</span>
+              <span class="text">Quản Lý Giao Dịch</span>
             </button>
           </div>
         </div>

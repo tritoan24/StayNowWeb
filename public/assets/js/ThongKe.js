@@ -905,6 +905,11 @@ document.addEventListener("DOMContentLoaded", () => {
       if (snapshot.exists()) {
         const userData = snapshot.val();
 
+        if(userData.loai_taikhoan === "Admin") {
+          const liCongVien = document.getElementById("li-congviec")
+          liCongVien.style.display = "none"
+        }
+
         // Hiển thị thông tin người dùng trên màn hình chính
         console.log("Thông tin người dùng:", userData);
 

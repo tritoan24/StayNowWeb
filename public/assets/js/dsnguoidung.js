@@ -399,7 +399,10 @@ document.addEventListener("DOMContentLoaded", () => {
   
           // Hiển thị thông tin người dùng trên màn hình chính
           console.log("Thông tin người dùng:", userData);
-  
+          if(userData.loai_taikhoan === "Admin") {
+            const liCongVien = document.getElementById("li-congviec")
+            liCongVien.style.display = "none"
+          }
           // Ví dụ: Cập nhật thông tin người dùng trên giao diện
           document.getElementById("userName").textContent = userData.ho_ten;
           document.getElementById("userAvatar").src =
