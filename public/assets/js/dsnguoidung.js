@@ -37,7 +37,6 @@ toggle.onclick = function () {
 // Biến để lưu trữ người dùng
 let allUsers = [];
 
-
 // Hàm để lấy danh sách người dùng
 function fetchUsers() {
     const usersRef = ref(database, 'NguoiDung');
@@ -53,7 +52,13 @@ function fetchUsers() {
 
                 for (const userId in users) {
                     const user = users[userId];
-                    allUsers.push(user); // Lưu trữ tất cả người dùng vào mảng
+
+                    // Kiểm tra nếu trường email bằng null hoặc không tồn tại thì bỏ qua
+                    if (!user.email) {
+                        continue; // Bỏ qua người dùng này
+                    }
+
+                    allUsers.push(user); // Lưu trữ người dùng hợp lệ vào mảng
 
                     // Tạo HTML cho mỗi người dùng
                     const userItem = document.createElement('div');
