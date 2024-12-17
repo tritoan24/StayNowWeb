@@ -319,7 +319,16 @@ async function handleFormSubmit(event) {
     if (mode === "add") {
       // Thêm dịch vụ mới
       const servicesRef = collection(db, "DichVu");
-      await addDoc(servicesRef, {
+    
+      const docRef = await addDoc(servicesRef, {
+        Ten_dichvu: serviceName,
+        Don_vi: serviceUnit,
+        Icon_dichvu: serviceIcon,
+        Status: serviceStatus,
+      });
+
+      await setDoc(docRef, {
+        Ma_dichvu: docRef.id, // ID tự động của Firestore
         Ten_dichvu: serviceName,
         Don_vi: serviceUnit,
         Icon_dichvu: serviceIcon,
@@ -341,6 +350,7 @@ async function handleFormSubmit(event) {
       // Cập nhật dịch vụ
       const serviceRef = doc(db, "DichVu", serviceId);
       await updateDoc(serviceRef, {
+        Ma_dichvu: serviceId, // ID tự động của Firestore
         Ten_dichvu: serviceName,
         Don_vi: serviceUnit,
         Icon_dichvu: serviceIcon,

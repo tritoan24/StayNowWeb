@@ -1,0 +1,12 @@
+:root{
+    --primary-color: #fe9300;
+    --secondary-color: #2a3547
+}
+
+.secondary-color{
+    color: var(--secondary-color);
+    --color: var(--secondary-color)
+}
+*{
+    font-family:    'Montserrat';
+}

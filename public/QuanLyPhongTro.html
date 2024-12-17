@@ -56,45 +56,55 @@
     <!-- chi tiet phong  -->
     <div id="overlay" onclick="closeDetails()"></div>
     <div id="detailDialog">
-      <div>
-        <button onclick="closeDetails()" id="back-button" class="back-button">
-          &larr;
-        </button>
-      </div>
+      <div id="detailDialogContent">
+        <div>
+          <button onclick="closeDetails()" id="back-button" class="back-button">
+            &larr;
+          </button>
+        </div>
 
-      <!-- slide ảnh -->
-      <div class="grid-slide-and-user-container">
-        <div id="roomImages" class="image-carousel">
-          <div class="carousel-container">
-            <button class="prev" onclick="changeSlide(-1)">&#10094;</button>
-            <div class="carousel-images">
-              <!-- Các ảnh slide sẽ được hiển thị ở đây -->
+        <!-- slide ảnh -->
+        <div class="grid-slide-and-user-container">
+          <div id="roomImages" class="image-carousel">
+            <div class="carousel-container">
+              <button class="prev" onclick="changeSlide(-1)">&#10094;</button>
+              <div class="carousel-images">
+                <!-- Các ảnh slide sẽ được hiển thị ở đây -->
+              </div>
+              <button class="next" onclick="changeSlide(1)">&#10095;</button>
             </div>
-            <button class="next" onclick="changeSlide(1)">&#10095;</button>
+            <div class="thumbnails">
+              <!-- Ảnh thu nhỏ sẽ được hiển thị ở đây -->
+            </div>
           </div>
-          <div class="thumbnails">
-            <!-- Ảnh thu nhỏ sẽ được hiển thị ở đây -->
+
+          <div class="user-info-container">
+            <img class="img-avt-user" src="" alt="" />
+            <p class="user-name"></p>
+            <p class="late-time-stamp"></p>
+            <div class="user-phone-container">
+              <p class="user-phone">Hiện số</p>
+            </div>
+            <div
+              data-user-id="USER_ID"
+              onclick="redirectToChat(this)"
+              class="chat-with-user-container"
+            >
+              <p>Chat với người dùng</p>
+            </div>
           </div>
         </div>
 
-        <div class="user-info-container">
-          <img class="img-avt-user" src="" alt="" />
-          <p class="user-name"></p>
-          <p class="late-time-stamp"></p>
-          <div class="user-phone-container">
-            <p class="user-phone">Hiện số</p>
-          </div>
-          <div
-            data-user-id="USER_ID"
-            onclick="redirectToChat(this)"
-            class="chat-with-user-container"
-          >
-            <p>Chat với người dùng</p>
-          </div>
-        </div>
+        <div id="roomDetails"></div>
       </div>
 
-      <div id="roomDetails"></div>
+      <div id="loadingSpinner">
+        <img
+          src="https://i.giphy.com/3oEjI6SIIHBdRxXI40.webp"
+          alt="Loading..."
+        />
+        <p>Đang tải dữ liệu...</p>
+      </div>
 
       <div class="actions"></div>
       <button class="close" onclick="closeDetails()">Đóng</button>

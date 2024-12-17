@@ -6,6 +6,7 @@ import {
   updateDoc,
   addDoc,
   deleteDoc,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 
@@ -298,11 +299,20 @@ async function handleFormSubmit(event) {
     if (mode === "add") {
       // Thêm mới
       const comfortsRef = collection(db, "TienNghi");
-      await addDoc(comfortsRef, {
+
+      const docRef = await addDoc(comfortsRef, {
         Ten_tiennghi: comfortName,
         Icon_tiennghi: comfortIcon,
         Status: comfortStatus,
       });
+
+      await setDoc(docRef, {
+        Ma_tiennghi: docRef.id, // ID tự động của Firestore
+        Ten_tiennghi: comfortName,
+        Icon_tiennghi: comfortIcon,
+        Status: comfortStatus,
+      });
+
       showSuccessModal("Tiện nghi đã được thêm thành công.", () => {
         clearForm();
         fetchAllComfort();
@@ -318,6 +328,7 @@ async function handleFormSubmit(event) {
       // Cập nhật dịch vụ
       const comfortsRef = doc(db, "TienNghi", comfortId);
       await updateDoc(comfortsRef, {
+        Ma_tiennghi: comfortId, // ID tự động của Firestore
         Ten_tiennghi: comfortName,
         Icon_tiennghi: comfortIcon,
         Status: comfortStatus,

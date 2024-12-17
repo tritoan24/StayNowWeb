@@ -298,6 +298,31 @@ function renderDienTich(dienTichData) {
 }
 
 
+let isLoadingDetail = false;
+function updateDetailLoadingState() {
+  const loadingElement = document.getElementById("loadingSpinner");
+  const detailDialog = document.getElementById("detailDialog");
+  const detailContent = document.getElementById("detailDialogContent");
+  const overlay = document.getElementById("overlay")
+
+  if (!loadingElement || !detailDialog) {
+    console.error("Phần tử loadingSpinner hoặc detailDialog không tồn tại.");
+    return;
+  }
+
+  if (isLoadingDetail) {
+    
+    loadingElement.style.display = "flex"; // Hiển thị spinner
+    detailDialog.style.display = "block"; // Ẩn chi tiết phòng
+     detailContent.style.display = "none"
+     overlay.style.display = "block"
+     
+  } else {
+    loadingElement.style.display = "none"; // Ẩn spinner
+    detailDialog.style.display = "block"; // Hiển thị chi tiết phòng
+    detailContent.style.display = "block"
+  }
+}
 
 
 // Hàm hiển thị chi tiết phòng trọ
@@ -307,7 +332,9 @@ async function viewDetails(roomId) {
 
   if (room) {
     try {
-      
+      isLoadingDetail = true;
+      updateDetailLoadingState();
+
       // Lấy thông tin người dùng và loại phòng (như trong đoạn code trước)
       const userInfo = await getUserInfo(room.Ma_nguoidung);
       const loaiPhongRef = doc(db, "LoaiPhong", room.Ma_loaiphong);
@@ -535,8 +562,7 @@ async function viewDetails(roomId) {
       }
 
         // Hiển thị chi tiết phòng
-        document.getElementById("detailDialog").style.display = "block";
-        document.getElementById("overlay").style.display = "block";
+        document.getElementById("detailDialogContent").style.display = "block";
 
         // Reset slide về ảnh đầu tiên
         currentSlide = 0;
@@ -544,6 +570,10 @@ async function viewDetails(roomId) {
       }
     } catch (error) {
       console.error("Lỗi khi lấy thông tin phòng:", error);
+    } finally {
+      // Tắt trạng thái loading
+      isLoadingDetail = false;
+      updateDetailLoadingState();
     }
   }
 }
@@ -606,7 +636,7 @@ function updateSlidePosition() {
   const carouselImages = imageContainer.querySelector(".carousel-images");
 
   // Di chuyển ảnh theo chỉ số slide hiện tại
-  carouselImages.style.transform = `translateX(-${currentSlide * 20}%)`;
+  carouselImages.style.transform = `translateX(-${currentSlide * 30}%)`;
 
   // Cập nhật trạng thái active cho thumbnail
   const thumbnails = document.querySelectorAll(".thumbnails img");

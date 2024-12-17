@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thống kê</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="./assets/css/thongke.css" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
+
+  <body>
+    <div class="navigation">
+      <ul>
+        <li>
+          <a href="#">
+            <span class="icon">
+              <ion-icon name="home"></ion-icon>
+            </span>
+            <span class="title">StayNow</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="./ThongKe.html">
+            <span class="icon">
+              <ion-icon name="bar-chart-outline"></ion-icon>
+            </span>
+            <span class="title">Thống kê</span>
+          </a>
+        </li>
+        <li>
+          <a href="./trangchu.html">
+            <span class="icon">
+              <ion-icon name="clipboard-outline"></ion-icon>
+            </span>
+            <span class="title">Quản lý</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="./QuanLyTinNhanHoTro.html">
+            <span class="icon">
+              <ion-icon name="chatbubble-outline"></ion-icon>
+            </span>
+            <span class="title">Tin nhắn hỗ trợ</span>
+          </a>
+        </li>
+
+        <li id="li-congviec">
+          <a href="./QuanLyCV.html">
+            <span class="icon">
+              <ion-icon name="briefcase-outline"></ion-icon>
+            </span>
+            <span class="title">Công việc</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="./danhsachnguoidung.html">
+            <span class="icon">
+              <ion-icon name="people-outline"></ion-icon>
+            </span>
+            <span class="title">Người Dùng</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="#" id="logoutButton">
+            <span class="icon">
+              <ion-icon name="log-out-outline"></ion-icon>
+            </span>
+            <span class="title">Đăng xuất</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="main">
+      <!-- Bộ lọc -->
+      <div class="filters">
+        <select id="regionFilter">
+          <option value="">Chọn khu vực</option>
+          <option value="Hà Nội">Hà Nội</option>
+          <option value="Hồ Chí Minh">Hồ Chí Minh</option>
+        </select>
+
+        <input type="date" id="startDate" />
+        <input type="date" id="endDate" />
+
+        <button id="applyFilters">Áp dụng</button>
+        <div class="quick-filters">
+          <select id="filterQuickOptions">
+            <option value="today">Hôm nay</option>
+            <option value="thisMonth">Tháng này</option>
+            <option value="thisYear">Năm này</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab" data-tab="rooms">Thống kê phòng trọ</button>
+        <button class="tab" data-tab="revenue">Thống kê doanh thu</button>
+        <button class="tab" data-tab="employees">Thống kê nhân viên</button>
+      </div>
+
+      <!-- Nội dung thống kê -->
+      <div class="stats">
+        <!-- Biểu đồ -->
+        <div class="chart-container">
+          <canvas id="chart"></canvas>
+        </div>
+
+        <!-- Bảng thống kê -->
+        <div class="table-container">
+          <table>
+            <thead id="roomsHeader" style="display: none">
+              <tr>
+                <th>Khu Vực</th>
+                <th>Số lượng đã tạo</th>
+                <th>Số lượng phòng đã thuê</th>
+              </tr>
+            </thead>
+            <thead id="revenueHeader" style="display: none">
+              <tr>
+                <th>Khu Vực</th>
+                <th>Tổng doanh thu</th>
+                <th>Số giao dịch</th>
+              </tr>
+            </thead>
+            <thead id="employeesHeader" style="display: none">
+              <tr>
+                <th>Nhân viên</th>
+                <th>Doanh thu</th>
+                <th>Số Công Việc</th>
+              </tr>
+            </thead>
+            <tbody id="statsTable">
+              <!-- Dữ liệu sẽ được thêm động -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <div id="logoutConfirmModal" class="modal modalHidden">
+      <div class="modal-content">
+        <h2 class="modal-title">Xác nhận đăng xuất</h2>
+        <p>Bạn có chắc chắn muốn đăng xuất tài khoản không?</p>
+        <div class="modal-actions">
+          <button id="confirmLogout" class="modal-button danger">Đồng ý</button>
+          <button id="cancelLogout" class="modal-button">Hủy</button>
+        </div>
+      </div>
+    </div>
+
+
+    <script type="module" src="./assets/js/ThongKe.js"></script>
+    <!-- =========== Scripts =========  -->
+    <script type="module" src="assets/js/main.js"></script>
+    <!-- ====== ionicons ======= -->
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+  </body>
+</html>

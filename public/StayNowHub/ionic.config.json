@@ -1,0 +1,7 @@
+{
+  "name": "StayNowHub",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
