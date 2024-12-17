@@ -574,3 +574,27 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+
+function removeVietnameseTones(str) {
+  return str
+    .normalize("NFD") // Tách dấu khỏi ký tự
+    .replace(/[\u0300-\u036f]/g, "") // Loại bỏ các ký tự dấu
+    .replace(/đ/g, "d") // Thay đ thành d
+    .replace(/Đ/g, "D") // Thay Đ thành D
+    .toLowerCase(); // Chuyển về chữ thường
+}
+
+function filterMessage(event) {
+  const keyword = removeVietnameseTones(event.target.value); // Từ khóa không dấu
+  // Lọc danh sách gốc để tìm dịch vụ phù hợp
+  const filteredMessage = allComforts.filter((comfort) =>
+    removeVietnameseTones(comfort.Ten_tiennghi).includes(keyword)
+  );
+
+    // Kiểm tra nếu không có kết quả
+    if (filteredComforts.length === 0) {
+      showNoResultMessage(); // Hiển thị thông báo không tìm thấy
+    } else {
+      renderComfortList(filteredComforts); // Hiển thị danh sách đã lọc
+    }
+}
