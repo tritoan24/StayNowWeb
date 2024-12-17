@@ -339,11 +339,6 @@ function searchUsers() {
                  }
              });
 
-
-
-
-
-
              // Thêm các phần tử vào userItem
              userDetails.appendChild(name);
              userDetails.appendChild(phone);
