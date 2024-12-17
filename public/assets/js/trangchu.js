@@ -53,7 +53,9 @@ document.getElementById('main').addEventListener('click', function (event) {
     }
     if (event.target && event.target.id === 'btnLichSuThanhToan') {
       navigateTo('LichSuThanhToan.html');
-  }
+  } if (event.target && event.target.id === 'btnLichSuGiaoDich') {
+    navigateTo('LichSuGiaoDich.html');
+}
 });
 
 

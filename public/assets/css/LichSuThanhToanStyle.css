@@ -221,3 +221,20 @@ h2 {
   font-size: 14px;
   font-weight: 400;
 }
+
+
+.no-result-message {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  text-align: center;
+  font-size: 16px;
+  color: #999;
+  margin-top: 20px;
+  align-items: center;
+}
+
+.no-result-message img{
+  width: 25px;
+  height: 25px;
+}
