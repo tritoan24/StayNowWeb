@@ -887,3 +887,47 @@ function showToast(message) {
 }
 
 
+document.addEventListener("DOMContentLoaded", () => {
+  const userId = localStorage.getItem("userId");
+
+  if (!userId) {
+    alert("Bạn chưa đăng nhập!");
+    window.location.href = "../../../public/Login/Login.html";
+    return;
+  }
+
+  // Truy vấn thông tin người dùng từ Firebase
+  const userRef = ref(rtdb, "NguoiDung/" + userId);
+
+  get(userRef)
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+
+
+        // Kiểm tra vai trò và ẩn nút nếu cần
+        if (userData.loai_taikhoan
+          === "NhanVien") {
+          const btnNhanVien = document.getElementById("btnNhanVien");
+          const btnLichSuThanhToan = document.getElementById("btnLichSuThanhToan");
+          const btnLichSuGiaoDich = document.getElementById("btnLichSuGiaoDich");
+          if (btnNhanVien) {
+            btnNhanVien.style.display = "none"; // Ẩn nút
+            btnLichSuThanhToan.style.display = "none"; 
+            btnLichSuGiaoDich.style.display = "none"; 
+        
+          }
+        }
+
+        if(userData.loai_taikhoan === "Admin") {
+          const liCongVien = document.getElementById("li-congviec")
+          liCongVien.style.display = "none"
+        }
+      } else {
+        alert("Không tìm thấy thông tin người dùng!");
+      }
+    })
+    .catch((error) => {
+      console.error("Lỗi kết nối đến máy chủ:", error.message);
+    });
+});
