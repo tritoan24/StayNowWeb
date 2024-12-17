@@ -126,7 +126,7 @@ async function fetchDataPhongTro(startDate = null, endDate = null, selectedProvi
         data.Trang_thailuu === false &&
         data.Trang_thaiphong === true &&
         isDateInRange(rentedTime, startDate, endDate);
-    
+
       // Điều kiện cho phòng đã tạo
       const isCreated = 
         data.Trang_thailuu === false &&
