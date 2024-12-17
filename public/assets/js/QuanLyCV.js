@@ -552,7 +552,7 @@ async function logoutUser() {
 
     // Delay chuyển hướng sau khi Toast hiển thị
     setTimeout(() => {
-      window.location.href = "../public/Login/Login.html"; // Chuyển hướng về trang chính
+      window.location.href = "../public/Login.html"; // Chuyển hướng về trang chính
     }, 1500); // Chờ 3 giây để Toast hiển thị
 
   } catch (error) {
@@ -595,7 +595,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!userId) {
     alert("Bạn chưa đăng nhập!");
-    window.location.href = "../../../public/Login/Login.html";
+    window.location.href = "../../../public/Login.html";
     return;
   }
 
