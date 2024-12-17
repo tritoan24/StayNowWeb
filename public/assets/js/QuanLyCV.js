@@ -369,8 +369,64 @@ window.thanhToan = async function (contractId) {
   }
 };
 
-function huyThanhToan(idHoaDon) {
-  console.log(`Hủy thanh toán hóa đơn: ${idHoaDon}`);
+window.chuyenCongViec = async function(idHoaDon) {
+  try {
+    // Load danh sách nhân viên
+    const staffSnapshot = await firestore.collection('NhanVien').get();
+    const staffList = staffSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    // Load thông tin assignment hiện tại
+    const assignmentSnapshot = await firestore.collection('CongViec')
+      .where('idHopDong', '==', idHoaDon)
+      .where('trangThai', '!=', 'AUTOCANCEL')
+      .get();
+    
+    if (assignmentSnapshot.empty) {
+      alert('Không tìm thấy công việc');
+      return;
+    }
+
+    const currentAssignment = assignmentSnapshot.docs[0].data();
+    const assignmentRef = assignmentSnapshot.docs[0].ref;
+
+    // Chọn nhân viên còn lại
+    const currentStaff = currentAssignment.idNhanVien;
+    const selectedStaff = staffList.find(staff => staff.id !== currentStaff);
+
+    if (!selectedStaff) {
+      alert('Không tìm thấy nhân viên để chuyển');
+      return;
+    }
+
+    // Tạo reference cho assignment mới
+    const newAssignmentRef = firestore.collection('CongViec').doc();
+
+    // Bắt đầu transaction
+    await firestore.runTransaction(async (transaction) => {
+      // Cập nhật trạng thái công việc cũ sang AutoCancel
+      transaction.update(assignmentRef, {
+        trangThai: 'AUTOCANCEL',
+        lyDoHuy: 'Nhân viên đã chuyển công việc sang một nhân viên mới'
+      });
+
+      // Thêm công việc mới cho nhân viên còn lại
+      transaction.create(newAssignmentRef, {
+        idNhanVien: selectedStaff.id,
+        idHopDong: idHoaDon,
+        thoigian: Date.now(),
+        trangThai: 'PROCESSING',
+        lyDoChuyenCongViec: 'Công việc được chuyển từ nhân viên khác'
+      });
+    });
+
+    alert('Chuyển công việc thành công');
+  } catch (error) {
+    console.error('Lỗi khi chuyển công việc:', error);
+    alert('Có lỗi xảy ra khi chuyển công việc');
+  }
 }
 
 // Function to open payment confirmation dialog
