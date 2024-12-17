@@ -8,6 +8,17 @@ import {
 
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
 import { signOut, getAuth} from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+// const firebaseConfig = {
+//   apiKey: "AIzaSyBmpKO0lDHFiYb3zklAJ2zz6qC-iQrypw0",
+//   authDomain: "staynowapp1.firebaseapp.com",
+//   databaseURL: "https://staynowapp1-default-rtdb.firebaseio.com",
+//   projectId: "staynowapp1",
+//   storageBucket: "staynowapp1.appspot.com",
+//   messagingSenderId: "918655571270",
+//   appId: "1:918655571270:web:94abfaf87fbbb3e4ecc147",
+//   measurementId: "G-PQP9CTPKGT",
+// };
+
 const firebaseConfig = {
   apiKey: "AIzaSyA-EHInpdkzzNF3z_GhMSQsqLC5GI7mYsc",
   authDomain: "reactnative-8e2ca.firebaseapp.com",
