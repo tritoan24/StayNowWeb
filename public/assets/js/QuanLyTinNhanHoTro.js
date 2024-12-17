@@ -221,7 +221,7 @@ function updateChatTitle(userDetails) {
 
   // Avatar
   const avatar = document.createElement("img");
-  avatar.src = userDetails.anh_daidien || "https://via.placeholder.com/50"; // Đường dẫn ảnh mặc định
+  avatar.src = userDetails.anh_daidien || "https://static.vecteezy.com/system/resources/thumbnails/005/194/102/small_2x/user-icon-flat-design-isolated-on-white-background-free-vector.jpg"; // Đường dẫn ảnh mặc định
   avatar.alt = `Avatar của ${userDetails.ho_ten}`;
   avatar.classList.add("chat-avatar");
 
