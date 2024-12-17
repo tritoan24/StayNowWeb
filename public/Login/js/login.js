@@ -85,8 +85,8 @@ togglePassword.addEventListener("click", () => {
   passwordInput.type = isPassword ? "text" : "password";
 
   togglePassword.src = isPassword 
-  ? "./images/icons/ic-eye-hidden.png" 
-  : "./images/icons/ic-eye.svg";
+  ? "./Login/images/icons/ic-eye-hidden.png" 
+  : "./Login/images/icons/ic-eye.svg";
 
  
 });
