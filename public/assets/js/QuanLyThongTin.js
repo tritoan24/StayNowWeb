@@ -6,6 +6,7 @@ import {
   updateDoc,
   addDoc,
   deleteDoc,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 
@@ -317,7 +318,7 @@ async function handleFormSubmit(event) {
         Ma_thongtin: docRef.id, // ID tự động của Firestore
         Ten_thongtin: informationName,
         Don_vi: informationUnit,
-        Icon_dichvu: informationIcon,
+        Icon_thongtin: informationIcon,
         Status: informationStatus,
       });
  
@@ -339,7 +340,7 @@ async function handleFormSubmit(event) {
         Ma_thongtin: informationId,
         Ten_thongtin: informationName,
         Don_vi: informationUnit,
-        Icon_dichvu: informationIcon,
+        Icon_thongtin: informationIcon,
         Status: informationStatus,
       });
       showSuccessModal("Thông tin đã được cập nhật thành công.", () => {

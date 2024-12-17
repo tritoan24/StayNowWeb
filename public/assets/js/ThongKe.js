@@ -8,15 +8,17 @@ import {
 
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
 import { signOut, getAuth} from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+
+
 const firebaseConfig = {
-  apiKey: "AIzaSyBmpKO0lDHFiYb3zklAJ2zz6qC-iQrypw0",
-  authDomain: "staynowapp1.firebaseapp.com",
-  databaseURL: "https://staynowapp1-default-rtdb.firebaseio.com",
-  projectId: "staynowapp1",
-  storageBucket: "staynowapp1.appspot.com",
-  messagingSenderId: "918655571270",
-  appId: "1:918655571270:web:94abfaf87fbbb3e4ecc147",
-  measurementId: "G-PQP9CTPKGT",
+  apiKey: "AIzaSyA-EHInpdkzzNF3z_GhMSQsqLC5GI7mYsc",
+  authDomain: "reactnative-8e2ca.firebaseapp.com",
+  databaseURL: "https://reactnative-8e2ca-default-rtdb.firebaseio.com",
+  projectId: "reactnative-8e2ca",
+  storageBucket: "reactnative-8e2ca.appspot.com",
+  messagingSenderId: "826980793632",
+  appId: "1:826980793632:web:41722d76fb0ef372776b45",
+  measurementId: "G-DMMZ0JC2GE",
 };
 
 const app = initializeApp(firebaseConfig);
@@ -885,10 +887,7 @@ function showToast(message) {
 }
 
 
-
-//lấy thông tin người dùng
 document.addEventListener("DOMContentLoaded", () => {
-  // Lấy `uid` từ `localStorage`
   const userId = localStorage.getItem("userId");
 
   if (!userId) {
@@ -905,18 +904,25 @@ document.addEventListener("DOMContentLoaded", () => {
       if (snapshot.exists()) {
         const userData = snapshot.val();
 
+
+        // Kiểm tra vai trò và ẩn nút nếu cần
+        if (userData.loai_taikhoan
+          === "NhanVien") {
+          const btnNhanVien = document.getElementById("btnNhanVien");
+          const btnLichSuThanhToan = document.getElementById("btnLichSuThanhToan");
+          const btnLichSuGiaoDich = document.getElementById("btnLichSuGiaoDich");
+          if (btnNhanVien) {
+            btnNhanVien.style.display = "none"; // Ẩn nút
+            btnLichSuThanhToan.style.display = "none"; 
+            btnLichSuGiaoDich.style.display = "none"; 
+        
+          }
+        }
+
         if(userData.loai_taikhoan === "Admin") {
           const liCongVien = document.getElementById("li-congviec")
           liCongVien.style.display = "none"
         }
-
-        // Hiển thị thông tin người dùng trên màn hình chính
-        console.log("Thông tin người dùng:", userData);
-
-        // Ví dụ: Cập nhật thông tin người dùng trên giao diện
-        document.getElementById("userName").textContent = userData.ho_ten;
-        document.getElementById("userAvatar").src =
-          userData.anh_daidien || "default-avatar.png";
       } else {
         alert("Không tìm thấy thông tin người dùng!");
       }

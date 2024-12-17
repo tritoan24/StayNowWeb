@@ -53,6 +53,11 @@ function fetchUsers() {
                 for (const userId in users) {
                     const user = users[userId];
 
+                     // Loại trừ người dùng có loai_taikhoan là Admin hoặc NhanVien
+                     if (user.loai_taikhoan === 'Admin' || user.loai_taikhoan === 'NhanVien') {
+                        continue; // Bỏ qua người dùng này
+                    }
+
                     // Kiểm tra nếu trường email bằng null hoặc không tồn tại thì bỏ qua
                     if (!user.email) {
                         continue; // Bỏ qua người dùng này
