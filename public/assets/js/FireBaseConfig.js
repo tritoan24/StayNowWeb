@@ -3,18 +3,6 @@ import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/fire
 import { getDatabase } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// Cấu hình Firebase
-// const firebaseConfig = {
-//   apiKey: "AIzaSyBmpKO0lDHFiYb3zklAJ2zz6qC-iQrypw0",
-//   authDomain: "staynowapp1.firebaseapp.com",
-//   databaseURL: "https://staynowapp1-default-rtdb.firebaseio.com",
-//   projectId: "staynowapp1",
-//   storageBucket: "staynowapp1.appspot.com",
-//   messagingSenderId: "918655571270",
-//   appId: "1:918655571270:web:94abfaf87fbbb3e4ecc147",
-//   measurementId: "G-PQP9CTPKGT",
-// };
-
 const firebaseConfig = {
   apiKey: "AIzaSyA-EHInpdkzzNF3z_GhMSQsqLC5GI7mYsc",
   authDomain: "reactnative-8e2ca.firebaseapp.com",
