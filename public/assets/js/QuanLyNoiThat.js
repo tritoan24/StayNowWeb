@@ -296,11 +296,19 @@ async function handleFormSubmit(event) {
     if (mode === "add") {
       // Thêm mới
       const furnituresRef = collection(db, "NoiThat");
-      await addDoc(furnituresRef, {
+      const docRef = await addDoc(furnituresRef, {
         Ten_noithat: furnitureName,
         Icon_noithat: furnitureIcon,
         Status: furnitureStatus,
       });
+
+      await setDoc(docRef, {
+        Ma_noithat: docRef.id, // ID tự động của Firestore
+        Ten_noithat: furnitureName,
+        Icon_noithat: furnitureIcon,
+        Status: furnitureStatus,
+      });
+  
       showSuccessModal("Nội thất đã được thêm thành công.", () => {
         clearForm();
         fetchAllFurniture();
@@ -316,6 +324,7 @@ async function handleFormSubmit(event) {
       // Cập nhật dịch vụ
       const furnitureRef = doc(db, "NoiThat", furnitureId);
       await updateDoc(furnitureRef, {
+        Ma_noithat: furnitureId, // ID tự động của Firestore
         Ten_noithat: furnitureName,
         Icon_noithat: furnitureIcon,
         Status: furnitureStatus,

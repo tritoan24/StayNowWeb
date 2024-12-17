@@ -306,12 +306,21 @@ async function handleFormSubmit(event) {
     if (mode === "add") {
       // Thêm dịch vụ mới
       const informationsRef = collection(db, "ThongTin");
-      await addDoc(informationsRef, {
+      const docRef = await addDoc(informationsRef, {
         Ten_thongtin: informationName,
         Don_vi: informationUnit,
         Icon_dichvu: informationIcon,
         Status: informationStatus,
       });
+
+      await setDoc(docRef, {
+        Ma_thongtin: docRef.id, // ID tự động của Firestore
+        Ten_thongtin: informationName,
+        Don_vi: informationUnit,
+        Icon_dichvu: informationIcon,
+        Status: informationStatus,
+      });
+ 
       showSuccessModal("Thông tin đã được thêm thành công.", () => {
         clearForm();
         fetchAllInformations();
@@ -327,6 +336,7 @@ async function handleFormSubmit(event) {
       // Cập nhật dịch vụ
       const informationRef = doc(db, "ThongTin", informationId);
       await updateDoc(informationRef, {
+        Ma_thongtin: informationId,
         Ten_thongtin: informationName,
         Don_vi: informationUnit,
         Icon_dichvu: informationIcon,
@@ -355,7 +365,7 @@ function updateInformation(informationId) {
     document.getElementById("informationUnit").value =
       selectedInformation.Don_vi || "";
     document.getElementById("informationIcon").value =
-      selectedInformation.Icon_dichvu || "";
+      selectedInformation.Icon_thongtin || "";
     document.getElementById("informationStatus").value =
       selectedInformation.Status.toString();
 
