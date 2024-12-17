@@ -13,6 +13,9 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
 
+import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+
+
 
 // Cấu hình Firebase
 const firebaseConfig = {
@@ -28,6 +31,8 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const realtimeDB = getDatabase(app); // Khởi tạo Realtime Database
+
 
 const auth = getAuth(app); // Đảm bảo truyền app vào
 
@@ -352,6 +357,23 @@ window.thanhToan = async function (contractId) {
       // Use dot notation to update nested field
       'hoaDonHopDong.trangThai': 'DONE'
     });
+
+    const notification = {
+      title: 'Hóa đơn hợp đồng đã được xác nhận và thanh toán thành công!',
+      message: `Hóa đơn hợp đồng của phòng ${contractData.thongtinphong.tenPhong} đã được xác nhận và thanh toán thành công.`,
+      typeNotification: 'ContractInvoice',
+      timestamp: Date.now(),
+      idModel: contractId
+    };
+    
+    // Tham chiếu đến node "ThongBao" của chủ nhà trong Realtime Database
+    const notificationRef = ref(realtimeDB, `ThongBao/${contractData.chuNha.maNguoiDung}`);
+    
+    // Thêm thông báo vào danh sách bằng push()
+    await push(notificationRef, notification);
+    
+    console.log("Thông báo đã được gửi thành công!");
+ 
 
     // Commit all updates in a single batch
     await batch.commit();
