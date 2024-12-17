@@ -9,12 +9,8 @@
     ],
     "rewrites": [
       {
-        "source": "/",
-        "destination": "/Login/Login.html"
-      },
-      {
         "source": "**",
-        "destination": "/Login/Login.html"
+        "destination": "/Login.html"
       }
     ]
   }
