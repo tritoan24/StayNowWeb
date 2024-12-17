@@ -293,7 +293,7 @@ window.thanhToan = async function (contractId) {
     const DcQuanHuyen = phongData.Dc_quanhuyen || '';
     const DcTinhThanhPho = phongData.Dc_tinhtp || '';
 
-    console.log(`Địa chỉ quận huyện: ${dcQuanHuyen}`);
+    console.log(`Địa chỉ quận huyện: ${DcQuanHuyen}`);
     console.log(`Địa chỉ tỉnh thành phố: ${DcTinhThanhPho}`);
 
     const batch = writeBatch(db);
