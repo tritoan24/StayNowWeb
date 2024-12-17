@@ -12,7 +12,7 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut} from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+import { getDatabase, ref, get, push } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
 
 
 
@@ -298,7 +298,7 @@ window.thanhToan = async function (contractId) {
     const DcQuanHuyen = phongData.Dc_quanhuyen || '';
     const DcTinhThanhPho = phongData.Dc_tinhtp || '';
 
-    console.log(`Địa chỉ quận huyện: ${dcQuanHuyen}`);
+    console.log(`Địa chỉ quận huyện: ${DcQuanHuyen}`);
     console.log(`Địa chỉ tỉnh thành phố: ${DcTinhThanhPho}`);
 
     const batch = writeBatch(db);
@@ -349,7 +349,26 @@ window.thanhToan = async function (contractId) {
         thoiGianHoanThanh: serverTimestamp(),
         ghiChu: 'Thanh toán thành công'
       });
+
+      
     });
+
+    const notification = {
+      title: 'Thông báo thành công',
+      message: `Hợp đồng của phòng ${contractData.thongtinphong.tenPhong} đã thanh toán thành công `,
+      timestamp: Date.now(),
+      isRead: false,
+      date: Calendar.getInstance().time.toString(),
+      time: new Date().toLocaleTimeString('vi-VN'),
+      mapLink : null,
+      isPushed : true,
+      typeNotification : "NotiNoti",
+      idModel : "idHopDong"
+    
+    };
+    
+    const notificationRef = ref(database, `ThongBao/${contractData.chuNha.maNguoiDung}`);
+    await push(notificationRef, notification);
 
     // Update the contract status
     batch.update(contractRef, {
