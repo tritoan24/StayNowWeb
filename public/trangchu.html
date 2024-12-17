@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trang Quản Lý</title>
+    <link rel="stylesheet" href="./assets/css/style.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+      }
+      /* Container setup */
+      .button-container {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 30px;
+        padding: 20px;
+        margin-top: 100px;
+      }
+
+      .column {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+      }
+
+      /* Card chung */
+      .card {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 330px;
+        height: 120px;
+        padding: 15px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        border-radius: 15px;
+        color: white;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background-size: 200% 200%;
+        background-position: center;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        background-position: left center;
+      }
+
+      /* Gradients for each card */
+      .phongtro {
+        background: linear-gradient(135deg, #42a5f5, #478ed1);
+      }
+
+      .dichvu {
+        background: linear-gradient(135deg, #ff9800, #e65100);
+      }
+
+      .thongtin {
+        background: linear-gradient(135deg, #66bb6a, #388e3c);
+      }
+
+      .tiennghi {
+        background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+      }
+
+      .noithat {
+        background: linear-gradient(135deg, #ef5350, #d32f2f);
+      }
+
+      .nhanvien {
+        background: linear-gradient(135deg, #3f51b5, #303f9f);
+      }
+
+      .lichsuthanhtoan {
+        background: linear-gradient(135deg, #ff5722, #e64a19);
+      }
+
+      /* Icon setup */
+      .card .icon {
+        width: 60px;
+        height: 60px;
+        margin-right: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .card .icon img {
+        width: 100%;
+        height: auto;
+        filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+      }
+
+      /* Text setup */
+      .card .text {
+        flex-grow: 1;
+        text-align: left;
+        font-size: 18px;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .button-container {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .card {
+          width: 95%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- =============== Navigation ================ -->
+    <div class="container">
+      <div class="navigation">
+        <ul>
+          <li>
+            <a href="#">
+              <span class="icon">
+                <ion-icon name="home"></ion-icon>
+              </span>
+              <span class="title">StayNow</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="./index.html">
+              <span class="icon">
+                <ion-icon name="home"></ion-icon>
+              </span>
+              <span class="title">Trang chủ</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="./danhsachnguoidung.html">
+              <span class="icon">
+                <ion-icon name="people-outline"></ion-icon>
+              </span>
+              <span class="title">Người Dùng</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="./QuanLyTinNhanHoTro.html">
+              <span class="icon">
+                <ion-icon name="chatbubble-outline"></ion-icon>
+              </span>
+              <span class="title">Tin nhắn hỗ trợ</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="./trangchu.html">
+              <span class="icon">
+                <ion-icon name="cloudy"></ion-icon>
+              </span>
+              <span class="title">Quản lý</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="#" id="logoutButton">
+              <span class="icon">
+                <ion-icon name="log-out-outline"></ion-icon>
+              </span>
+              <span class="title">Đăng xuất</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div id="logoutConfirmModal" class="modal modalHidden">
+        <div class="modal-content">
+          <h2 class="modal-title">Xác nhận đăng xuất</h2>
+          <p>Bạn có chắc chắn muốn đăng xuất tài khoản không?</p>
+          <div class="modal-actions">
+            <button id="confirmLogout" class="modal-button danger">
+              Đồng ý
+            </button>
+            <button id="cancelLogout" class="modal-button">Hủy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- toast dang xuat thanh cong -->
+      <div id="toastContainer" class="toast-container"></div>
+
+      <!-- ========================= Main ==================== -->
+      <div class="main" id="main">
+        <div class="topbar">
+          <div class="toggle">
+            <ion-icon name="menu-outline"></ion-icon>
+          </div>
+
+          <div class="search">
+            <label>
+              <input type="text" placeholder="Tìm kiếm" />
+              <ion-icon name="search-outline"></ion-icon>
+            </label>
+          </div>
+
+          <div class="info-user">
+            <h3 id="userName">Tên người dùng</h3>
+            <div class="user">
+              <img id="userAvatar" src="assets/imgs/customer01.jpg" alt="" />
+            </div>
+          </div>
+        </div>
+
+        <div class="button-container">
+          <div class="column">
+            <button id="btnPhongTro" class="card phongtro">
+              <span class="icon"
+                ><img src="./assets/imgs/icons/ic-bedroom.png" alt="Room Icon"
+              /></span>
+              <span class="text">Quản Lý Phòng Trọ</span>
+            </button>
+            <button id="btndichvu" class="card dichvu">
+              <span class="icon"
+                ><img
+                  src="./assets/imgs/icons/ic-customer-service.png"
+                  alt="Service Icon"
+              /></span>
+              <span class="text">Quản Lý Dịch Vụ</span>
+            </button>
+          </div>
+          <div class="column">
+            <button id="btnthongtin" class="card thongtin">
+              <span class="icon"
+                ><img src="./assets/imgs/icons/ic-info.png" alt="Info Icon"
+              /></span>
+              <span class="text">Quản lý Thông Tin</span>
+            </button>
+            <button id="btntiennghi" class="card tiennghi">
+              <span class="icon"
+                ><img
+                  src="./assets/imgs/icons/ic-comfort.png"
+                  alt="Convenience Icon"
+              /></span>
+              <span class="text">Quản Lý Tiện Nghi</span>
+            </button>
+          </div>
+          <div class="column">
+            <button id="btnnoithat" class="card noithat">
+              <span class="icon"
+                ><img
+                  src="./assets/imgs/icons/ic-window.png"
+                  alt="Interior Icon"
+              /></span>
+              <span class="text">Quản Lý Nội Thất</span>
+            </button>
+            <button id="btnNhanVien" class="card nhanvien">
+              <span class="icon"
+                ><img src="./assets/imgs/icons/ic-people.png" alt="Staff Icon"
+              /></span>
+              <span class="text">Quản Lý Nhân Viên</span>
+            </button>
+          </div>
+          <div class="column">
+            <button id="btnLichSuThanhToan" class="card lichsuthanhtoan">
+              <span class="icon"
+                ><img
+                  src="./assets/imgs/icons/ic-receipt.png"
+                  alt="Payment Icon"
+              /></span>
+              <span class="text">Lịch sử thanh toán</span>
+            </button>
+            <button id="btnNhanVien" class="card nhanvien">
+              <span class="icon"
+                ><img src="./assets/imgs/icons/ic-people.png" alt="Staff Icon"
+              /></span>
+              <span class="text">Quản Lý Nhân Viên</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./assets/js/FireBaseConfig.js"></script>
+    <script type="module" src="./assets/js/trangchu.js"></script>
+    <script type="module" src="./assets/js/SignOut.js"></script>
+
+    <!-- ====== ionicons ======= -->
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+  </body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản Lý Phòng Trọ</title>
+    <link rel="stylesheet" href="./assets/css/QuanLyPhongTroStyle.css" />
+  </head>
+  <body>
+    <header>
+      <div class="back-button">
+        <button onclick="goBack()">Quay lại</button>
+      </div>
+      <h1>Quản Lý Phòng Trọ</h1>
+    </header>
+
+    <div class="container">
+      <h2>Danh sách phòng trọ</h2>
+
+      <!-- Thanh tìm kiếm -->
+      <div class="search-view">
+        <div class="search-container">
+          <img src="./assets/imgs/icons/ic-search-gray.svg" alt="Search Icon" />
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Tìm kiếm phòng..."
+            oninput="searchRooms()"
+          />
+        </div>
+        <div class="search-actions">
+          <img src="./assets/imgs/icons/ic-sort.svg" alt="Sort Icon" />
+          <img src="./assets/imgs/icons/ic-fill.svg" alt="Fill Icon" />
+        </div>
+      </div>
+
+      <!-- Danh sách phòng trọ -->
+      <div id="columns">
+        <div id="approvedRooms" class="column">
+          <h3>Phòng đã duyệt</h3>
+          <div id="approvedRoomList"></div>
+        </div>
+        <div id="canceledRooms" class="column">
+          <h3>Phòng bị hủy</h3>
+          <div id="canceledRoomList"></div>
+        </div>
+        <div id="pendingRooms" class="column">
+          <h3>Phòng đang chờ duyệt</h3>
+          <div id="pendingRoomList"></div>
+        </div>
+      </div>
+
+      <!-- Đây là nơi sẽ hiển thị danh sách phòng trọ -->
+    </div>
+
+    <!-- chi tiet phong  -->
+    <div id="overlay" onclick="closeDetails()"></div>
+    <div id="detailDialog">
+      <div id="detailDialogContent">
+        <div>
+          <button onclick="closeDetails()" id="back-button" class="back-button">
+            &larr;
+          </button>
+        </div>
+
+        <!-- slide ảnh -->
+        <div class="grid-slide-and-user-container">
+          <div id="roomImages" class="image-carousel">
+            <div class="carousel-container">
+              <button class="prev" onclick="changeSlide(-1)">&#10094;</button>
+              <div class="carousel-images">
+                <!-- Các ảnh slide sẽ được hiển thị ở đây -->
+              </div>
+              <button class="next" onclick="changeSlide(1)">&#10095;</button>
+            </div>
+            <div class="thumbnails">
+              <!-- Ảnh thu nhỏ sẽ được hiển thị ở đây -->
+            </div>
+          </div>
+
+          <div class="user-info-container">
+            <img class="img-avt-user" src="" alt="" />
+            <p class="user-name"></p>
+            <p class="late-time-stamp"></p>
+            <div class="user-phone-container">
+              <p class="user-phone">Hiện số</p>
+            </div>
+            <div
+              data-user-id="USER_ID"
+              onclick="redirectToChat(this)"
+              class="chat-with-user-container"
+            >
+              <p>Chat với người dùng</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="roomDetails"></div>
+      </div>
+
+      <div id="loadingSpinner">
+        <img
+          src="https://i.giphy.com/3oEjI6SIIHBdRxXI40.webp"
+          alt="Loading..."
+        />
+        <p>Đang tải dữ liệu...</p>
+      </div>
+
+      <div class="actions"></div>
+      <button class="close" onclick="closeDetails()">Đóng</button>
+    </div>
+
+    <!-- Đính kèm file JavaScript -->
+    <script src="./assets/js/QuanLyPhongTro.js" type="module"></script>
+  </body>
+</html>
