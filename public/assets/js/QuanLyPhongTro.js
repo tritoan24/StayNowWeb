@@ -170,6 +170,7 @@ function renderRoomList(rooms, containerId) {
         <button class="btn revert">Duyệt lại</button>
       `;
     }
+    
 
     roomDiv.innerHTML = `
       <div class="room-card">
@@ -371,7 +372,7 @@ function renderPhiDichVuList(phiDichVuData) {
   } else {
     return "<p>Không có phí dịch vụ</p>";
   }
-}
+}  
 
 let isLoadingDetail = false;
 function updateDetailLoadingState() {
@@ -430,6 +431,7 @@ async function viewDetails(roomId) {
 
       const dichVuData = await getDichVuByPhongTro(currentRoomId);
       const phiDichVuData = await getPhiDichVuByPhongTro(currentRoomId);
+      
 
       if (loaiPhongSnapshot.exists()) {
         const loaiPhongData = loaiPhongSnapshot.data();
@@ -565,7 +567,7 @@ async function viewDetails(roomId) {
                 </div>
              </div>
             </div>
-    
+                    
         `;
 
         const imageContainer = document.getElementById("roomImages");
@@ -789,6 +791,7 @@ function approveRoom(roomId) {
   })
     .then(() => {
       showToast("Phòng đã được duyệt")
+      closeDetails() 
       fetchAllRooms();
     })
     .catch((error) => {
@@ -806,6 +809,7 @@ function cancelRoom(roomId) {
   })
     .then(() => {
       showToastFalse("Phòng đã bị huỷ!")
+      closeDetails() 
       fetchAllRooms(); // Tải lại danh sách phòng trọ để cập nhật giao diện
     })
     .catch((error) => {
@@ -822,6 +826,7 @@ function revertToPending(roomId) {
   })
     .then(() => {
       showToast("Phòng đã chuyển về trạng thái Chờ duyệt!")
+      closeDetails() 
       fetchAllRooms(); // Tải lại danh sách phòng trọ để cập nhật giao diện
     })
     .catch((error) => {
