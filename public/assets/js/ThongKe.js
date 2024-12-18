@@ -892,7 +892,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!userId) {
     alert("Bạn chưa đăng nhập!");
-    window.location.href = "../../../public/Login/Login.html";
+    window.location.href = "../../../public/Login.html";
     return;
   }
 
