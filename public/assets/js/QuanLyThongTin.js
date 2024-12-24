@@ -114,7 +114,7 @@ function filterInformation(event) {
 
   // Lọc danh sách gốc để tìm dịch vụ phù hợp
   const filteredInformations = allInformations.filter((information) =>
-    removeVietnameseTones(information.Ten_thongtin).includes(keyword)
+    removeVietnameseTones(information.tenThongTin).includes(keyword)
   );
 
   // Kiểm tra nếu không có kết quả
@@ -131,10 +131,10 @@ function renderInformationList(informations) {
   informationListContainer.innerHTML = ""; // Xóa nội dung cũ
 
   const activeInformations = informations.filter(
-    (information) => information.Status === true
+    (information) => information.trangThai === true
   );
   const inactiveInformations = informations.filter(
-    (information) => information.Status === false
+    (information) => information.trangThai === false
   );
 
   // Hiển thị dịch vụ hoạt động
@@ -147,11 +147,11 @@ function renderInformationList(informations) {
     informationDiv.innerHTML = `
       <div class="information-card">
         <div class="information-image">
-            <img src="${information.Icon_thongtin}" alt="${information.Ten_thongtin}" />
+            <img src="${information.iconThongTin}" alt="${information.tenThongTin}" />
         </div>
         <div class="information-info">
-            <h3 class="information-title">${information.Ten_thongtin}</h3>
-            <p class="information-unit">${information.Don_vi}</p>
+            <h3 class="information-title">${information.tenThongTin}</h3>
+            <p class="information-unit">${information.donVi}</p>
              <div class="status-layout">
                  <img src="../public/assets/imgs/icons/ic-dot-active.svg" alt="">
                       <p class="service-status">Hoạt động</p>
@@ -179,11 +179,11 @@ function renderInformationList(informations) {
     informationDiv.innerHTML = `
       <div class="information-card">
         <div class="information-image">
-            <img src="${information.Icon_thongtin}" alt="${information.Ten_thongtin}" />
+            <img src="${information.iconThongTin}" alt="${information.tenThongTin}" />
         </div>
         <div class="information-info">
-            <h3 class="information-title">${information.Ten_thongtin}</h3>
-            <p class="information-unit">${information.Don_vi}</p>
+            <h3 class="information-title">${information.tenThongTin}</h3>
+            <p class="information-unit">${information.donVi}</p>
      <div class="status-layout">
                  <img src="../public/assets/imgs/icons/ic-dot-cancel.svg" alt="">
             <p class="service-status">Đã hủy</p>
@@ -211,9 +211,9 @@ async function cancelInformation(informationId) {
     try {
       // Cập nhật trạng thái trong Firestore
       const informationRef = doc(db, "ThongTin", informationId); // Tạo tham chiếu đến dịch vụ trong Firestore
-      await updateDoc(informationRef, { Status: false }); // Cập nhật trạng thái thành false
+      await updateDoc(informationRef, { trangThai: false }); // Cập nhật trạng thái thành false
       showToastFalse("Huỷ thông tin thành công")
-      information.Status = false;
+      information.trangThai = false;
 
       // Làm mới giao diện để hiển thị trạng thái mới
       renderInformationList(informations);
@@ -235,9 +235,9 @@ async function activateInformation(informationId) {
     try {
       // Cập nhật trạng thái trong Firestore
       const informationRef = doc(db, "ThongTin", informationId); // Tạo tham chiếu đến dịch vụ trong Firestore
-      await updateDoc(informationRef, { Status: true }); // Cập nhật trạng thái thành true
+      await updateDoc(informationRef, { trangThai: true }); // Cập nhật trạng thái thành true
 
-      information.Status = true;
+      information.trangThai = true;
       showToast("Kích hoạt thông tin thành công")
       // Làm mới giao diện để hiển thị trạng thái mới
       renderInformationList(informations);
@@ -308,18 +308,18 @@ async function handleFormSubmit(event) {
       // Thêm dịch vụ mới
       const informationsRef = collection(db, "ThongTin");
       const docRef = await addDoc(informationsRef, {
-        Ten_thongtin: informationName,
-        Don_vi: informationUnit,
-        Icon_dichvu: informationIcon,
-        Status: informationStatus,
+        tenThongTin: informationName,
+        donVi: informationUnit,
+        iconDichVu: informationIcon,
+        trangThai: informationStatus,
       });
 
       await setDoc(docRef, {
-        Ma_thongtin: docRef.id, // ID tự động của Firestore
-        Ten_thongtin: informationName,
-        Don_vi: informationUnit,
-        Icon_thongtin: informationIcon,
-        Status: informationStatus,
+        maThongTin: docRef.id, // ID tự động của Firestore
+        tenThongTin: informationName,
+        donVi: informationUnit,
+        iconThongTin: informationIcon,
+        trangThai: informationStatus,
       });
  
       showSuccessModal("Thông tin đã được thêm thành công.", () => {
@@ -337,11 +337,11 @@ async function handleFormSubmit(event) {
       // Cập nhật dịch vụ
       const informationRef = doc(db, "ThongTin", informationId);
       await updateDoc(informationRef, {
-        Ma_thongtin: informationId,
-        Ten_thongtin: informationName,
-        Don_vi: informationUnit,
-        Icon_thongtin: informationIcon,
-        Status: informationStatus,
+        maThongTin: informationId,
+        tenThongTin: informationName,
+        donVi: informationUnit,
+        iconThongTin: informationIcon,
+        trangThai: informationStatus,
       });
       showSuccessModal("Thông tin đã được cập nhật thành công.", () => {
         clearForm();
@@ -362,13 +362,13 @@ function updateInformation(informationId) {
   if (selectedInformation) {
     // Điền thông tin vào form
     document.getElementById("informationName").value =
-      selectedInformation.Ten_thongtin || "";
+      selectedInformation.tenThongTin || "";
     document.getElementById("informationUnit").value =
-      selectedInformation.Don_vi || "";
+      selectedInformation.donVi || "";
     document.getElementById("informationIcon").value =
-      selectedInformation.Icon_thongtin || "";
+      selectedInformation.iconThongTin || "";
     document.getElementById("informationStatus").value =
-      selectedInformation.Status.toString();
+      selectedInformation.trangThai.toString();
 
     // Chuyển form sang chế độ cập nhật
     const form = document.getElementById("insertInformationForm");

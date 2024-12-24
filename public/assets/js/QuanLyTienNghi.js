@@ -116,7 +116,7 @@ function filterComfort(event) {
   const keyword = removeVietnameseTones(event.target.value); // Từ khóa không dấu
   // Lọc danh sách gốc để tìm dịch vụ phù hợp
   const filteredComforts = allComforts.filter((comfort) =>
-    removeVietnameseTones(comfort.Ten_tiennghi).includes(keyword)
+    removeVietnameseTones(comfort.tenTienNghi).includes(keyword)
   );
 
     // Kiểm tra nếu không có kết quả
@@ -132,10 +132,10 @@ function renderComfortList(comforts) {
   comfortListContainer.innerHTML = ""; // Xóa nội dung cũ
 
   const activeComforts = comforts.filter(
-    (comfort) => comfort.Status === true
+    (comfort) => comfort.trangThai === true
   );
   const inactiveComforts = comforts.filter(
-    (comfort) => comfort.Status === false
+    (comfort) => comfort.trangThai === false
   );
 
   // Hiển thị dịch vụ hoạt động
@@ -149,10 +149,10 @@ function renderComfortList(comforts) {
     comfortDiv.innerHTML = `
       <div class="comfort-card">
         <div class="comfort-image">
-            <img src="${comfort.Icon_tiennghi}" alt="${comfort.Ten_tiennghi}" />
+            <img src="${comfort.iconTienNghi}" alt="${comfort.tenTienNghi}" />
         </div>
         <div class="comfort-info">
-            <h3 class="comfort-title">${comfort.Ten_tiennghi}</h3>
+            <h3 class="comfort-title">${comfort.tenTienNghi}</h3>
              <div class="status-layout">
               <img src="../public/assets/imgs/icons/ic-dot-active.svg" alt="">
                       <p class="comfort-status">Hoạt động</p>
@@ -179,10 +179,10 @@ function renderComfortList(comforts) {
     comfortDiv.innerHTML = `
       <div class="comfort-card">
         <div class="comfort-image">
-            <img src="${comfort.Icon_tiennghi}" alt="${comfort.Ten_tiennghi}" />
+            <img src="${comfort.iconTienNghi}" alt="${comfort.tenTienNghi}" />
         </div>
         <div class="comfort-info">
-            <h3 class="comfort-title">${comfort.Ten_tiennghi}</h3>
+            <h3 class="comfort-title">${comfort.tenTienNghi}</h3>
      <div class="status-layout">
               <img src="../public/assets/imgs/icons/ic-dot-cancel.svg" alt="">
             <p class="comfort-status">Đã hủy</p>
@@ -211,9 +211,9 @@ async function cancelComfort(comfortId) {
     try {
       // Cập nhật trạng thái trong Firestore
       const comfortRef = doc(db, "TienNghi", comfortId); // Tạo tham chiếu đến dịch vụ trong Firestore
-      await updateDoc(comfortRef, { Status: false }); // Cập nhật trạng thái thành false
+      await updateDoc(comfortRef, { trangThai: false }); // Cập nhật trạng thái thành false
 
-      comfort.Status = false;
+      comfort.trangThai = false;
       // Làm mới giao diện để hiển thị trạng thái mới
       renderComfortList(comforts);
       showToastFalse("Huỷ tiện nghi thành công")
@@ -234,9 +234,9 @@ async function activateComfort(comfortId) {
     try {
       // Cập nhật trạng thái trong Firestore
       const comfortRef = doc(db, "TienNghi", comfortId); // Tạo tham chiếu đến dịch vụ trong Firestore
-      await updateDoc(comfortRef, { Status: true }); // Cập nhật trạng thái thành true
+      await updateDoc(comfortRef, { trangThai: true }); // Cập nhật trạng thái thành true
 
-      comfort.Status = true;
+      comfort.trangThai = true;
 
       // Làm mới giao diện để hiển thị trạng thái mới
       renderComfortList(comforts);
@@ -301,16 +301,16 @@ async function handleFormSubmit(event) {
       const comfortsRef = collection(db, "TienNghi");
 
       const docRef = await addDoc(comfortsRef, {
-        Ten_tiennghi: comfortName,
-        Icon_tiennghi: comfortIcon,
-        Status: comfortStatus,
+        tenTienNghi: comfortName,
+        iconTienNghi: comfortIcon,
+        trangThai: comfortStatus,
       });
 
       await setDoc(docRef, {
-        Ma_tiennghi: docRef.id, // ID tự động của Firestore
-        Ten_tiennghi: comfortName,
-        Icon_tiennghi: comfortIcon,
-        Status: comfortStatus,
+        maTienNghi: docRef.id, // ID tự động của Firestore
+        tenTienNghi: comfortName,
+        iconTienNghi: comfortIcon,
+        trangThai: comfortStatus,
       });
 
       showSuccessModal("Tiện nghi đã được thêm thành công.", () => {
@@ -328,10 +328,10 @@ async function handleFormSubmit(event) {
       // Cập nhật dịch vụ
       const comfortsRef = doc(db, "TienNghi", comfortId);
       await updateDoc(comfortsRef, {
-        Ma_tiennghi: comfortId, // ID tự động của Firestore
-        Ten_tiennghi: comfortName,
-        Icon_tiennghi: comfortIcon,
-        Status: comfortStatus,
+        maTienNghi: comfortId, // ID tự động của Firestore
+        tenTienNghi: comfortName,
+        iconTienNghi: comfortIcon,
+        trangThai: comfortStatus,
       });
       showSuccessModal("Tiện nghi đã được cập nhật thành công.", () => {
         clearForm();
@@ -352,11 +352,11 @@ function updateComfort(comfortId) {
   if (selectedComfort) {
     // Điền thông tin vào form
     document.getElementById("comfortName").value =
-    selectedComfort.Ten_tiennghi || "";
+    selectedComfort.tenTienNghi || "";
     document.getElementById("comfortIcon").value =
-    selectedComfort.Icon_tiennghi || "";
+    selectedComfort.iconTienNghi || "";
     document.getElementById("comfortStatus").value =
-    selectedComfort.Status.toString();
+    selectedComfort.trangThai.toString();
 
     // Chuyển form sang chế độ cập nhật
     const form = document.getElementById("insertComfortForm");
@@ -458,7 +458,7 @@ window.cancelComfort = cancelComfort;
 window.activateComfort = activateComfort;
 window.deleteComfort = deleteComfort;
 window.goBack = goBack;
-window.clearForm = clearForm;
+window.clearForm = clearForm;     
 window.handleFormSubmit = handleFormSubmit;
 window.updateComfort = updateComfort;
 window.filterComfort = filterComfort;

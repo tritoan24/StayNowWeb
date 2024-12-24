@@ -115,7 +115,7 @@ function filterServices(event) {
   const keyword = removeVietnameseTones(event.target.value); // Từ khóa không dấu
   // Lọc danh sách gốc để tìm dịch vụ phù hợp
   const filteredServices = allServices.filter((service) =>
-    removeVietnameseTones(service.Ten_dichvu).includes(keyword)
+    removeVietnameseTones(service.tenDichVu).includes(keyword)
   );
 
     // Kiểm tra nếu không có kết quả
@@ -131,9 +131,9 @@ function renderServiceList(services) {
   const serviceListContainer = document.getElementById("serviceList");
   serviceListContainer.innerHTML = ""; // Xóa nội dung cũ
 
-  const activeServices = services.filter((service) => service.Status === true);
+  const activeServices = services.filter((service) => service.trangThai === true);
   const inactiveServices = services.filter(
-    (service) => service.Status === false
+    (service) => service.trangThai === false
   );
 
   // Hiển thị dịch vụ hoạt động
@@ -147,11 +147,11 @@ function renderServiceList(services) {
     serviceDiv.innerHTML = `
       <div class="service-card">
         <div class="service-image">
-            <img src="${service.Icon_dichvu}" alt="${service.Ten_dichvu}" />
+            <img src="${service.iconDichVu}" alt="${service.tenDichVu}" />
         </div>
         <div class="service-info">
-            <h3 class="service-title">${service.Ten_dichvu}</h3>
-            <p class="service-unit">${service.Don_vi}</p>
+            <h3 class="service-title">${service.tenDichVu}</h3>
+            <p class="service-unit">${service.donVi}</p>
             <div class="status-layout">
                 <img src="../public/assets/imgs/icons/ic-dot-active.svg" alt="">
                              <p class="service-status">Hoạt động</p>
@@ -179,11 +179,11 @@ function renderServiceList(services) {
     serviceDiv.innerHTML = `
       <div class="service-card">
         <div class="service-image">
-            <img src="${service.Icon_dichvu}" alt="${service.Ten_dichvu}" />
+            <img src="${service.iconDichVu}" alt="${service.tenDichVu}" />
         </div>
         <div class="service-info">
-            <h3 class="service-title">${service.Ten_dichvu}</h3>
-            <p class="service-unit">${service.Don_vi}</p>
+            <h3 class="service-title">${service.tenDichVu}</h3>
+            <p class="service-unit">${service.donVi}</p>
             <div class="status-layout">
             <img src="../public/assets/imgs/icons/ic-dot-cancel.svg" alt="">
             <p class="service-status">Đã hủy</p>
@@ -214,10 +214,10 @@ async function cancelService(serviceId) {
     try {
       // Cập nhật trạng thái trong Firestore
       const serviceRef = doc(db, "DichVu", serviceId); // Tạo tham chiếu đến dịch vụ trong Firestore
-      await updateDoc(serviceRef, { Status: false }); // Cập nhật trạng thái thành false
+      await updateDoc(serviceRef, { trangThai: false }); // Cập nhật trạng thái thành false
 
       // Cập nhật trạng thái trong mảng services
-      service.Status = false;
+      service.trangThai = false;
 
       // Làm mới giao diện để hiển thị trạng thái mới
       renderServiceList(services);
@@ -241,10 +241,10 @@ async function activateService(serviceId) {
     try {
       // Cập nhật trạng thái trong Firestore
       const serviceRef = doc(db, "DichVu", serviceId); // Tạo tham chiếu đến dịch vụ trong Firestore
-      await updateDoc(serviceRef, { Status: true }); // Cập nhật trạng thái thành true
+      await updateDoc(serviceRef, { trangThai: true }); // Cập nhật trạng thái thành true
 
       // Cập nhật trạng thái trong mảng services
-      service.Status = true;
+      service.trangThai = true;
 
       // Làm mới giao diện để hiển thị trạng thái mới
       renderServiceList(services);
@@ -322,18 +322,18 @@ async function handleFormSubmit(event) {
       const servicesRef = collection(db, "DichVu");
     
       const docRef = await addDoc(servicesRef, {
-        Ten_dichvu: serviceName,
-        Don_vi: serviceUnit,
-        Icon_dichvu: serviceIcon,
-        Status: serviceStatus,
+        tenDichVu: serviceName,
+        donVi: serviceUnit,
+        iconDichVu: serviceIcon,
+        trangThai: serviceStatus,
       });
 
       await setDoc(docRef, {
-        Ma_dichvu: docRef.id, // ID tự động của Firestore
-        Ten_dichvu: serviceName,
-        Don_vi: serviceUnit,
-        Icon_dichvu: serviceIcon,
-        Status: serviceStatus,
+        maDichVu: docRef.id, // ID tự động của Firestore
+        tenDichVu: serviceName,
+        donVi: serviceUnit,
+        iconDichVu: serviceIcon,
+        trangThai: serviceStatus,
       });
       // Hiển thị modal thành công
       showSuccessModal("Dịch vụ đã được thêm thành công.", () => {
@@ -351,11 +351,11 @@ async function handleFormSubmit(event) {
       // Cập nhật dịch vụ
       const serviceRef = doc(db, "DichVu", serviceId);
       await updateDoc(serviceRef, {
-        Ma_dichvu: serviceId, // ID tự động của Firestore
-        Ten_dichvu: serviceName,
-        Don_vi: serviceUnit,
-        Icon_dichvu: serviceIcon,
-        Status: serviceStatus,
+        maDichVu: serviceId, // ID tự động của Firestore
+        tenDichVu: serviceName,
+        donVi: serviceUnit,
+        iconDichVu: serviceIcon,
+        trangThai: serviceStatus,
       });
       showSuccessModal("Dịch vụ đã được cập nhật thành công.", () => {
         clearForm();
@@ -377,12 +377,12 @@ function updateService(serviceId) {
   if (selectedService) {
     // Điền thông tin vào form
     document.getElementById("serviceName").value =
-      selectedService.Ten_dichvu || "";
-    document.getElementById("serviceUnit").value = selectedService.Don_vi || "";
+      selectedService.tenDichVu || "";
+    document.getElementById("serviceUnit").value = selectedService.donVi || "";
     document.getElementById("serviceIcon").value =
-      selectedService.Icon_dichvu || "";
+      selectedService.iconDichVu || "";
     document.getElementById("serviceStatus").value =
-      selectedService.Status.toString();
+      selectedService.trangThai.toString();
 
     // Chuyển form sang chế độ cập nhật
     const form = document.getElementById("addServiceForm");
