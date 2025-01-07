@@ -36,6 +36,9 @@ document.getElementById('main').addEventListener('click', function (event) {
     if (event.target && event.target.id === 'btnPhongTro') {
         navigateTo('QuanLyPhongTro.html');
     }
+    if (event.target && event.target.id === 'btnloaiphong') {
+      navigateTo('QuanLyLoaiPhong.html');
+  }
     if (event.target && event.target.id === 'btnthongtin') {
         navigateTo('QuanLyThongTin.html');
     }

@@ -226,7 +226,7 @@ async function getUserInfo(maNguoiDung) {
     if (snapshot.exists()) {
       return snapshot.val(); // Trả về dữ liệu người dùng
     } else {
-      console.error("Không tìm thấy người dùng với Ma_nguoidung:", maNguoiDung);
+      console.error("Không tìm thấy người dùng với maNguoiDung:", maNguoiDung);
       return null;
     }
   } catch (error) {
@@ -238,7 +238,7 @@ async function getUserInfo(maNguoiDung) {
 async function getNoiThatByPhongTro(maPhongTro) {
   const q = query(
     collection(db, "PhongTroNoiThat"),
-    where("maPhongTro", "==", maPhongTro)
+    where("ma_phongtro", "==", maPhongTro)
   );
   const querySnapshot = await getDocs(q);
   const noiThat = [];
@@ -274,7 +274,7 @@ function renderNoiThatList(noiThatData) {
 async function getTienNghiByPhongTro(maPhongTro) {
   const q = query(
     collection(db, "PhongTroTienNghi"),
-    where("maPhongTro", "==", maPhongTro)
+    where("ma_phongtro", "==", maPhongTro)
   );
   const querySnapshot = await getDocs(q);
   const tienNghi = [];
@@ -410,7 +410,7 @@ async function viewDetails(roomId) {
 
       // Lấy thông tin người dùng và loại phòng (như trong đoạn code trước)
       const userInfo = await getUserInfo(room.maNguoiDung);
-      const loaiPhongRef = doc(db, "LoaiPhong", room.maLoaiPhong);
+      const loaiPhongRef = doc(db, "LoaiPhong", room.maLoaiNhaTro);
       const loaiPhongSnapshot = await getDoc(loaiPhongRef);
 
       const gioiTinhRef = doc(db, "GioiTinh", room.maGioiTinh);
@@ -598,9 +598,9 @@ async function viewDetails(roomId) {
           ".user-info-container"
         );
         userInfoContainer.querySelector(".img-avt-user").src =
-          userInfo.anh_daidien || "./assets/imgs/default-avatar.png";
+          userInfo.anhDaiDien || "./assets/imgs/default-avatar.png";
         userInfoContainer.querySelector(".user-name").textContent =
-          userInfo.ho_ten;
+          userInfo.hoTen;
         userInfoContainer.querySelector(
           ".late-time-stamp"
         ).textContent = `${formatTimestamp(userInfo.lastActiveTime)}`;

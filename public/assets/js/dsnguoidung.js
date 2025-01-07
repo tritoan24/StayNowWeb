@@ -1,9 +1,12 @@
 // Import các chức năng cần thiết từ Firebase SDK
-import { database, auth } from "./FireBaseConfig.js";
-import { ref, get, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+import { database, auth, db} from "./FireBaseConfig.js";
+import { ref, get, update, query} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+import { collection, where, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
 import {
     signOut,
   } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
 
 // Ẩn dialog khi tải lại trang
 document.getElementById('userDialog').style.display = 'none';
@@ -37,6 +40,7 @@ toggle.onclick = function () {
 // Biến để lưu trữ người dùng
 let allUsers = [];
 
+
 // Hàm để lấy danh sách người dùng
 function fetchUsers() {
     const usersRef = ref(database, 'NguoiDung');
@@ -53,8 +57,8 @@ function fetchUsers() {
                 for (const userId in users) {
                     const user = users[userId];
 
-                     // Loại trừ người dùng có loai_taikhoan là Admin hoặc NhanVien
-                     if (user.loai_taikhoan === 'Admin' || user.loai_taikhoan === 'NhanVien') {
+                     // Loại trừ người dùng có loaiTaiKhoan là Admin hoặc NhanVien
+                     if (user.loaiTaiKhoan === 'Admin' || user.loaiTaiKhoan === 'NhanVien') {
                         continue; // Bỏ qua người dùng này
                     }
 
@@ -71,15 +75,15 @@ function fetchUsers() {
 
                     // Ảnh đại diện
                     const avatar = document.createElement('img');
-                    avatar.src = user.anh_daidien;
-                    avatar.alt = user.ho_ten;
+                    avatar.src = user.anhDaiDien;
+                    avatar.alt = user.hoTen;
 
                     // Thông tin người dùng
                     const userDetails = document.createElement('div');
                     userDetails.classList.add('user-details');
 
                     const name = document.createElement('h3');
-                    name.textContent = user.ho_ten;
+                    name.textContent = user.hoTen;
 
                     const phone = document.createElement('p');
                     phone.textContent = `SĐT: ${user.sdt}`;
@@ -122,56 +126,112 @@ function fetchUsers() {
                     detailButton.classList.add('detail-button');
 
                     // Kiểm tra trạng thái tài khoản để đặt nhãn và màu cho nút
-                    if (user.trang_thaitaikhoan === 'HoatDong') {
+                    if (user.trangThaiTaiKhoan === 'HoatDong') {
                         detailButton.textContent = 'Khóa Tài Khoản';
                         detailButton.classList.add('button-active'); // Thêm màu xanh cho nút
-                    } else if (user.trang_thaitaikhoan === 'Khoa') {
+                    } else if (user.trangThaiTaiKhoan === 'Khoa') {
                         detailButton.textContent = 'Mở Tài Khoản';
                         detailButton.classList.add('button-banned'); // Thêm màu đỏ cho nút
                     }
 
                     // Thêm sự kiện click cho nút
-                    detailButton.addEventListener('click', (e) => {
+                    detailButton.addEventListener('click', async (e) => {
                         e.stopPropagation(); // Ngăn chặn sự kiện click lan tỏa lên phần tử cha
-
-                        if (user.trang_thaitaikhoan === 'HoatDong') {
+                    
+                        if (user.trangThaiTaiKhoan === 'HoatDong') {
                             // Hiển thị xác nhận khóa tài khoản
-                            var r = confirm("Bạn có chắc chắn muốn Khóa tài khoản này hay không?");
-                            if (r == true) {
-                                // Đổi trạng thái tài khoản thành Khoa
+                            const r = confirm("Bạn có chắc chắn muốn Khóa tài khoản này hay không?");
+                            if (r === true) {
                                 const updates = {};
-                                updates[`/NguoiDung/${user.ma_nguoidung}/trang_thaitaikhoan`] = 'Khoa';
-                                updates[`/NguoiDung/${user.ma_nguoidung}/ngay_capnhat`] = new Date().toISOString();
-
-                                update(ref(database), updates)
-                                    .then(() => {
-                                        alert('Tài khoản đã bị Khóa');
-                                        fetchUsers(); // Tải lại danh sách người dùng
-                                    })
-                                    .catch((error) => {
-                                        console.error("Error updating data: ", error);
-                                    });
+                                updates[`/NguoiDung/${user.maNguoiDung}/trangThaiTaiKhoan`] = 'Khoa';
+                                updates[`/NguoiDung/${user.maNguoiDung}/ngayCapNhat`] = new Date().toISOString();
+                    
+                                try {
+                                    // Lấy danh sách phòng trọ của người dùng từ Firestore
+                                    const roomsQuery = query(
+                                        collection(db, 'PhongTro'),
+                                        where('maNguoiDung', '==', user.maNguoiDung)
+                                    );
+                                    const snapshot = await getDocs(roomsQuery);
+                    
+                                    if (!snapshot.empty) {
+                                        console.log(`Phòng trọ thuộc user ${user.maNguoiDung}:`);
+                                        const roomUpdates = [];
+                    
+                                        snapshot.forEach((docSnapshot) => {
+                                            const roomData = docSnapshot.data();
+                                            console.log(`- Phòng ID: ${docSnapshot.id}, Tên phòng: ${roomData.tenPhong}, Trạng thái hiện tại: ${roomData.trangThaiDuyet}`);
+                    
+                                            // Cập nhật trạng thái phòng trọ thành BiHuy
+                                            roomUpdates.push(
+                                                updateDoc(doc(db, 'PhongTro', docSnapshot.id), {
+                                                    trangThaiDuyet: 'BiHuy',
+                                                })
+                                            );
+                                        });
+                    
+                                        // Thực hiện đồng thời các cập nhật phòng trọ
+                                        await Promise.all(roomUpdates);
+                                        console.log("Tất cả phòng trọ liên quan đã được khóa.");
+                                    }
+                    
+                                    // Cập nhật trạng thái tài khoản
+                                    await update(ref(database), updates);
+                                    alert('Tài khoản và các phòng trọ liên quan đã bị khóa');
+                                    fetchUsers(); // Tải lại danh sách người dùng
+                                } catch (error) {
+                                    console.error("Error updating data: ", error);
+                                }
                             }
-                        } else if (user.trang_thaitaikhoan === 'Khoa') {
+                        } else if (user.trangThaiTaiKhoan === 'Khoa') {
                             // Hiển thị xác nhận mở tài khoản
-                            var r = confirm("Bạn có chắc chắn muốn Mở tài khoản này không?");
-                            if (r == true) {
-                                // Đổi trạng thái tài khoản thành HoatDong
+                            const r = confirm("Bạn có chắc chắn muốn Mở tài khoản này không?");
+                            if (r === true) {
                                 const updates = {};
-                                updates[`/NguoiDung/${user.ma_nguoidung}/trang_thaitaikhoan`] = 'HoatDong';
-                                updates[`/NguoiDung/${user.ma_nguoidung}/ngay_capnhat`] = new Date().toISOString();
-
-                                update(ref(database), updates)
-                                    .then(() => {
-                                        alert('Tài khoản đã được Mở');
-                                        fetchUsers(); // Tải lại danh sách người dùng
-                                    })
-                                    .catch((error) => {
-                                        console.error("Error updating data: ", error);
-                                    });
+                                updates[`/NguoiDung/${user.maNguoiDung}/trangThaiTaiKhoan`] = 'HoatDong';
+                                updates[`/NguoiDung/${user.maNguoiDung}/ngayCapNhat`] = new Date().toISOString();
+                    
+                                try {
+                                    // Lấy danh sách phòng trọ của người dùng từ Firestore
+                                    const roomsQuery = query(
+                                        collection(db, 'PhongTro'),
+                                        where('maNguoiDung', '==', user.maNguoiDung)
+                                    );
+                                    const snapshot = await getDocs(roomsQuery);
+                    
+                                    if (!snapshot.empty) {
+                                        console.log(`Phòng trọ thuộc user ${user.maNguoiDung}:`);
+                                        const roomUpdates = [];
+                    
+                                        snapshot.forEach((docSnapshot) => {
+                                            const roomData = docSnapshot.data();
+                                            console.log(`- Phòng ID: ${docSnapshot.id}, Tên phòng: ${roomData.tenPhong}, Trạng thái hiện tại: ${roomData.trangThaiDuyet}`);
+                    
+                                            // Cập nhật trạng thái phòng trọ thành ChoDuyet
+                                            roomUpdates.push(
+                                                updateDoc(doc(db, 'PhongTro', docSnapshot.id), {
+                                                    trangThaiDuyet: 'ChoDuyet',
+                                                })
+                                            );
+                                        });
+                    
+                                        // Thực hiện đồng thời các cập nhật phòng trọ
+                                        await Promise.all(roomUpdates);
+                                        console.log("Tất cả phòng trọ liên quan đã được mở.");
+                                    }
+                    
+                                    // Cập nhật trạng thái tài khoản
+                                    await update(ref(database), updates);
+                                    alert('Tài khoản và các phòng trọ liên quan đã được mở');
+                                    fetchUsers(); // Tải lại danh sách người dùng
+                                } catch (error) {
+                                    console.error("Error updating data: ", error);
+                                }
                             }
                         }
                     });
+                    
+                    
 
 
 
@@ -209,16 +269,16 @@ function showUserDialog(user) {
     const dialog = document.getElementById('userDialog');
     dialog.style.display = 'block';
 
-    document.getElementById('dialogName').textContent = user.ho_ten;
-    document.getElementById('dialogAvatar').src = user.anh_daidien;
+    document.getElementById('dialogName').textContent = user.hoTen;
+    document.getElementById('dialogAvatar').src = user.anhDaiDien;
     document.getElementById('dialogPhone').textContent = `SĐT: ${user.sdt}`;
     document.getElementById('dialogEmail').textContent = `Email: ${user.email || 'Không có'}`;
-    document.getElementById('dialogAccountType').textContent = `Loại tài khoản: ${user.loai_taikhoan}`;
-    document.getElementById('dialogUserId').textContent = `Mã người dùng: ${user.ma_nguoidung}`;
-    document.getElementById('dialogAccountStatus').textContent = `Trạng thái tài khoản: ${user.trang_thaitaikhoan}`;
-    document.getElementById('dialogCreatedDate').textContent = `Ngày tạo: ${new Date(user.ngay_taotaikhoan).toLocaleString()}`;
-    document.getElementById('dialogUpdatedDate').textContent = `Ngày cập nhật: ${new Date(user.ngay_capnhat).toLocaleString()}`;
-    document.getElementById('dialogBookingCount').textContent = `Số lượt đặt lịch: ${user.so_luotdatlich}`;
+    document.getElementById('dialogAccountType').textContent = `Loại tài khoản: ${user.loaiTaiKhoan}`;
+    document.getElementById('dialogUserId').textContent = `Mã người dùng: ${user.maNguoiDung}`;
+    document.getElementById('dialogAccountStatus').textContent = `Trạng thái tài khoản: ${user.trangThaiTaiKhoan}`;
+    document.getElementById('dialogCreatedDate').textContent = `Ngày tạo: ${new Date(user.ngayTaoTaiKhoan).toLocaleString()}`;
+    document.getElementById('dialogUpdatedDate').textContent = `Ngày cập nhật: ${new Date(user.ngayCapNhat).toLocaleString()}`;
+    document.getElementById('dialogBookingCount').textContent = `Số lượt đặt lịch: ${user.soLuotDatLich}`;
 }
 
 // Thêm sự kiện click để đóng dialog
@@ -231,8 +291,8 @@ function searchUsers() {
     contentElement.innerHTML = ''; // Xóa nội dung cũ trước khi thêm kết quả tìm kiếm
 
     allUsers.forEach(user => {
-        const hoTen = user.ho_ten?.toLowerCase() || ''; // Xử lý nếu ho_ten bị null hoặc undefined
-        const maNguoiDung = user.ma_nguoidung?.toLowerCase() || ''; // Xử lý nếu ma_nguoidung bị null hoặc undefined
+        const hoTen = user.hoTen?.toLowerCase() || ''; // Xử lý nếu hoTen bị null hoặc undefined
+        const maNguoiDung = user.maNguoiDung?.toLowerCase() || ''; // Xử lý nếu maNguoiDung bị null hoặc undefined
 
         // Kiểm tra điều kiện tìm kiếm
         if (hoTen.includes(searchInput) || maNguoiDung.includes(searchInput)) {
@@ -242,15 +302,15 @@ function searchUsers() {
 
              // Ảnh đại diện
              const avatar = document.createElement('img');
-             avatar.src = user.anh_daidien;
-             avatar.alt = user.ho_ten;
+             avatar.src = user.anhDaiDien;
+             avatar.alt = user.hoTen;
 
              // Thông tin người dùng
              const userDetails = document.createElement('div');
              userDetails.classList.add('user-details');
 
              const name = document.createElement('h3');
-             name.textContent = user.ho_ten;
+             name.textContent = user.hoTen;
 
              const phone = document.createElement('p');
              phone.textContent = `SĐT: ${user.sdt}`;
@@ -293,10 +353,10 @@ function searchUsers() {
              detailButton.classList.add('detail-button');
 
              // Kiểm tra trạng thái tài khoản để đặt nhãn và màu cho nút
-             if (user.trang_thaitaikhoan === 'HoatDong') {
+             if (user.trangThaiTaiKhoan === 'HoatDong') {
                  detailButton.textContent = 'Khóa Tài Khoản';
                  detailButton.classList.add('button-active'); // Thêm màu xanh cho nút
-             } else if (user.trang_thaitaikhoan === 'Khoa') {
+             } else if (user.trangThaiTaiKhoan === 'Khoa') {
                  detailButton.textContent = 'Mở Tài Khoản';
                  detailButton.classList.add('button-banned'); // Thêm màu đỏ cho nút
              }
@@ -305,14 +365,14 @@ function searchUsers() {
              detailButton.addEventListener('click', (e) => {
                  e.stopPropagation(); // Ngăn chặn sự kiện click lan tỏa lên phần tử cha
 
-                 if (user.trang_thaitaikhoan === 'HoatDong') {
+                 if (user.trangThaiTaiKhoan === 'HoatDong') {
                      // Hiển thị xác nhận khóa tài khoản
                      var r = confirm("Bạn có chắc chắn muốn Khóa tài khoản này hay không?");
                      if (r == true) {
                          // Đổi trạng thái tài khoản thành Khoa
                          const updates = {};
-                         updates[`/NguoiDung/${user.ma_nguoidung}/trang_thaitaikhoan`] = 'Khoa';
-                         updates[`/NguoiDung/${user.ma_nguoidung}/ngay_capnhat`] = new Date().toISOString();
+                         updates[`/NguoiDung/${user.maNguoiDung}/trangThaiTaiKhoan`] = 'Khoa';
+                         updates[`/NguoiDung/${user.maNguoiDung}/ngayCapNhat`] = new Date().toISOString();
 
                          update(ref(database), updates)
                              .then(() => {
@@ -323,14 +383,14 @@ function searchUsers() {
                                  console.error("Error updating data: ", error);
                              });
                      }
-                 } else if (user.trang_thaitaikhoan === 'Khoa') {
+                 } else if (user.trangThaiTaiKhoan === 'Khoa') {
                      // Hiển thị xác nhận mở tài khoản
                      var r = confirm("Bạn có chắc chắn muốn Mở tài khoản này không?");
                      if (r == true) {
                          // Đổi trạng thái tài khoản thành HoatDong
                          const updates = {};
-                         updates[`/NguoiDung/${user.ma_nguoidung}/trang_thaitaikhoan`] = 'HoatDong';
-                         updates[`/NguoiDung/${user.ma_nguoidung}/ngay_capnhat`] = new Date().toISOString();
+                         updates[`/NguoiDung/${user.maNguoiDung}/trangThaiTaiKhoan`] = 'HoatDong';
+                         updates[`/NguoiDung/${user.maNguoiDung}/ngayCapNhat`] = new Date().toISOString();
 
                          update(ref(database), updates)
                              .then(() => {
@@ -404,14 +464,14 @@ document.addEventListener("DOMContentLoaded", () => {
   
           // Hiển thị thông tin người dùng trên màn hình chính
           console.log("Thông tin người dùng:", userData);
-          if(userData.loai_taikhoan === "Admin") {
+          if(userData.loaiTaiKhoan === "Admin") {
             const liCongVien = document.getElementById("li-congviec")
             liCongVien.style.display = "none"
           }
           // Ví dụ: Cập nhật thông tin người dùng trên giao diện
-          document.getElementById("userName").textContent = userData.ho_ten;
+          document.getElementById("userName").textContent = userData.hoTen;
           document.getElementById("userAvatar").src =
-            userData.anh_daidien || "default-avatar.png";
+            userData.anhDaiDien || "default-avatar.png";
         } else {
           alert("Không tìm thấy thông tin người dùng!");
         }
@@ -420,7 +480,4 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Lỗi kết nối đến máy chủ:", error.message);
       });
   });
-
-
-  
 
