@@ -114,4 +114,30 @@
     outline: none;
     border-color: #007bff;
   }
+
+  .search-phong-tro-view{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
   
+  .search-phong-tro-view input {
+    height: 30px;
+    border: 1px solid #ccc;
+    width: 310px;
+  }
+ 
+
+  .search-phong-tro-view button {
+    color: white;
+    background-color: #471bc4;
+    border: none;
+    border-radius: 3px;
+    padding: 5px;
+    width: 100px;
+  }
+
+  .search-phong-tro-view button:active{
+    opacity: 0.3;
+  }

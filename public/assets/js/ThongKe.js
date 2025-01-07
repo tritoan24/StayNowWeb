@@ -3,10 +3,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebas
 import {
   getFirestore,
   collection,
-  onSnapshot
+  onSnapshot,
+  where,
+  query,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
 
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+import { getDatabase, ref, get  } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
 import { signOut, getAuth} from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
 
 
@@ -801,6 +804,70 @@ const updateTableHeader = (activeTab) => {
 
 // Hiển thị mặc định tab đầu tiên
 document.querySelector('.tab[data-tab="rooms"]').click();
+
+
+// Lắng nghe sự kiện click vào nút tìm kiếm
+document.getElementById('thongKePhongTroBtn').addEventListener('click', async () => {
+  const maNguoiDung = document.getElementById('thongKePhongTroTheoId').value.trim();
+
+  if (!maNguoiDung) {
+    alert("Vui lòng nhập mã người dùng!");
+    return;
+  }
+
+  // Gọi hàm lấy danh sách phòng trọ từ Firestore
+  await getRoomsByUser(maNguoiDung);
+});
+
+// Hàm lấy danh sách phòng trọ của người dùng từ Firestore
+const getRoomsByUser = async (maNguoiDung) => {
+  const db = getFirestore();
+  const roomsRef = collection(db, "PhongTro");
+
+  // Tạo query để lấy các phòng trọ của người dùng
+  const q = query(roomsRef, where("maNguoiDung", "==", maNguoiDung));
+
+  try {
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      alert("Không tìm thấy phòng trọ của người dùng này!");
+      return;
+    }
+
+    // Mảng chứa các phòng của người dùng
+    let totalRooms = 0;
+    let rentedRooms = 0;
+
+    querySnapshot.forEach(doc => {
+      const roomData = doc.data();
+      totalRooms += 1; // Tăng số lượng phòng
+      if (roomData.isRented) rentedRooms += 1; // Kiểm tra nếu phòng đã được thuê
+    });
+
+    // Cập nhật bảng thống kê phòng trọ
+    updateRoomStatsTable(totalRooms, rentedRooms);
+
+  } catch (error) {
+    console.error("Lỗi khi lấy dữ liệu phòng trọ:", error);
+    alert("Có lỗi xảy ra khi lấy dữ liệu phòng trọ!");
+  }
+};
+
+// Hàm cập nhật bảng thống kê phòng trọ
+const updateRoomStatsTable = (totalRooms, rentedRooms) => {
+  const tableBody = document.getElementById('statsTable');
+  tableBody.innerHTML = ''; // Xóa các dữ liệu cũ
+  
+  const row = `<tr>
+    <td>Toàn bộ</td>
+    <td>${totalRooms}</td>
+    <td>${rentedRooms}</td>
+  </tr>`;
+  
+  tableBody.innerHTML = row;
+};
+
 
 
 
