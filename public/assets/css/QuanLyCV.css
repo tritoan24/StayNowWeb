@@ -24,7 +24,7 @@
 }
 
 .content{
-    margin-top: 90px;
+    margin-top: 62px;
 }
   
   .contract-info {
@@ -58,29 +58,64 @@
     background-color: #0056b3;
   }
   
-
-
-.tab-container {
+  .tab-container {
     display: flex;
-    margin-bottom: 20px;
-}
-.tab {
-    padding: 10px 20px;
+    justify-content: space-around;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  /* Tab Styling */
+  .tab {
+    padding: 12px 20px;
     cursor: pointer;
-    border: 1px solid #ddd;
-    background-color: #f1f1f1;
-    margin-right: 5px;
-}
-.tab.active {
-    background-color: #2a2185;
-    color: white;
-}
-.tab-content {
+    text-align: center;
+    flex-grow: 1;
+    background-color: #f7f7f7;
+    color: #555;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+  }
+
+  .tab:hover {
+    background-color: #eaeaea;
+  }
+
+  .tab.active {
+    background-color: #ffffff;
+    color: #2a3547;
+    border-bottom: 3px solid #ffffff;
+    box-shadow: inset 0 3px 0 #471bc4;
+  }
+
+  /* Tab Content Styling */
+  .tab-content {
     display: none;
-}
-.tab-content.active {
+    padding: 20px;
+    background-color: #ffffff;
+    border-top: none;
+    margin-top: -1px;
+  }
+
+  .tab-content.active {
     display: block;
-}
+  }
+
+  /* Contract Grid Styling */
+  .contract-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+  }
+
+  .contract-grid p {
+    background-color: #f5f5f5;
+    padding: 10px;
+    text-align: center;
+    border-radius: 6px;
+  }
 
 
 .modal {

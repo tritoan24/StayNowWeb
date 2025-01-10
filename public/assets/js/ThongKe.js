@@ -811,7 +811,7 @@ document.getElementById('thongKePhongTroBtn').addEventListener('click', async ()
   const maNguoiDung = document.getElementById('thongKePhongTroTheoId').value.trim();
 
   if (!maNguoiDung) {
-    alert("Vui lòng nhập mã người dùng!");
+    showToast("Vui lòng nhập mã người dùng!");
     return;
   }
 
@@ -831,7 +831,7 @@ const getRoomsByUser = async (maNguoiDung) => {
     const querySnapshot = await getDocs(q);
 
     if (querySnapshot.empty) {
-      alert("Không tìm thấy phòng trọ của người dùng này!");
+      showToastFalse("Không tìm thấy phòng trọ của người dùng này!");
       return;
     }
 
@@ -953,6 +953,23 @@ function showToast(message) {
   },1500);
 }
 
+
+function showToastFalse(message) {
+  const toastContainer = document.getElementById("toastContainerFalse");
+
+  // Tạo toast
+  const toast = document.createElement("div");
+  toast.className = "toast-false";
+  toast.textContent = message;
+
+  // Thêm toast vào container
+  toastContainer.appendChild(toast);
+
+  // Xóa toast sau khi animation kết thúc
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   const userId = localStorage.getItem("userId");

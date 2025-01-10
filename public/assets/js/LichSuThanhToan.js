@@ -32,7 +32,7 @@ async function fetchAllPaymentHistoris() {
 function renderPaymentHistoryList(data) {
   const paymentHistoryListContainer =
     document.getElementById("paymentHistoryList");
-  paymentHistoryListContainer.innerHTML = ""; // Xóa nội dung cũ
+  paymentHistoryListContainer.innerHTML = "";
 
   if (data.length === 0) {
     paymentHistoryListContainer.innerHTML =
@@ -40,12 +40,10 @@ function renderPaymentHistoryList(data) {
     return;
   }
 
-  // Lấy dữ liệu trang hiện tại
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedData = data.slice(startIndex, endIndex);
 
-  // Tạo bảng
   let tableHTML = `
     <table class="payment-history-table">
       <thead>
@@ -59,7 +57,6 @@ function renderPaymentHistoryList(data) {
       <tbody>
   `;
 
-  // Lặp qua dữ liệu phân trang
   paginatedData.forEach((paymentHistory) => {
     const formattedVND = new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -67,13 +64,9 @@ function renderPaymentHistoryList(data) {
     }).format(paymentHistory.tongHoaDon);
 
     tableHTML += `
-      <tr>
+      <tr class="payment-item" data-id="${paymentHistory.id}">
         <td>${formatFirebaseTime(paymentHistory.ngayThanhToan || "N/A")}</td>
-        <td>
-          <div class="id-cong-viec">${paymentHistory.idCongViec || "N/A"}</div>
-          <div class="ma-nhan-vien"> <p class="title-manhanvien">Mã nhân viên</p> 
-          ${paymentHistory.idNhanVien || "N/A"}</div>
-        </td>
+        <td>${paymentHistory.idCongViec || "N/A"}</td>
         <td>${formattedVND || 0}</td>
         <td>${paymentHistory.trangThai || "Chưa xác định"}</td>
       </tr>
@@ -87,9 +80,74 @@ function renderPaymentHistoryList(data) {
 
   paymentHistoryListContainer.innerHTML = tableHTML;
 
-  // Thêm phân trang
+  // Thêm sự kiện click vào từng hàng
+  document.querySelectorAll(".payment-item").forEach((row) => {
+    row.addEventListener("click", (event) => {
+      const itemId = event.currentTarget.getAttribute("data-id");
+      showItemDetail(itemId);
+    });
+  });
+
   renderPagination(data);
 }
+
+function showItemDetail(itemId) {
+  const item = allPaymentHistoryData.find((data) => data.id === itemId);
+  
+  if (!item) {
+    alert("Không tìm thấy chi tiết cho mục này.");
+    return;
+  }
+
+  const itemDetailContent = document.getElementById("itemDetailContent");
+  itemDetailContent.innerHTML = `
+    <p><strong>Thời gian thanh toán:</strong> ${formatFirebaseTime(item.ngayThanhToan)}</p>
+    <p><strong>Mã công việc:</strong> ${item.idCongViec || "N/A"}</p>
+    <p><strong>Mã hợp đồng:</strong> ${item.idHopDong || "N/A"}</p>
+    <p><strong>Mã nhân viên:</strong> ${item.idNhanVien || "N/A"}</p>
+     <p><strong>Tiền cọc:</strong> ${new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(item.chiTietHoaDon?.tienCoc)}</p>
+      <p><strong>Tiền phòng:</strong> ${new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(item.chiTietHoaDon.tienPhong)}</p>
+    <p><strong>Tổng hoá đơn:</strong> ${new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(item.tongHoaDon)}</p>
+     <p><strong>Tổng tiền đã gửi:</strong> ${new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(item.tongTienDaGui)}</p>
+    <p><strong>Tổng tiền đã gửi:</strong> ${new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(item.tongTienDaTru)}</p>
+    <p><strong>Trạng thái:</strong> ${item.trangThai || "Chưa xác định"}</p>
+    <p><strong>Người thuê:</strong> ${item.nguoiThue?.hoTen || "N/A"}</p>
+    <p><strong>Chủ nhà:</strong> ${item.chuNha?.hoTen || "N/A"}</p>
+     <p><strong>Địa chỉ:</strong> ${item.Dc_quanhuyen}, ${item.Dc_tinhthanhpho}</p>
+  `;
+
+  const modal = document.getElementById("itemDetailModal");
+  modal.style.display = "block";
+}
+
+
+const closeModal = document.getElementById("closeModal");
+closeModal.addEventListener("click", () => {
+  document.getElementById("itemDetailModal").style.display = "none";
+});
+
+window.addEventListener("click", (event) => {
+  const modal = document.getElementById("itemDetailModal");
+  if (event.target === modal) {
+    modal.style.display = "none";
+  }
+});
+
 
 function renderPagination(data) {
   const paginationContainer = document.getElementById("pagination");

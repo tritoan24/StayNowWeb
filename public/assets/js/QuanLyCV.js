@@ -9,12 +9,18 @@ import {
   getDoc,
   onSnapshot,
   writeBatch,
-  serverTimestamp
+  serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signOut} from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
-
-
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut,
+} from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+import {
+  getDatabase,
+  ref,
+  get,
+} from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA-EHInpdkzzNF3z_GhMSQsqLC5GI7mYsc",
@@ -27,14 +33,11 @@ const firebaseConfig = {
   measurementId: "G-DMMZ0JC2GE",
 };
 
-
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const database = getDatabase(app); // Realtime Database
 const auth = getAuth(app); // Đảm bảo truyền app vào
-
 
 let currentUserId = null;
 
@@ -46,7 +49,7 @@ function checkAuthStatus() {
         currentUserId = user.uid; // Gán giá trị global
         resolve(user.uid);
       } else {
-        console.log('Chưa đăng nhập');
+        console.log("Chưa đăng nhập");
         resolve(null);
       }
     });
@@ -60,10 +63,10 @@ async function initializeStaynowApp() {
       currentUserId = userId;
       // await fetchContracts(userId);
     } else {
-      console.log('Không thể lấy user ID');
+      console.log("Không thể lấy user ID");
     }
   } catch (error) {
-    console.error('Lỗi khởi tạo ứng dụng:', error);
+    console.error("Lỗi khởi tạo ứng dụng:", error);
   }
 }
 
@@ -89,21 +92,20 @@ window.addEventListener("click", (event) => {
 });
 
 // Tab functionality
-const tabs = document.querySelectorAll('.tab');
-const tabContents = document.querySelectorAll('.tab-content');
+const tabs = document.querySelectorAll(".tab");
+const tabContents = document.querySelectorAll(".tab-content");
 
-tabs.forEach(tab => {
-  tab.addEventListener('click', () => {
+tabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
     // Remove active class from all tabs and tab contents
-    tabs.forEach(t => t.classList.remove('active'));
-    tabContents.forEach(tc => tc.classList.remove('active'));
+    tabs.forEach((t) => t.classList.remove("active"));
+    tabContents.forEach((tc) => tc.classList.remove("active"));
 
     // Add active class to clicked tab and corresponding content
-    tab.classList.add('active');
-    document.getElementById(tab.dataset.tab).classList.add('active');
+    tab.classList.add("active");
+    document.getElementById(tab.dataset.tab).classList.add("active");
   });
 });
-
 
 async function layThongTinThanhToan(maNguoiDung) {
   try {
@@ -115,7 +117,9 @@ async function layThongTinThanhToan(maNguoiDung) {
 
     // Kiểm tra xem document có tồn tại không
     if (!thongTinDoc.exists()) {
-      console.log(`Không tìm thấy thông tin thanh toán cho mã người dùng: ${maNguoiDung}`);
+      console.log(
+        `Không tìm thấy thông tin thanh toán cho mã người dùng: ${maNguoiDung}`
+      );
       return null;
     }
 
@@ -124,16 +128,14 @@ async function layThongTinThanhToan(maNguoiDung) {
 
     return {
       soTaiKhoan: thongTinData.Sotaikhoan || "Không có thông tin",
-      tenTaiKhoan: thongTinData.Tentaikhoan || "Không có thông tin", 
-      maQR: thongTinData.maQR || "Không có mã QR"
+      tenTaiKhoan: thongTinData.Tentaikhoan || "Không có thông tin",
+      maQR: thongTinData.maQR || "Không có mã QR",
     };
-
   } catch (error) {
     console.error("Lỗi khi lấy thông tin thanh toán:", error);
     return null;
   }
 }
-
 
 async function fetchContracts(userId) {
   const waitingList = document.getElementById("waiting-contract-list");
@@ -141,7 +143,9 @@ async function fetchContracts(userId) {
   const canceledList = document.getElementById("canceled-contract-list");
 
   // Clear existing lists
-  [waitingList, paidList, canceledList].forEach(list => list.innerHTML = "");
+  [waitingList, paidList, canceledList].forEach(
+    (list) => (list.innerHTML = "")
+  );
 
   try {
     // Query PhanChiaCV to get contract IDs assigned to the employee
@@ -153,63 +157,63 @@ async function fetchContracts(userId) {
     // Lắng nghe thay đổi bằng onSnapshot
     onSnapshot(assignmentQuery, async (assignmentSnapshot) => {
       if (assignmentSnapshot.empty) {
-        waitingList.innerHTML = "<tr><td colspan='3'>Không có hợp đồng nào!</td></tr>";
+        waitingList.innerHTML =
+          "<tr><td colspan='3'>Không có hợp đồng nào!</td></tr>";
         return;
       }
 
       // Clear lists again to handle live updates
-      [waitingList, paidList, canceledList].forEach(list => list.innerHTML = "");
-const promises = assignmentSnapshot.docs.map(async (assignmentDoc) => {
-  const assignmentData = assignmentDoc.data();
-  const contractRef = doc(db, "HopDong", assignmentData.idHopDong);
-  const contractDoc = await getDoc(contractRef);
+      [waitingList, paidList, canceledList].forEach(
+        (list) => (list.innerHTML = "")
+      );
+      const promises = assignmentSnapshot.docs.map(async (assignmentDoc) => {
+        const assignmentData = assignmentDoc.data();
+        const contractRef = doc(db, "HopDong", assignmentData.idHopDong);
+        const contractDoc = await getDoc(contractRef);
 
-  if (contractDoc.exists()) {
-    const contract = {
-      id: contractDoc.id,
-      ...contractDoc.data()
-    };
+        if (contractDoc.exists()) {
+          const contract = {
+            id: contractDoc.id,
+            ...contractDoc.data(),
+          };
 
-    const trangThai = assignmentData.trangThai;
-    const thoigian = assignmentData.thoigian; // Thời gian bắt đầu công việc (timestamp)
-    
-    // Tính toán thời gian kết thúc công việc
-    const endTime = new Date(thoigian);
-    endTime.setMinutes(endTime.getMinutes() + 5); // Thêm 5 phút
-    
-    console.log(`Thời gian kết thúc: ${endTime}`);
-    
+          const trangThai = assignmentData.trangThai;
+          const thoigian = assignmentData.thoigian; // Thời gian bắt đầu công việc (timestamp)
 
+          // Tính toán thời gian kết thúc công việc
+          const endTime = new Date(thoigian);
+          endTime.setMinutes(endTime.getMinutes() + 5); // Thêm 5 phút
 
-    // Xác định danh sách mục tiêu dựa trên trạng thái
-    let targetList;
-    switch (trangThai) {
-      case 'PROCESSING':
-        targetList = waitingList;
-        break;
-      case 'DONE':
-        targetList = paidList;
-        break;
-      case 'AUTOCANCEL':
-        targetList = canceledList;
-        break;
-      default:
-        console.log('Trạng thái không xác định:', trangThai);
-        targetList = waitingList; // Mặc định là danh sách chờ
-    }
+          console.log(`Thời gian kết thúc: ${endTime}`);
 
-   
+          // Xác định danh sách mục tiêu dựa trên trạng thái
+          let targetList;
+          switch (trangThai) {
+            case "PROCESSING":
+              targetList = waitingList;
+              break;
+            case "DONE":
+              targetList = paidList;
+              break;
+            case "AUTOCANCEL":
+              targetList = canceledList;
+              break;
+            default:
+              console.log("Trạng thái không xác định:", trangThai);
+              targetList = waitingList; // Mặc định là danh sách chờ
+          }
+
           // Tạo nội dung HTML cho hợp đồng
-          let actionButtons = ''; // Nút hành động mặc định là rỗng
-          if (trangThai === 'PROCESSING') {
+          let actionButtons = ""; // Nút hành động mặc định là rỗng
+          if (trangThai === "PROCESSING") {
             actionButtons = `
              <button class="btn btn-primary" onclick="openPaymentConfirmationDialog('${contract.id}')">Thanh toán</button>
           <button class="btn btn-danger" onclick="chuyenCongViec('${assignmentDoc.id}')">Chuyển công việc</button>
              `;
           }
 
-  // Tạo nội dung HTML cho hợp đồng
-const contractRow = `
+          // Tạo nội dung HTML cho hợp đồng
+          const contractRow = `
 <div class="contract-item">
   <div class="contract-info">
     <p>Thời gian còn lại: <span id="countdown-${thoigian}"></span></p>
@@ -227,20 +231,20 @@ const contractRow = `
 </div>
 `;
 
+          // Thêm nội dung vào danh sách
+          targetList.innerHTML += contractRow;
 
+          // Tạo bộ đếm thời gian
+          createCountdown(endTime.getTime(), `countdown-${thoigian}`);
+        } else {
+          console.error(
+            `Hợp đồng với ID ${assignmentData.idHopDong} không tồn tại.`
+          );
+        }
+      });
 
-    // Thêm nội dung vào danh sách
-    targetList.innerHTML += contractRow;
-
-    // Tạo bộ đếm thời gian
-    createCountdown(endTime.getTime(), `countdown-${thoigian}`);
-  } else {
-    console.error(`Hợp đồng với ID ${assignmentData.idHopDong} không tồn tại.`);
-  }
-});
-
-// Chờ tất cả các Promise hoàn tất
-await Promise.all(promises);
+      // Chờ tất cả các Promise hoàn tất
+      await Promise.all(promises);
     });
   } catch (error) {
     console.error("Lỗi khi lắng nghe thay đổi hợp đồng:", error);
@@ -251,30 +255,29 @@ window.thanhToan = async function (contractId) {
   try {
     // Validate input
     if (!contractId) {
-      console.error('Invalid contract ID: undefined or null');
+      console.error("Invalid contract ID: undefined or null");
       return false;
     }
 
     // Fetch contract details first
-    const contractRef = doc(db, 'HopDong', contractId);
+    const contractRef = doc(db, "HopDong", contractId);
     const contractDoc = await getDoc(contractRef);
 
     if (!contractDoc.exists()) {
-      console.error('Contract not found');
+      console.error("Contract not found");
       return false;
     }
 
     const contractData = {
       id: contractDoc.id,
-      ...contractDoc.data()
+      ...contractDoc.data(),
     };
-
 
     // Query PhanChiaCV records related to this contract
     const phanChiaCVQuery = query(
-      collection(db, 'PhanChiaCV'),
-      where('idHopDong', '==', contractId),
-      where('trangThai', '==', 'PROCESSING')
+      collection(db, "PhanChiaCV"),
+      where("idHopDong", "==", contractId),
+      where("trangThai", "==", "PROCESSING")
     );
 
     // Get the snapshot of matching tasks
@@ -285,37 +288,36 @@ window.thanhToan = async function (contractId) {
       console.log(`No tasks found for contract ${contractId}`);
       return false;
     }
-    const idPhong = contractData.thongtinphong.maPhongTro|| '';
+    const idPhong = contractData.thongtinphong.maPhongTro || "";
     console.log(`ID phòng: ${idPhong}`);
-    const phongRef = doc(db, 'PhongTro', idPhong);
+    const phongRef = doc(db, "PhongTro", idPhong);
     const phongDoc = await getDoc(phongRef);
 
     const phongData = {
       id: phongDoc.id,
-      ...phongDoc.data()
+      ...phongDoc.data(),
     };
 
-    const DcQuanHuyen = phongData.Dc_quanhuyen || '';
-    const DcTinhThanhPho = phongData.Dc_tinhtp || '';
+    const DcQuanHuyen = phongData.Dc_quanhuyen || "";
+    const DcTinhThanhPho = phongData.Dc_tinhtp || "";
 
     console.log(`Địa chỉ quận huyện: ${dcQuanHuyen}`);
     console.log(`Địa chỉ tỉnh thành phố: ${DcTinhThanhPho}`);
 
     const batch = writeBatch(db);
 
-    const paymentHistoryRef = doc(collection(db, 'LichSuTT'));
+    const paymentHistoryRef = doc(collection(db, "LichSuTT"));
 
-      // Ensure bill details exist and have default values
-      const tienPhong = contractData.hoaDonHopDong?.tienPhong || 0;
-      const tienCoc = contractData.hoaDonHopDong?.tienCoc || 0;
-      const tongHoaDon = tienPhong + tienCoc;
-      const tongTienDaTru = tongHoaDon * 0.1;
-      const tongTienDaGui = tongHoaDon - tongTienDaTru;
+    // Ensure bill details exist and have default values
+    const tienPhong = contractData.hoaDonHopDong?.tienPhong || 0;
+    const tienCoc = contractData.hoaDonHopDong?.tienCoc || 0;
+    const tongHoaDon = tienPhong + tienCoc;
+    const tongTienDaTru = tongHoaDon * 0.1;
+    const tongTienDaGui = tongHoaDon - tongTienDaTru;
 
-
-        // Prepare payment history data
+    // Prepare payment history data
     const paymentHistoryData = {
-      idNhanVien: currentUserId || '',
+      idNhanVien: currentUserId || "",
       idHopDong: contractId,
       idCongViec: phanChiaCVSnapshot.docs[0].id,
       tongHoaDon: tongHoaDon,
@@ -324,45 +326,44 @@ window.thanhToan = async function (contractId) {
       Dc_quanhuyen: DcQuanHuyen,
       Dc_tinhthanhpho: DcTinhThanhPho,
       nguoiThue: {
-        maNguoiDung: contractData.nguoiThue?.maNguoiDung || '',
-        hoTen: contractData.nguoiThue?.hoTen || 'Không rõ'
+        maNguoiDung: contractData.nguoiThue?.maNguoiDung || "",
+        hoTen: contractData.nguoiThue?.hoTen || "Không rõ",
       },
       chuNha: {
-        maNguoiDung: contractData.chuNha?.maNguoiDung || '',
-        hoTen: contractData.chuNha?.hoTen || 'Không rõ'
+        maNguoiDung: contractData.chuNha?.maNguoiDung || "",
+        hoTen: contractData.chuNha?.hoTen || "Không rõ",
       },
       ngayThanhToan: serverTimestamp(),
-      trangThai: 'DONE',
+      trangThai: "DONE",
       chiTietHoaDon: {
         tienPhong: tienPhong,
-        tienCoc: tienCoc
-      }
+        tienCoc: tienCoc,
+      },
     };
- // Add payment history record
- batch.set(paymentHistoryRef, paymentHistoryData);
+    // Add payment history record
+    batch.set(paymentHistoryRef, paymentHistoryData);
 
     // Update each matching task
     phanChiaCVSnapshot.forEach((docSnapshot) => {
-      const docRef = doc(db, 'PhanChiaCV', docSnapshot.id);
+      const docRef = doc(db, "PhanChiaCV", docSnapshot.id);
       batch.update(docRef, {
-        trangThai: 'DONE',
+        trangThai: "DONE",
         thoiGianHoanThanh: serverTimestamp(),
-        ghiChu: 'Thanh toán thành công'
+        ghiChu: "Thanh toán thành công",
       });
     });
 
     // Update the contract status
     batch.update(contractRef, {
-      trangThai: 'ACTIVE',
+      trangThai: "ACTIVE",
       // Use dot notation to update nested field
-      'hoaDonHopDong.trangThai': 'DONE'
+      "hoaDonHopDong.trangThai": "DONE",
     });
 
     // Commit all updates in a single batch
     await batch.commit();
     console.log(`Updated status for contract ${contractId}`);
     return true;
-
   } catch (error) {
     console.error(`Error updating contract ${contractId} status:`, error);
     return false;
@@ -374,25 +375,26 @@ function huyThanhToan(idHoaDon) {
 }
 
 // Function to open payment confirmation dialog
-window.openPaymentConfirmationDialog = async function(contractId){
+window.openPaymentConfirmationDialog = async function (contractId) {
   try {
     // Fetch contract details
     const contractRef = doc(db, "HopDong", contractId);
     const contractDoc = await getDoc(contractRef);
 
     if (!contractDoc.exists()) {
-      console.error('Contract not found');
+      console.error("Contract not found");
       return;
     }
 
     const contract = {
       id: contractDoc.id,
-      ...contractDoc.data()
+      ...contractDoc.data(),
     };
 
-     // Lấy thông tin thanh toán của chủ nhà
-     const thongTinThanhToan = await layThongTinThanhToan(contract.chuNha.maNguoiDung);
-
+    // Lấy thông tin thanh toán của chủ nhà
+    const thongTinThanhToan = await layThongTinThanhToan(
+      contract.chuNha.maNguoiDung
+    );
 
     // Create detailed dialog content
     const dialogContent = `
@@ -401,24 +403,49 @@ window.openPaymentConfirmationDialog = async function(contractId){
         <h2>Xác Nhận Thanh Toán</h2>
         <div class="content-left">
         <div class="contract-details">
-          <p><strong>Mã hóa đơn:</strong> ${contract.hoaDonHopDong?.idHoaDon}</p>
-          <p><strong>Bên gửi:</strong> ${contract.nguoiThue.hoTen || "Không rõ"}</p>
-          <p><strong>Bên nhận:</strong> ${contract.chuNha.hoTen || "Không rõ"}</p>
+          <p><strong>Mã hóa đơn:</strong> ${
+            contract.hoaDonHopDong?.idHoaDon
+          }</p>
+          <p><strong>Bên gửi:</strong> ${
+            contract.nguoiThue.hoTen || "Không rõ"
+          }</p>
+          <p><strong>Bên nhận:</strong> ${
+            contract.chuNha.hoTen || "Không rõ"
+          }</p>
           <p><strong>Ngày gửi:</strong> ${contract.ngayTao || "Không rõ"}</p>
-          <p><strong>Tiền phòng:</strong> ${contract.hoaDonHopDong.tienPhong.toLocaleString('vi-VN') || "Không rõ"}</p>
-          <p><strong>Tiền Cọc:</strong> ${contract.hoaDonHopDong?.tienCoc.toLocaleString('vi-VN') || "Không rõ"}</p>
-     <p><strong>Tổng tiền:</strong> ${(contract.hoaDonHopDong.tienPhong + contract.hoaDonHopDong.tienCoc).toLocaleString('vi-VN')}</p>
-<p><strong>Phí hoa hồng:</strong> - 10% (${((contract.hoaDonHopDong.tienPhong + contract.hoaDonHopDong.tienCoc) * 0.1).toLocaleString('vi-VN')})</p>
-<p style="color: red; font-weight: bold; margin-top: 40px; "> Tổng cần thanh toán: ${(contract.hoaDonHopDong.tienPhong + contract.hoaDonHopDong.tienCoc - (contract.hoaDonHopDong.tienPhong + contract.hoaDonHopDong.tienCoc) * 0.1).toLocaleString('vi-VN')}</p>
+          <p><strong>Tiền phòng:</strong> ${
+            contract.hoaDonHopDong.tienPhong.toLocaleString("vi-VN") ||
+            "Không rõ"
+          }</p>
+          <p><strong>Tiền Cọc:</strong> ${
+            contract.hoaDonHopDong?.tienCoc.toLocaleString("vi-VN") ||
+            "Không rõ"
+          }</p>
+     <p><strong>Tổng tiền:</strong> ${(
+       contract.hoaDonHopDong.tienPhong + contract.hoaDonHopDong.tienCoc
+     ).toLocaleString("vi-VN")}</p>
+<p><strong>Phí hoa hồng:</strong> - 10% (${(
+      (contract.hoaDonHopDong.tienPhong + contract.hoaDonHopDong.tienCoc) *
+      0.1
+    ).toLocaleString("vi-VN")})</p>
+<p style="color: red; font-weight: bold; margin-top: 40px; "> Tổng cần thanh toán: ${(
+      contract.hoaDonHopDong.tienPhong +
+      contract.hoaDonHopDong.tienCoc -
+      (contract.hoaDonHopDong.tienPhong + contract.hoaDonHopDong.tienCoc) * 0.1
+    ).toLocaleString("vi-VN")}</p>
       </div>
         <div class="content-right">
       <h3>Thông Tin Thanh Toán Của Chủ Nhà</h3>
-            ${thongTinThanhToan ? `
+            ${
+              thongTinThanhToan
+                ? `
               <p><strong>Số Tài Khoản:</strong> ${thongTinThanhToan.soTaiKhoan}</p>
               <p><strong>Tên Tài Khoản:</strong> ${thongTinThanhToan.tenTaiKhoan}</p>
               <p><strong>Mã QR Thanh Toán:</strong></p>
               <img src="${thongTinThanhToan.maQR}" alt="Mã QR Thanh Toán" style="max-width: 200px; max-height: 200px;">
-            ` : '<p>Không tìm thấy thông tin thanh toán</p>'}
+            `
+                : "<p>Không tìm thấy thông tin thanh toán</p>"
+            }
 
         </div>
         </div>
@@ -433,35 +460,31 @@ window.openPaymentConfirmationDialog = async function(contractId){
     openModal(dialogContent);
 
     // Add event listeners to buttons
-    const confirmBtn = document.getElementById('confirm-payment-btn');
-    const cancelBtn = document.getElementById('cancel-payment-btn');
+    const confirmBtn = document.getElementById("confirm-payment-btn");
+    const cancelBtn = document.getElementById("cancel-payment-btn");
 
-    confirmBtn.addEventListener('click', async () => {
-        const paymentResult = await thanhToan(contractId);
-        if (paymentResult) {
-          alert('Thanh toán thành công!');
-          closeModal();
-          [waitingList, paidList, canceledList].forEach(list => list.innerHTML = "");
-          fetchContracts(currentUserId);
-          
-        } else {
-          alert('Thanh toán thất bại. Vui lòng thử lại.');
-        }
-     
+    confirmBtn.addEventListener("click", async () => {
+      const paymentResult = await thanhToan(contractId);
+      if (paymentResult) {
+        alert("Thanh toán thành công!");
+        closeModal();
+        [waitingList, paidList, canceledList].forEach(
+          (list) => (list.innerHTML = "")
+        );
+        fetchContracts(currentUserId);
+      } else {
+        alert("Thanh toán thất bại. Vui lòng thử lại.");
+      }
     });
 
-    cancelBtn.addEventListener('click', () => {
+    cancelBtn.addEventListener("click", () => {
       closeModal();
     });
-
-    
   } catch (error) {
-    console.error('Lỗi khi mở dialog thanh toán:', error);
-    alert('Không thể mở dialog thanh toán. Vui lòng thử lại.');
+    console.error("Lỗi khi mở dialog thanh toán:", error);
+    alert("Không thể mở dialog thanh toán. Vui lòng thử lại.");
   }
-}
-
-
+};
 
 function createCountdown(endTime, elementId) {
   const updateCountdown = () => {
@@ -472,9 +495,8 @@ function createCountdown(endTime, elementId) {
     const minutes = Math.floor(timeRemaining / (1000 * 60));
     const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
 
-    const remainingTimeText = timeRemaining > 0
-      ? `${minutes} phút, ${seconds} giây`
-      : "Hết hạn";
+    const remainingTimeText =
+      timeRemaining > 0 ? `${minutes} phút, ${seconds} giây` : "Hết hạn";
 
     // Display countdown
     const countdownElement = document.getElementById(elementId);
@@ -494,8 +516,7 @@ function createCountdown(endTime, elementId) {
 }
 // fetchContracts(currentUserId);   // Sử dụng biến này
 
-console.log( "mã người dùng: "+currentUserId);
-
+console.log("mã người dùng: " + currentUserId);
 
 initializeStaynowApp().then(() => {
   if (currentUserId) {
@@ -503,11 +524,7 @@ initializeStaynowApp().then(() => {
   }
 });
 
-
-
-
 document.getElementById("logoutButton").addEventListener("click", function () {
-  
   // Hiển thị modal xác nhận đăng xuất
   showLogoutConfirmModal(logoutUser);
 });
@@ -525,7 +542,8 @@ function showLogoutConfirmModal(logoutCallback) {
   };
 
   // Xử lý khi nhấn hủy
-  document.getElementById("cancelLogout").onclick = () => hideModalLogout(modal);
+  document.getElementById("cancelLogout").onclick = () =>
+    hideModalLogout(modal);
 
   // Đóng modal khi nhấn ra ngoài
   window.onclick = function (event) {
@@ -554,14 +572,10 @@ async function logoutUser() {
     setTimeout(() => {
       window.location.href = "../public/Login.html"; // Chuyển hướng về trang chính
     }, 1500); // Chờ 3 giây để Toast hiển thị
-
   } catch (error) {
     alert("Đã xảy ra lỗi khi đăng xuất: " + error.message);
   }
 }
-
-
-
 
 function showToast(message) {
   const toastContainer = document.getElementById("toastContainer");
@@ -583,10 +597,8 @@ function showToast(message) {
   // Xóa toast sau khi animation kết thúc
   setTimeout(() => {
     toast.remove();
-  },1500);
+  }, 1500);
 }
-
-
 
 //lấy thông tin người dùng
 document.addEventListener("DOMContentLoaded", () => {
