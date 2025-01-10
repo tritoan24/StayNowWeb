@@ -205,6 +205,7 @@ const promises = assignmentSnapshot.docs.map(async (assignmentDoc) => {
           if (trangThai === 'PROCESSING') {
             actionButtons = `
              <button class="btn btn-primary" onclick="openPaymentConfirmationDialog('${contract.id}')">Thanh toán</button>
+             <button class="btn btn-danger" onclick="chuyenCongViec('${assignmentDoc.id}')">Chuyển công việc</button>
              `;
           }
 
@@ -358,7 +359,7 @@ window.thanhToan = async function (contractId) {
       message: `Hợp đồng của phòng ${contractData.thongtinphong.tenPhong} đã thanh toán thành công `,
       timestamp: Date.now(),
       isRead: false,
-      date: Calendar.getInstance().time.toString(),
+      date: new Date().toLocaleDateString('vi-VN'),
       time: new Date().toLocaleTimeString('vi-VN'),
       mapLink : null,
       isPushed : true,
