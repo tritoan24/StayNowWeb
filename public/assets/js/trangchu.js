@@ -1,9 +1,8 @@
 import { db, database, auth } from "./FireBaseConfig.js";
-import {  ref, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-
-
-
-
+import {
+  ref,
+  get,
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
 // add hovered class to selected list item
 let list = document.querySelectorAll(".navigation li");
@@ -28,39 +27,41 @@ toggle.onclick = function () {
 };
 
 function navigateTo(url) {
-    window.location.href = url; // Chuyển hướng trình duyệt đến URL được truyền vào
+  window.location.href = url; // Chuyển hướng trình duyệt đến URL được truyền vào
 }
 
-
-document.getElementById('main').addEventListener('click', function (event) {
-    if (event.target && event.target.id === 'btnPhongTro') {
-        navigateTo('QuanLyPhongTro.html');
-    }
-    if (event.target && event.target.id === 'btnloaiphong') {
-      navigateTo('QuanLyLoaiPhong.html');
+document.getElementById("main").addEventListener("click", function (event) {
+  if (event.target && event.target.id === "btnPhongTro") {
+    navigateTo("QuanLyPhongTro.html");
   }
-    if (event.target && event.target.id === 'btnthongtin') {
-        navigateTo('QuanLyThongTin.html');
-    }
-    if (event.target && event.target.id === 'btndichvu') {
-        navigateTo('QuanLyDichVu.html');
-    }
-    if (event.target && event.target.id === 'btntiennghi') {
-        navigateTo('QuanLyTienNghi.html');
-    }
-    if (event.target && event.target.id === 'btnnoithat') {
-        navigateTo('QuanLyNoiThat.html');
-    }
-    if (event.target && event.target.id === 'btnNhanVien') {
-        navigateTo('QuanLyNhanVien.html');
-    }
-    if (event.target && event.target.id === 'btnLichSuThanhToan') {
-      navigateTo('LichSuThanhToan.html');
-  } if (event.target && event.target.id === 'btnLichSuGiaoDich') {
-    navigateTo('LichSuGiaoDich.html');
-}
+  if (event.target && event.target.id === "btnloaiphong") {
+    navigateTo("QuanLyLoaiPhong.html");
+  }
+  if (event.target && event.target.id === "btnthongtin") {
+    navigateTo("QuanLyThongTin.html");
+  }
+  if (event.target && event.target.id === "btntocao") {
+    navigateTo("QuanLyDonToCao.html");
+  }
+  if (event.target && event.target.id === "btndichvu") {
+    navigateTo("QuanLyDichVu.html");
+  }
+  if (event.target && event.target.id === "btntiennghi") {
+    navigateTo("QuanLyTienNghi.html");
+  }
+  if (event.target && event.target.id === "btnnoithat") {
+    navigateTo("QuanLyNoiThat.html");
+  }
+  if (event.target && event.target.id === "btnNhanVien") {
+    navigateTo("QuanLyNhanVien.html");
+  }
+  if (event.target && event.target.id === "btnLichSuThanhToan") {
+    navigateTo("LichSuThanhToan.html");
+  }
+  if (event.target && event.target.id === "btnLichSuGiaoDich") {
+    navigateTo("LichSuGiaoDich.html");
+  }
 });
-
 
 document.addEventListener("DOMContentLoaded", () => {
   const userId = localStorage.getItem("userId");
@@ -85,22 +86,22 @@ document.addEventListener("DOMContentLoaded", () => {
           userData.anh_daidien || "default-avatar.png";
 
         // Kiểm tra vai trò và ẩn nút nếu cần
-        if (userData.loai_taikhoan
-          === "NhanVien") {
+        if (userData.loai_taikhoan === "NhanVien") {
           const btnNhanVien = document.getElementById("btnNhanVien");
-          const btnLichSuThanhToan = document.getElementById("btnLichSuThanhToan");
-          const btnLichSuGiaoDich = document.getElementById("btnLichSuGiaoDich");
+          const btnLichSuThanhToan =
+            document.getElementById("btnLichSuThanhToan");
+          const btnLichSuGiaoDich =
+            document.getElementById("btnLichSuGiaoDich");
           if (btnNhanVien) {
             btnNhanVien.style.display = "none"; // Ẩn nút
-            btnLichSuThanhToan.style.display = "none"; 
-            btnLichSuGiaoDich.style.display = "none"; 
-        
+            btnLichSuThanhToan.style.display = "none";
+            btnLichSuGiaoDich.style.display = "none";
           }
         }
 
-        if(userData.loai_taikhoan === "Admin") {
-          const liCongVien = document.getElementById("li-congviec")
-          liCongVien.style.display = "none"
+        if (userData.loai_taikhoan === "Admin") {
+          const liCongVien = document.getElementById("li-congviec");
+          liCongVien.style.display = "none";
         }
       } else {
         alert("Không tìm thấy thông tin người dùng!");
@@ -110,5 +111,3 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Lỗi kết nối đến máy chủ:", error.message);
     });
 });
-
-

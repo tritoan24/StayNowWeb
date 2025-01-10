@@ -1,4 +1,3 @@
-
 // Import các chức năng cần thiết từ Firebase SDK
 import { database } from "./FireBaseConfig.js"; // Import database và auth đã khởi tạo
 import {
@@ -10,7 +9,6 @@ import {
   onChildAdded,
   onValue,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-
 
 // add hovered class to selected list item
 let list = document.querySelectorAll(".navigation li");
@@ -52,7 +50,6 @@ function fetchUserDetails(userId) {
     });
 }
 
-
 // Hàm lắng nghe danh sách chat
 function listenToChatList(senderId) {
   const chatListRef = ref(database, `DanhSachTroChuyen/${senderId}`);
@@ -80,12 +77,12 @@ async function renderChatList(userChatData) {
 
     const messageItem = document.createElement("div");
     messageItem.classList.add("message-item");
-    messageItem.dataset.chatId = chatId;
+    messageItem.dataset.maTinNhan = chatId;
 
     // Avatar (nếu có thông tin người dùng, hiển thị avatar từ đó; nếu không, dùng placeholder)
     const avatar = document.createElement("img");
-    avatar.src = userDetails?.anh_daidien || `https://via.placeholder.com/50`;
-    avatar.alt = `Avatar của ${userDetails?.ho_ten}`;
+    avatar.src = userDetails?.anhDaiDien || `https://via.placeholder.com/50`;
+    avatar.alt = `Avatar của ${userDetails?.hoTen}`;
     avatar.classList.add("avatar");
 
     // Nội dung chat
@@ -94,7 +91,7 @@ async function renderChatList(userChatData) {
 
     const userName = document.createElement("h2");
     userName.classList.add("user-name");
-    userName.textContent = userDetails?.ho_ten || `Người dùng ${otherUserId}`; // Nếu có tên thì hiển thị tên, nếu không thì hiển thị ID.
+    userName.textContent = userDetails?.hoTen || `Người dùng ${otherUserId}`; // Nếu có tên thì hiển thị tên, nếu không thì hiển thị ID.
 
     const lastMessage = document.createElement("p");
     lastMessage.classList.add("last-message");
@@ -102,7 +99,7 @@ async function renderChatList(userChatData) {
 
     const messageTime = document.createElement("span");
     messageTime.classList.add("message-time");
-    messageTime.textContent = formatTimestamp(chat.thoiGianTinNhanCuoi    );
+    messageTime.textContent = formatTimestamp(chat.thoiGianTinNhanCuoi);
 
     messageContent.appendChild(userName);
     messageContent.appendChild(lastMessage);
@@ -144,7 +141,6 @@ function formatTimestamp(timestamp) {
   }
 }
 const displayedMessageIds = new Set(); // Lưu trữ các ID tin nhắn đã hiển thị
-
 
 function fetchChatDetails(chatId) {
   return new Promise((resolve, reject) => {
@@ -189,7 +185,6 @@ function fetchChatDetails(chatId) {
   });
 }
 
-
 function formatChatId(chatId, userId) {
   // Loại bỏ userId và dấu _
   return chatId.replace(userId, "").replace("_", "");
@@ -221,8 +216,10 @@ function updateChatTitle(userDetails) {
 
   // Avatar
   const avatar = document.createElement("img");
-  avatar.src = userDetails.anh_daidien || "https://static.vecteezy.com/system/resources/thumbnails/005/194/102/small_2x/user-icon-flat-design-isolated-on-white-background-free-vector.jpg"; // Đường dẫn ảnh mặc định
-  avatar.alt = `Avatar của ${userDetails.ho_ten}`;
+  avatar.src =
+    userDetails.anhDaiDien ||
+    "https://static.vecteezy.com/system/resources/thumbnails/005/194/102/small_2x/user-icon-flat-design-isolated-on-white-background-free-vector.jpg"; // Đường dẫn ảnh mặc định
+  avatar.alt = `Avatar của ${userDetails.hoTen}`;
   avatar.classList.add("chat-avatar");
 
   // Container thông tin
@@ -232,13 +229,14 @@ function updateChatTitle(userDetails) {
   // Tên người nhận
   const receiverName = document.createElement("span");
   receiverName.textContent =
-    userDetails.ho_ten || "Người nhận chưa cập nhật tên";
+    userDetails.hoTen || "Người nhận chưa cập nhật tên";
   receiverName.classList.add("receiver-name");
 
   // Trạng thái
   const status = document.createElement("span");
   const now = Date.now();
-  const lastActiveTime = userDetails.lastActiveTime || 0;
+  const lastActiveTime = userDetails.thoiGianKichHoatCuoiCung
+  || 0;
   const isOnline = now - lastActiveTime < 60000; // Nếu hoạt động trong 1 phút, coi là online
 
   if (isOnline) {
@@ -299,7 +297,6 @@ function addNewMessage(message) {
 }
 
 function renderChatMessages(messageList, chatId) {
-
   const chatViewElement = document.querySelector(".chat-content");
   chatViewElement.innerHTML = ""; // Xóa nội dung cũ
   console.log("chatId: ", chatId);
@@ -346,14 +343,16 @@ document.getElementById("back-button").addEventListener("click", () => {
   chatModal.style.display = "none"; // Ẩn modal khi quay lại
 });
 
-
 // Hàm cập nhật danh sách chat
 function updateChatList(chatId, lastMessage, lastMessageTime, senderId) {
-  const chatListRefSender = ref(database, `ChatList/${senderId}/${chatId}`);
+  const chatListRefSender = ref(
+    database,
+    `DanhSachTroChuyen/${senderId}/${chatId}`
+  );
   const otherUserId = chatId.replace(senderId, "").replace("_", "");
   const chatListRefReceiver = ref(
     database,
-    `ChatList/${otherUserId}/${chatId}`
+    `DanhSachTroChuyen/${otherUserId}/${chatId}`
   );
 
   // Cập nhật lại tin nhắn mới và thời gian trong danh sách của người gửi
@@ -398,7 +397,7 @@ document.getElementById("send-button").addEventListener("click", () => {
 
     const senderId = localStorage.getItem("userId"); //id nguoi gui
     // Thêm tin nhắn vào Firebase Realtime Database
-    const chatRef = ref(database, `Chats/${chatId}/messages`); // Tham chiếu đến trường messages trong cuộc hội thoại
+    const chatRef = ref(database, `TroChuyen/${chatId}/messages`); // Tham chiếu đến trường messages trong cuộc hội thoại
     const newMessageRef = push(chatRef); // Tạo ID mới tự động cho tin nhắn
     const timestamp = Date.now();
     // Ghi tin nhắn vào Firebase
@@ -424,7 +423,7 @@ document.getElementById("send-button").addEventListener("click", () => {
 // Gọi hàm với userId cụ thể khi trang tải
 document.addEventListener("DOMContentLoaded", () => {
   const userId = localStorage.getItem("userId"); // Thay ID người dùng ở đây
-listenToChatList(userId);
+  listenToChatList(userId);
 });
 
 //lấy thông tin người dùng
@@ -446,9 +445,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (snapshot.exists()) {
         const userData = snapshot.val();
 
-        if(userData.loai_taikhoan === "Admin") {
-          const liCongVien = document.getElementById("li-congviec")
-          liCongVien.style.display = "none"
+        if (userData.loai_taikhoan === "Admin") {
+          const liCongVien = document.getElementById("li-congviec");
+          liCongVien.style.display = "none";
         }
 
         // Hiển thị thông tin người dùng trên màn hình chính
@@ -467,7 +466,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-
 document.addEventListener("DOMContentLoaded", () => {
   const userChatId = localStorage.getItem("chatUserId"); // id người nhận
   const currentUserId = localStorage.getItem("userId"); // id người gửi
@@ -477,18 +475,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatId = `${currentUserId}_${userChatId}`;
     const chatId2 = `${userChatId}_${currentUserId}`;
 
-    const chatListRef = ref(database, `ChatList/${currentUserId}/${chatId}`);
-    const chatsRef = ref(database, `Chats/${chatId}`);
-    const chatListIds = ref(database, `ChatList/${currentUserId}`);
+    const chatListRef = ref(
+      database,
+      `DanhSachTroChuyen/${currentUserId}/${chatId}`
+    );
+    const chatsRef = ref(database, `TroChuyen/${chatId}`);
+    const chatListIds = ref(database, `DanhSachTroChuyen/${currentUserId}`);
     const timestamp = Date.now();
-   
-    let checkId = false
+
+    let checkId = false;
     get(chatListIds)
       .then((snapshot) => {
-        
         if (snapshot.exists()) {
-          const chats = snapshot.val();  // Dữ liệu của tất cả các chat
-          const chatIds = Object.keys(chats);  // Lấy ra danh sách chatId từ các khóa của đối tượng chats      
+          const chats = snapshot.val(); // Dữ liệu của tất cả các chat
+          const chatIds = Object.keys(chats); // Lấy ra danh sách chatId từ các khóa của đối tượng chats
 
           for (const id of chatIds) {
             if (id === chatId || id === chatId2) {
@@ -504,8 +504,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
           if (checkId == false) {
             console.log("Không có chat nào trong bảng Chats.");
-
-
           }
         }
         if (checkId == false) {
@@ -521,7 +519,7 @@ document.addEventListener("DOMContentLoaded", () => {
             messages: [],
           });
 
-          const chatRef = ref(database, `Chats/${chatId}/messages`); // Tham chiếu đến trường messages trong cuộc hội thoại
+          const chatRef = ref(database, `TroChuyen/${chatId}/messages`); // Tham chiếu đến trường messages trong cuộc hội thoại
           const newMessageRef = push(chatRef); // Tạo ID mới tự động cho tin nhắn
           const messageInput = document.getElementById("message-input");
           const message = messageInput.value.trim();
@@ -538,11 +536,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 listenToChatList(currentUserId); // Làm mới danh sách ChatList
               });
 
-
               // Gọi fetchChatDetails với chatId, nếu lỗi thì thử với chatId2
               fetchChatDetails(chatId)
                 .then(() => {
-                  const chatTitleElement = document.getElementById("chat-title");
+                  const chatTitleElement =
+                    document.getElementById("chat-title");
                   chatTitleElement.setAttribute("data-chat-id", chatId);
                   console.log("Lấy đoạn chat thành công với chatId!");
                   localStorage.removeItem("chatUserId");
@@ -553,13 +551,17 @@ document.addEventListener("DOMContentLoaded", () => {
                   // Thử lại với chatId2
                   fetchChatDetails(chatId2)
                     .then(() => {
-                      const chatTitleElement = document.getElementById("chat-title");
+                      const chatTitleElement =
+                        document.getElementById("chat-title");
                       chatTitleElement.setAttribute("data-chat-id", chatId2);
                       console.log("Lấy đoạn chat thành công với chatId2!");
                       localStorage.removeItem("chatUserId");
                     })
                     .catch((err) => {
-                      console.error("Không lấy được đoạn chat với chatId2:", err);
+                      console.error(
+                        "Không lấy được đoạn chat với chatId2:",
+                        err
+                      );
                     });
                 });
 
@@ -568,14 +570,10 @@ document.addEventListener("DOMContentLoaded", () => {
             .catch((error) => {
               console.error("Error sending message:", error);
             });
-
-
         }
       })
       .catch((error) => {
         console.error("Lỗi khi lấy danh sách chatId:", error);
       });
-
   }
 });
-

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản Lý Tố Cáo</title>
+    <link rel="stylesheet" href="./assets/css/QuanLyDonToCaoStyle.css" />
+  </head>
+  <body>
+    <header>
+      <div class="back-button">
+        <button onclick="goBack()">Quay lại</button>
+      </div>
+      <h1>Quản Lý Đơn Tố Cáo</h1>
+    </header>
+
+    <div class="container">
+      <div id="successModal" class="modal modalHidden">
+        <div class="modal-content">
+          <span id="closeModal" class="close">&times;</span>
+          <div class="modal-icon">
+            <img
+              src="./assets/imgs/icons/ic-tick-success.svg"
+              alt="Success Icon"
+            />
+          </div>
+          <h2 class="modal-title">Thành công!</h2>
+          <p id="modalMessage">Tiện nghi đã được thêm thành công.</p>
+          <button id="modalAction" class="modal-button">OK</button>
+        </div>
+      </div>
+
+      <div id="deleteConfirmModal" class="modal modalHidden">
+        <div class="modal-content">
+          <h2 class="modal-title">Xác nhận xóa</h2>
+          <p>Bạn có chắc chắn muốn xóa tiện nghi này không?</p>
+          <div class="modal-actions">
+            <button id="confirmDelete" class="modal-button danger">Xóa</button>
+            <button id="cancelDelete" class="modal-button">Hủy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danh sách nội thất -->
+      <div class="comfortContainerView">
+        <div class="titleAddForm">
+          <h3>Danh sách đơn tố cáo</h3>
+        </div>
+        <div class="comfortContainer">
+          <!-- Thanh tìm kiếm -->
+          <div class="search-view">
+            <div class="search-container">
+              <img
+                src="./assets/imgs/icons/ic-search-gray.svg"
+                alt="Search Icon"
+              />
+              <input
+                type="text"
+                id="searchComfort"
+                placeholder="Tìm kiếm đơn tố cáo"
+                oninput="filterComfort(event)"
+              />
+            </div>
+            <div class="search-actions">
+              <img src="./assets/imgs/icons/ic-sort.svg" alt="Sort Icon" />
+              <img src="./assets/imgs/icons/ic-fill.svg" alt="Fill Icon" />
+            </div>
+          </div>
+
+          <div class="content">
+            <!-- Tab Navigation -->
+            <div class="tab-container">
+              <div class="tab active" data-tab="pending">Đang chờ duyệt</div>
+              <div class="tab" data-tab="approved">Đã duyệt</div>
+              <div class="tab" data-tab="canceled">Đã huỷ</div>
+            </div>
+
+            <!-- Tab Contents -->
+            <div id="pending" class="tab-content active">
+              <div class="complaint-table" id="pending-contract-list">
+                <!-- Danh sách -->
+                <div class="table-container"></div>
+              </div>
+              <div id="pagination" class="pagination"></div>
+            </div>
+
+            <div id="approved" class="tab-content">
+              <div class="complaint-table" id="approved-contract-list">
+                <!-- Danh sách -->
+                <div class="table-container"></div>
+              </div>
+              <div id="pagination" class="pagination"></div>
+            </div>
+
+            <div id="canceled" class="tab-content">
+              <div class="complaint-table" id="canceled-contract-list">
+                <!-- Danh sách -->
+                <div class="table-container"></div>
+              </div>
+              <div id="pagination" class="pagination"></div>
+            </div>
+          </div>
+
+          <!-- Modal chi tiết đơn tố cáo -->
+         <!-- Modal chi tiết đơn tố cáo -->
+<div id="itemDetailModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Chi tiết đơn tố cáo</h2>
+    <div id="itemDetailContent"></div>
+    <div class="modal-actions">
+      <button id="lockAccComplainant" class="modal-btn">Khoá tài khoản người tố cáo</button>
+      <button id="lockAccDefendant" class="modal-btn">Khoá tài khoản người bị tố cáo</button>
+      <button id="cancelComplaint" class="modal-btn cancel-btn">Huỷ đơn</button>
+    </div>
+  </div>
+</div>
+
+
+          <div id="toastContainer" class="toast-container"></div>
+          <div id="toastContainerFalse" class="toast-container-false"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./assets/js/QuanLyDonToCao.js" type="module"></script>
+  </body>
+</html>
