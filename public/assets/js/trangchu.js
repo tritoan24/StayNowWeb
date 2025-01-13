@@ -84,9 +84,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const userData = snapshot.val();
 
         // Hiển thị thông tin người dùng
-        document.getElementById("userName").textContent = userData.ho_ten;
+        document.getElementById("userName").textContent = userData.hoTen;
         document.getElementById("userAvatar").src =
-          userData.anh_daidien || "default-avatar.png";
+          userData.anhDaiDien || "default-avatar.png";
 
         // Kiểm tra vai trò và ẩn nút nếu cần
         if (userData.loai_taikhoan === "NhanVien") {

@@ -623,9 +623,9 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Thông tin người dùng:", userData);
 
         // Ví dụ: Cập nhật thông tin người dùng trên giao diện
-        document.getElementById("userName").textContent = userData.ho_ten;
+        document.getElementById("userName").textContent = userData.hoTen;
         document.getElementById("userAvatar").src =
-          userData.anh_daidien || "default-avatar.png";
+          userData.anhDaiDien || "default-avatar.png";
       } else {
         alert("Không tìm thấy thông tin người dùng!");
       }

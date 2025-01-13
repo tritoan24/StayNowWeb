@@ -279,11 +279,11 @@ function addNewMessage(message) {
 
   const messageContent = document.createElement("p");
   messageContent.classList.add("message-content");
-  messageContent.textContent = message.message;
+  messageContent.textContent = message.tinNhan;
   const currentUserId = localStorage.getItem("userId"); //id nguoi gui
 
   // Phân loại tin nhắn gửi hoặc nhận
-  if (message.senderId === currentUserId) {
+  if (message.maNguoiGui === currentUserId) {
     messageItem.classList.add("message-sender");
   } else {
     messageItem.classList.add("message-receiver");
@@ -322,11 +322,11 @@ function renderChatMessages(messageList, chatId) {
     // Nội dung tin nhắn
     const messageContent = document.createElement("p");
     messageContent.classList.add("message-content");
-    messageContent.textContent = message.message;
+    messageContent.textContent = message.tinNhan;
     const currentUserId = localStorage.getItem("userId"); //id nguoi gui
 
     // Tạo div cho tin nhắn gửi hoặc nhận
-    if (message.senderId === currentUserId) {
+    if (message.maNguoiGui === currentUserId) {
       messageItem.classList.add("message-sender"); // Tin nhắn của người gửi sẽ ở bên phải
     } else {
       messageItem.classList.add("message-receiver"); // Tin nhắn của người nhận sẽ ở bên trái
@@ -356,15 +356,15 @@ function updateChatList(chatId, lastMessage, lastMessageTime, senderId) {
   );
 
   // Cập nhật lại tin nhắn mới và thời gian trong danh sách của người gửi
-  update(chatListRefSender, { lastMessage, lastMessageTime });
+  update(chatListRefSender, {tinNhanCuoi: lastMessage,thoiGianTinNhanCuoi: lastMessageTime });
 
   // Cập nhật danh sách chat của người nhận
   get(chatListRefReceiver).then((snapshot) => {
     const unreadCount = snapshot.exists() ? snapshot.val().unreadCount || 0 : 0;
     update(chatListRefReceiver, {
-      lastMessage,
-      lastMessageTime,
-      unreadCount: unreadCount + 1,
+      tinNhanCuoi: lastMessage,
+      thoiGianTinNhanCuoi: lastMessageTime,
+      soTinChuaDoc: unreadCount + 1,
     });
   });
 
@@ -402,8 +402,8 @@ document.getElementById("send-button").addEventListener("click", () => {
     const timestamp = Date.now();
     // Ghi tin nhắn vào Firebase
     set(newMessageRef, {
-      message: message,
-      senderId: senderId,
+      tinNhan: message,
+      maNguoiGui: senderId,
       timestamp: timestamp,
     })
       .then(() => {
@@ -510,9 +510,9 @@ document.addEventListener("DOMContentLoaded", () => {
           console.log("tao thanh cong doan chat moi");
 
           set(chatListRef, {
-            chatId: chatId,
-            otherUserId: userChatId,
-            unreadCount: 0,
+            maTinNhan: chatId,
+            maNguoiDungKhac: userChatId,
+            soTinChuaDoc: 0,
           });
 
           set(chatsRef, {
@@ -526,8 +526,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
           // Ghi tin nhắn vào Firebase
           set(newMessageRef, {
-            message: "Admin xin chào!",
-            senderId: currentUserId,
+            tinNhan: "Admin xin chào!",
+            maNguoiGui: currentUserId,
             timestamp: timestamp,
           })
             .then(() => {
