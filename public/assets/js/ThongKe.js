@@ -973,6 +973,8 @@ function showToastFalse(message) {
 
 document.addEventListener("DOMContentLoaded", () => {
   const userId = localStorage.getItem("userId");
+  console.log("userID: ", userId);
+  
 
   if (!userId) {
     alert("Bạn chưa đăng nhập!");

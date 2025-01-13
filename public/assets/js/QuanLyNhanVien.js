@@ -11,6 +11,7 @@ import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebase
 document.getElementById("userDialog").style.display = "none";
 
 
+
 // Biến toàn cục để lưu trữ danh sách phòng trọ
 let staffs = [];
 let allStaff = []; // Danh sách gốc
@@ -30,7 +31,7 @@ function fetchStaffs() {
           const user = users[userId];
 
           // Chỉ xử lý người dùng có loai_taikhoan là NhanVien
-          if (user.loai_taikhoan === "NhanVien") {
+          if (user.loaiTaiKhoan === "NhanVien") {
             allStaff.push(user);
 
             // Tạo HTML cho mỗi nhân viên
@@ -39,26 +40,26 @@ function fetchStaffs() {
 
             // Ảnh đại diện
             const avatar = document.createElement("img");
-            avatar.src = user.anh_daidien || "default-avatar.png"; // Thêm ảnh mặc định nếu thiếu ảnh đại diện
-            avatar.alt = user.ho_ten;
+            avatar.src = user.anhDaiDien || "default-avatar.png"; // Thêm ảnh mặc định nếu thiếu ảnh đại diện
+            avatar.alt = user.hoTen;
 
             // Thông tin người dùng
             const userDetails = document.createElement("div");
             userDetails.classList.add("user-details");
 
             const name = document.createElement("h3");
-            name.textContent = user.ho_ten;
+            name.textContent = user.hoTen;
 
             // Tạo trạng thái (online/offline)
             const statusCircle = document.createElement("span");
             statusCircle.classList.add("status-circle");
-            if (user.status === "online") {
+            if (user.trangThai === "online") {
               statusCircle.classList.add("online");
             } else {
               statusCircle.classList.add("offline");
 
               // Tính thời gian offline
-              const lastOnline = new Date(user.lastActiveTime); // Giả sử `user.lastOnline` là thời gian cuối cùng online
+              const lastOnline = new Date(user.thoiGianKichHoatCuoiCung); // Giả sử `user.lastOnline` là thời gian cuối cùng online
               const now = new Date();
               const diffMs = now - lastOnline; // Chênh lệch thời gian (ms)
               const diffMinutes = Math.floor(diffMs / 60000); // Đổi sang phút
@@ -86,10 +87,10 @@ function fetchStaffs() {
             detailButton.classList.add("detail-button");
 
             // Kiểm tra trạng thái tài khoản để đặt nhãn và màu cho nút
-            if (user.trang_thaitaikhoan === "HoatDong") {
+            if (user.trangThaiTaiKhoan === "HoatDong") {
               detailButton.textContent = "Khóa Tài Khoản";
               detailButton.classList.add("button-active"); // Thêm màu xanh cho nút
-            } else if (user.trang_thaitaikhoan === "Khoa") {
+            } else if (user.trangThaiTaiKhoan === "Khoa") {
               detailButton.textContent = "Mở Tài Khoản";
               detailButton.classList.add("button-banned"); // Thêm màu đỏ cho nút
             }
@@ -98,14 +99,14 @@ function fetchStaffs() {
             detailButton.addEventListener("click", (e) => {
               e.stopPropagation(); // Ngăn chặn sự kiện click lan tỏa lên phần tử cha
 
-              if (user.trang_thaitaikhoan === "HoatDong") {
+              if (user.trangThaiTaiKhoan === "HoatDong") {
                 const confirmLock = confirm(
                   "Bạn có chắc chắn muốn khóa tài khoản này không?"
                 );
                 if (confirmLock) {
                   const updates = {};
-                  updates[`/NguoiDung/${userId}/trang_thaitaikhoan`] = "Khoa";
-                  updates[`/NguoiDung/${userId}/ngay_capnhat`] =
+                  updates[`/NguoiDung/${userId}/trangThaiTaiKhoan`] = "Khoa";
+                  updates[`/NguoiDung/${userId}/ngayCapNhat`] =
                     new Date().toISOString();
 
                   update(ref(database), updates)
@@ -123,9 +124,9 @@ function fetchStaffs() {
                 );
                 if (confirmUnlock) {
                   const updates = {};
-                  updates[`/NguoiDung/${userId}/trang_thaitaikhoan`] =
+                  updates[`/NguoiDung/${userId}/trangThaiTaiKhoan`] =
                     "HoatDong";
-                  updates[`/NguoiDung/${userId}/ngay_capnhat`] =
+                  updates[`/NguoiDung/${userId}/ngayCapNhat`] =
                     new Date().toISOString();
 
                   update(ref(database), updates)
@@ -169,30 +170,30 @@ function showUserDialog(user) {
   const dialog = document.getElementById("userDialog");
   dialog.style.display = "block";
 
-  document.getElementById("dialogName").textContent = user.ho_ten;
-  document.getElementById("dialogAvatar").src = user.anh_daidien;
+  document.getElementById("dialogName").textContent = user.hoTen;
+  document.getElementById("dialogAvatar").src = user.anhDaiDien;
   document.getElementById("dialogPhone").textContent = `SĐT: ${user.sdt}`;
   document.getElementById("dialogEmail").textContent = `Email: ${
     user.email || "Không có"
   }`;
   document.getElementById(
     "dialogAccountType"
-  ).textContent = `Loại tài khoản: ${user.loai_taikhoan}`;
+  ).textContent = `Loại tài khoản: ${user.loaiTaiKhoan}`;
   document.getElementById(
     "dialogUserId"
-  ).textContent = `Mã người dùng: ${user.ma_nguoidung}`;
+  ).textContent = `Mã người dùng: ${user.maNguoiDung}`;
   document.getElementById(
     "dialogAccountStatus"
-  ).textContent = `Trạng thái tài khoản: ${user.trang_thaitaikhoan}`;
+  ).textContent = `Trạng thái tài khoản: ${user.trangThaiTaiKhoan}`;
   document.getElementById(
     "dialogCreatedDate"
   ).textContent = `Ngày tạo: ${new Date(
-    user.ngay_taotaikhoan
+    user.ngayTaoTaiKhoan
   ).toLocaleString()}`;
   document.getElementById(
     "dialogUpdatedDate"
   ).textContent = `Ngày cập nhật: ${new Date(
-    user.ngay_capnhat
+    user.ngayCapNhat
   ).toLocaleString()}`;
 }
 
@@ -211,8 +212,8 @@ function searchUsers() {
   contentElement.innerHTML = ""; // Xóa nội dung cũ trước khi thêm kết quả tìm kiếm
 
   allStaff.forEach((user) => {
-    const hoTen = user.ho_ten?.toLowerCase() || ""; // Xử lý nếu ho_ten bị null hoặc undefined
-    const maNguoiDung = user.ma_nguoidung?.toLowerCase() || ""; // Xử lý nếu ma_nguoidung bị null hoặc undefined
+    const hoTen = user.hoTen?.toLowerCase() || ""; // Xử lý nếu ho_ten bị null hoặc undefined
+    const maNguoiDung = user.maNguoiDung?.toLowerCase() || ""; // Xử lý nếu ma_nguoidung bị null hoặc undefined
 
     // Kiểm tra điều kiện tìm kiếm
     if (hoTen.includes(searchInput) || maNguoiDung.includes(searchInput)) {
@@ -222,15 +223,15 @@ function searchUsers() {
 
       // Ảnh đại diện
       const avatar = document.createElement("img");
-      avatar.src = user.anh_daidien;
-      avatar.alt = user.ho_ten;
+      avatar.src = user.anhDaiDien;
+      avatar.alt = user.hoTen;
 
       // Thông tin người dùng
       const userDetails = document.createElement("div");
       userDetails.classList.add("user-details");
 
       const name = document.createElement("h3");
-      name.textContent = user.ho_ten;
+      name.textContent = user.hoTen;
 
       const phone = document.createElement("p");
       phone.textContent = `SĐT: ${user.sdt}`;
@@ -238,13 +239,13 @@ function searchUsers() {
       // Tạo trạng thái (online/offline)
       const statusCircle = document.createElement("span");
       statusCircle.classList.add("status-circle");
-      if (user.status === "online") {
+      if (user.trangThai === "online") {
         statusCircle.classList.add("online");
       } else {
         statusCircle.classList.add("offline");
 
         // Tính thời gian offline
-        const lastOnline = new Date(user.lastActiveTime); // Giả sử `user.lastOnline` là thời gian cuối cùng online
+        const lastOnline = new Date(user.thoiGianKichHoatCuoiCung        ); // Giả sử `user.lastOnline` là thời gian cuối cùng online
         const now = new Date();
         const diffMs = now - lastOnline; // Chênh lệch thời gian (ms)
         const diffMinutes = Math.floor(diffMs / 60000); // Đổi sang phút
@@ -271,10 +272,10 @@ function searchUsers() {
       detailButton.classList.add("detail-button");
 
       // Kiểm tra trạng thái tài khoản để đặt nhãn và màu cho nút
-      if (user.trang_thaitaikhoan === "HoatDong") {
+      if (user.trangThaiTaiKhoan === "HoatDong") {
         detailButton.textContent = "Khóa Tài Khoản";
         detailButton.classList.add("button-active"); // Thêm màu xanh cho nút
-      } else if (user.trang_thaitaikhoan === "Khoa") {
+      } else if (user.trangThaiTaiKhoan === "Khoa") {
         detailButton.textContent = "Mở Tài Khoản";
         detailButton.classList.add("button-banned"); // Thêm màu đỏ cho nút
       }
@@ -283,7 +284,7 @@ function searchUsers() {
       detailButton.addEventListener("click", (e) => {
         e.stopPropagation(); // Ngăn chặn sự kiện click lan tỏa lên phần tử cha
 
-        if (user.trang_thaitaikhoan === "HoatDong") {
+        if (user.trangThaiTaiKhoan === "HoatDong") {
           // Hiển thị xác nhận khóa tài khoản
           var r = confirm(
             "Bạn có chắc chắn muốn Khóa tài khoản này hay không?"
@@ -291,9 +292,9 @@ function searchUsers() {
           if (r == true) {
             // Đổi trạng thái tài khoản thành Khoa
             const updates = {};
-            updates[`/NguoiDung/${user.ma_nguoidung}/trang_thaitaikhoan`] =
+            updates[`/NguoiDung/${user.maNguoiDung}/trangThaiTaiKhoan`] =
               "Khoa";
-            updates[`/NguoiDung/${user.ma_nguoidung}/ngay_capnhat`] =
+            updates[`/NguoiDung/${user.maNguoiDung}/ngayCapNhat`] =
               new Date().toISOString();
 
             update(ref(database), updates)
@@ -305,15 +306,15 @@ function searchUsers() {
                 console.error("Error updating data: ", error);
               });
           }
-        } else if (user.trang_thaitaikhoan === "Khoa") {
+        } else if (user.trangThaiTaiKhoan === "Khoa") {
           // Hiển thị xác nhận mở tài khoản
           var r = confirm("Bạn có chắc chắn muốn Mở tài khoản này không?");
           if (r == true) {
             // Đổi trạng thái tài khoản thành HoatDong
             const updates = {};
-            updates[`/NguoiDung/${user.ma_nguoidung}/trang_thaitaikhoan`] =
+            updates[`/NguoiDung/${user.maNguoiDung}/trangThaiTaiKhoan`] =
               "HoatDong";
-            updates[`/NguoiDung/${user.ma_nguoidung}/ngay_capnhat`] =
+            updates[`/NguoiDung/${user.maNguoiDung}/ngayCapNhat`] =
               new Date().toISOString();
 
             update(ref(database), updates)
@@ -443,16 +444,16 @@ async function handleFormSubmit(event) {
     // Lưu thông tin nhân viên vào Realtime Database
     const staffRef = ref(database, `NguoiDung/${userId}`);
     const newStaff = {
-      ma_nguoidung: userId,
-      ho_ten: staffName,
+      maNguoiDung: userId,
+      hoTen: staffName,
       sdt: staffPhone,
-      anh_daidien: staffAvt || null, // Ảnh đại diện có thể để trống
+      anhDaiDien: staffAvt || null, // Ảnh đại diện có thể để trống
       email: staffEmail,
-      loai_taikhoan: "NhanVien",
-      trang_thaitaikhoan: "HoatDong",
-      ngay_taotaikhoan: new Date().toISOString(),
-      ngay_capnhat: new Date().toISOString(),
-      lastActiveTime: new Date().getTime(),
+      loaiTaiKhoan: "NhanVien",
+      trangThaiTaiKhoan: "HoatDong",
+      ngayTaoTaiKhoan: new Date().toISOString(),
+      ngayCapNhat: new Date().toISOString(),
+      thoiGianKichHoatCuoiCung: new Date().getTime(),
     };
 
     await set(staffRef, newStaff);
