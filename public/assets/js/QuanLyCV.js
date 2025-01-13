@@ -8,19 +8,14 @@ import {
   doc,
   getDoc,
   onSnapshot,
-  writeBatch,
-  serverTimestamp,
+  writeBatch, 
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
-import {
-  getAuth,
-  onAuthStateChanged,
-  signOut,
-} from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
-import {
-  getDatabase,
-  ref,
-  get,
-} from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+
+import { getAuth, onAuthStateChanged, signOut} from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+import { getDatabase, ref, get, push } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyA-EHInpdkzzNF3z_GhMSQsqLC5GI7mYsc",
@@ -38,6 +33,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const database = getDatabase(app); // Realtime Database
 const auth = getAuth(app); // Đảm bảo truyền app vào
+// Tạo đối tượng Firestore
+const firestore = getFirestore(app);
 
 let currentUserId = null;
 
@@ -55,7 +52,6 @@ function checkAuthStatus() {
     });
   });
 }
-
 async function initializeStaynowApp() {
   try {
     const userId = await checkAuthStatus();
@@ -208,7 +204,7 @@ async function fetchContracts(userId) {
           if (trangThai === "PROCESSING") {
             actionButtons = `
              <button class="btn btn-primary" onclick="openPaymentConfirmationDialog('${contract.id}')">Thanh toán</button>
-          <button class="btn btn-danger" onclick="chuyenCongViec('${assignmentDoc.id}')">Chuyển công việc</button>
+             <button class="btn btn-danger" onclick="chuyenCongViec('${assignmentDoc.id}')">Chuyển công việc</button>
              `;
           }
 
@@ -301,7 +297,7 @@ window.thanhToan = async function (contractId) {
     const DcQuanHuyen = phongData.Dc_quanhuyen || "";
     const DcTinhThanhPho = phongData.Dc_tinhtp || "";
 
-    console.log(`Địa chỉ quận huyện: ${dcQuanHuyen}`);
+    console.log(`Địa chỉ quận huyện: ${DcQuanHuyen}`);
     console.log(`Địa chỉ tỉnh thành phố: ${DcTinhThanhPho}`);
 
     const batch = writeBatch(db);
@@ -349,9 +345,28 @@ window.thanhToan = async function (contractId) {
       batch.update(docRef, {
         trangThai: "DONE",
         thoiGianHoanThanh: serverTimestamp(),
-        ghiChu: "Thanh toán thành công",
+        ghiChu: 'Thanh toán thành công'
       });
+
+      
     });
+
+    const notification = {
+      title: 'Thông báo thành công',
+      message: `Hợp đồng của phòng ${contractData.thongtinphong.tenPhong} đã thanh toán thành công `,
+      timestamp: Date.now(),
+      isRead: false,
+      date: new Date().toLocaleDateString('vi-VN'),
+      time: new Date().toLocaleTimeString('vi-VN'),
+      mapLink : null,
+      isPushed : true,
+      typeNotification : "NotiNoti",
+      idModel : "idHopDong"
+    
+    };
+    
+    const notificationRef = ref(database, `ThongBao/${contractData.chuNha.maNguoiDung}`);
+    await push(notificationRef, notification);
 
     // Update the contract status
     batch.update(contractRef, {
@@ -370,9 +385,95 @@ window.thanhToan = async function (contractId) {
   }
 };
 
-function huyThanhToan(idHoaDon) {
-  console.log(`Hủy thanh toán hóa đơn: ${idHoaDon}`);
-}
+
+window.chuyenCongViec = async function(idCongViec) {
+
+  await checkAuthStatus(); 
+  try {
+    // Kiểm tra xem người dùng hiện tại đã đăng nhập chưa
+    if (!currentUserId) {
+      alert('Vui lòng đăng nhập để thực hiện chức năng này');
+      return;
+    }
+
+    // Lấy danh sách nhân viên từ Realtime Database
+    const staffRef = ref(database, 'NguoiDung');
+    const staffSnapshot = await get(staffRef);
+
+    if (!staffSnapshot.exists()) {
+      alert('Không tìm thấy danh sách nhân viên');
+      return;
+    }
+
+    // Lọc danh sách nhân viên
+    const staffList = [];
+    staffSnapshot.forEach((childSnapshot) => {
+      const staffData = childSnapshot.val();
+      if (staffData.Loai_taikhoan === 'NhanVien' && childSnapshot.key !== currentUserId) {
+        staffList.push({
+          id: childSnapshot.key,
+          ...staffData
+        });
+      }
+    });
+
+    // Nếu không có nhân viên khác để chuyển
+    if (staffList.length === 0) {
+      alert('Không tìm thấy nhân viên để chuyển công việc');
+      return;
+    }
+
+    // Chọn ngẫu nhiên một nhân viên từ danh sách
+    const selectedStaff = staffList[Math.floor(Math.random() * staffList.length)];
+
+    // Lấy thông tin công việc hiện tại từ Firestore
+    const currentTaskRef = doc(db, 'PhanChiaCV', idCongViec);
+    const currentTaskDoc = await getDoc(currentTaskRef);
+
+    if (!currentTaskDoc.exists()) {
+      alert('Không tìm thấy công việc để chuyển');
+      return;
+    }
+
+    const currentTaskData = currentTaskDoc.data();
+
+    // Kiểm tra xem công việc có phải đang ở trạng thái PROCESSING không
+    if (currentTaskData.trangThai !== 'PROCESSING') {
+      alert('Chỉ có thể chuyển công việc đang ở trạng thái PROCESSING');
+      return;
+    }
+
+    // Sử dụng writeBatch
+    const batch = writeBatch(db);
+
+    // Cập nhật trạng thái công việc cũ
+    batch.update(currentTaskRef, {
+      trangThai: 'AUTOCANCEL',
+      lyDoHuy: 'Công việc được chuyển sang nhân viên khác',
+      thoiGianHuy: serverTimestamp()
+    });
+
+    // Tạo document mới cho nhân viên được chọn
+    const newTaskRef = doc(collection(db, 'PhanChiaCV'));
+    batch.set(newTaskRef, {
+      idNhanVien: selectedStaff.id,
+      idHopDong: currentTaskData.idHopDong,
+      thoigian: serverTimestamp(),
+      trangThai: 'PROCESSING',
+      lyDoChuyenCongViec: 'Được chuyển từ nhân viên trước'
+    });
+
+    // Commit batch
+    await batch.commit();
+
+    // Làm mới danh sách công việc
+    await fetchContracts(currentUserId);
+
+  } catch (error) {
+    console.error('Lỗi khi chuyển công việc:', error);
+    alert('Đã xảy ra lỗi khi chuyển công việc');
+  }
+};
 
 // Function to open payment confirmation dialog
 window.openPaymentConfirmationDialog = async function (contractId) {
