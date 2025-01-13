@@ -4,29 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lịch sử thanh toán</title>
-    <link rel="stylesheet" href="./assets/css/LichSuThanhToanStyle.css" />
+    <link rel="stylesheet" href="./assets/css/LichSuGiaoDichStyle.css" />
   </head>
   <body>
     <header>
       <div class="back-button">
         <button onclick="goBack()">Quay lại</button>
       </div>
-      <h1>Lịch sử giao dịch</h1>
+      <h1>Lịch sử thanh toán</h1>
     </header>
 
     <div class="container">
-      <h2>Danh sách lịch sử giao dịch</h2>
+      <h2>Danh sách lịch sử thanh toán</h2>
 
       <!-- Thanh tìm kiếm -->
       <div class="search-view">
         <div class="search-container">
           <img src="./assets/imgs/icons/ic-search-gray.svg" alt="Search Icon" />
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="Tìm kiếm"
-      
-          />
+          <input type="text" id="searchInput" placeholder="Tìm kiếm" />
         </div>
         <div class="search-actions">
           <img src="./assets/imgs/icons/ic-sort.svg" alt="Sort Icon" />
@@ -34,17 +29,34 @@
         </div>
       </div>
 
-      <!-- Danh sách lich su -->
-      <div id="paymentHistoryList" class="table-container"></div>
-      <div id="pagination" class="pagination"></div>
-        
+      <div class="tab-container">
+        <div class="tab active" data-tab="tab-dichvu">Dịch vụ</div>
+        <div class="tab" data-tab="tab-hopdong">Hợp đồng</div>
+      </div>
 
+      <div id="tab-dichvu" class="tab-content active">
+        <div class="table-container" id="paymentHistoryList">
+          <!-- Waiting contracts will be populated here -->
+        </div>
+      </div>
+      
+      <div id="tab-hopdong" class="tab-content">
+        <div class="table-container" id="hopdong-contract-list">
+          <!-- Paid contracts will be populated here -->
+        </div>
+      </div>
+      
+
+      <div id="itemDetailModal" class="modal">
+        <div class="modal-content">
+          <span id="closeModal" class="close">&times;</span>
+          <h3>Chi Tiết Lịch Sử Thanh Toán</h3>
+          <div id="itemDetailContent"></div>
+        </div>
+      </div>
     </div>
 
-    
-
-
     <!-- Đính kèm file JavaScript -->
-    <script src="./assets/js/LichSuThanhToan.js" type="module"></script>
+    <script src="./assets/js/LichSuGiaoDich.js" type="module"></script>
   </body>
 </html>

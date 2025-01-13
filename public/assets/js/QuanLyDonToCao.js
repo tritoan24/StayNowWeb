@@ -4,14 +4,19 @@ import {
   collection,
   getDocs,
   doc,
-  updateDoc
+  updateDoc,
+  where
 } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
 import {
   getAuth,
 } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
 import {
   getDatabase,
+  ref,
+  update,
+  query
 } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyA-EHInpdkzzNF3z_GhMSQsqLC5GI7mYsc",
@@ -188,14 +193,16 @@ function showItemDetail(itemId) {
   const lockAccDefendantBtn = document.getElementById("lockAccDefendant");
   const cancelComplaintBtn = document.getElementById("cancelComplaint");
 
-  lockAccComplainantBtn.onclick = () => {
-    alert(`Khoá tài khoản người tố cáo: ${item.maNguoiToCao}`);
-    // Thực hiện các hành động khoá tài khoản ở đây
+  lockAccComplainantBtn.onclick = async () => {
+    lockUserAndRooms(item.maNguoiToCao);
+    const itemId = item.id; 
+    await approvedComplaintInDatabase(itemId)
   };
 
-  lockAccDefendantBtn.onclick = () => {
-    alert(`Khoá tài khoản người bị tố cáo: ${item.maNguoiBiToCao}`);
-    // Thực hiện các hành động khoá tài khoản ở đây
+  lockAccDefendantBtn.onclick = async () => {
+    lockUserAndRooms(item.maNguoiBiToCao);
+    const itemId = item.id; 
+    await approvedComplaintInDatabase(itemId)
   };
 
   cancelComplaintBtn.onclick = async () => {
@@ -211,6 +218,37 @@ function showItemDetail(itemId) {
     modal.style.display = "none";
   };
 }
+
+async function lockUserAndRooms(userId) {
+  try {
+    // 1. Khóa tài khoản người dùng trong Realtime Database
+    const userRef = ref(database, `NguoiDung/${userId}`);
+    await update(userRef, {
+      trangThaiTaiKhoan: 'Khoa',
+      ngayCapNhat: new Date().toISOString()
+    });
+
+    // 2. Lấy danh sách phòng trọ liên quan từ Firestore
+    const roomQuery = query(collection(db, 'PhongTro'), where('maNguoiDung', '==', userId));
+    const roomSnapshot = await getDocs(roomQuery);
+
+    if (!roomSnapshot.empty) {
+      const roomUpdates = roomSnapshot.docs.map(docSnapshot =>
+        updateDoc(doc(db, 'PhongTro', docSnapshot.id), { trangThaiDuyet: 'BiHuy' })
+      );
+      
+      // Cập nhật trạng thái tất cả phòng trọ liên quan
+      await Promise.all(roomUpdates);
+      console.log("Tất cả phòng trọ liên quan đã bị khoá.");
+    }
+
+    alert(`Tài khoản người dùng ${userId} và các phòng trọ liên quan đã bị khóa.`);
+  } catch (error) {
+    console.error("Lỗi khi khóa tài khoản và phòng trọ:", error);
+  }
+}
+
+
 
 // Đóng modal khi nhấn vào dấu 'x'
 const closeModal = document.querySelector(".close");
@@ -239,6 +277,16 @@ async function cancelComplaintInDatabase(itemId) {
   }
 }
 
+async function approvedComplaintInDatabase(itemId) {
+  const complaintRef = doc(db, "ToCaoPhongTro", itemId); // Lấy reference của đơn tố cáo
+  try {
+    await updateDoc(complaintRef, { trangThai: "APPROVED" }); // Cập nhật trạng thái thành "CANCELED"
+    alert("Đơn tố cáo đã được duyệt!");
+  } catch (e) {
+    console.error("Lỗi khi duyệt tố cáo:", e);
+    alert("Có lỗi xảy ra khi duyệt đơn tố cáo.");
+  }
+}
 
 
 function renderPagination(data) {
