@@ -61,6 +61,9 @@ document.getElementById("main").addEventListener("click", function (event) {
   if (event.target && event.target.id === "btnLichSuGiaoDich") {
     navigateTo("LichSuGiaoDich.html");
   }
+  if (event.target && event.target.id === "btncongviec") {
+    navigateTo("CongViecAdmin.html");
+  }
 });
 
 document.addEventListener("DOMContentLoaded", () => {
