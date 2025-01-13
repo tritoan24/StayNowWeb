@@ -89,20 +89,22 @@ document.addEventListener("DOMContentLoaded", () => {
           userData.anhDaiDien || "default-avatar.png";
 
         // Kiểm tra vai trò và ẩn nút nếu cần
-        if (userData.loai_taikhoan === "NhanVien") {
+        if (userData.loaiTaiKhoan === "NhanVien") {
           const btnNhanVien = document.getElementById("btnNhanVien");
           const btnLichSuThanhToan =
             document.getElementById("btnLichSuThanhToan");
           const btnLichSuGiaoDich =
             document.getElementById("btnLichSuGiaoDich");
+            const btnCongViecAdmin = document.getElementById("btncongviec")
           if (btnNhanVien) {
             btnNhanVien.style.display = "none"; // Ẩn nút
             btnLichSuThanhToan.style.display = "none";
             btnLichSuGiaoDich.style.display = "none";
+            btnCongViecAdmin.style.display = "none"
           }
         }
 
-        if (userData.loai_taikhoan === "Admin") {
+        if (userData.loaiTaiKhoan === "Admin") {
           const liCongVien = document.getElementById("li-congviec");
           liCongVien.style.display = "none";
         }
