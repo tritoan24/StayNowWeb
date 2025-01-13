@@ -6,6 +6,8 @@ import {
 
 let paymentHistoryData = [];
 let allPaymentHistoryData = [];
+let serviceData = []
+let allServiceData = []
 let currentId = null;
 let currentPage = 1; // Trang hiện tại
 const itemsPerPage = 10; // Số hàng hiển thị trên mỗi trang
@@ -46,9 +48,28 @@ async function fetchAllPaymentHistoris() {
   }
 }
 
+async function fetchAllServices() {
+  const serviceRef = collection(db, "ThanhToanDichVu");
+
+  try {
+    const querySnapshot = await getDocs(serviceRef);
+    allServiceData = [];
+    serviceData = [];
+    querySnapshot.forEach((doc) => {
+      const service = { id: doc.id, ...doc.data() };
+      allServiceData.push(service); // Lưu vào danh sách gốc
+      serviceData.push(service); // Lưu vào danh sách gốc
+    });
+
+    renderSerivceList(allServiceData); // Render toàn bộ khi vừa tải
+  } catch (e) {
+    console.error("Lỗi khi lấy danh sách lịch sử:", e);
+  }
+}
+
 function renderPaymentHistoryList(data) {
   const paymentHistoryListContainer =
-    document.getElementById("paymentHistoryList");
+    document.getElementById("hopdong-contract-list");
   paymentHistoryListContainer.innerHTML = "";
 
   if (data.length === 0) {
@@ -66,7 +87,7 @@ function renderPaymentHistoryList(data) {
       <thead>
         <tr>
           <th>Thời gian</th>
-          <th>Mã thanh toán</th>
+          <th>Mã giao dịch</th>
           <th>Tổng hoá đơn</th>
           <th>Trạng thái</th>
         </tr>
@@ -78,14 +99,14 @@ function renderPaymentHistoryList(data) {
     const formattedVND = new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
-    }).format(paymentHistory.tongHoaDon);
+    }).format(paymentHistory.amount);
 
     tableHTML += `
       <tr class="payment-item" data-id="${paymentHistory.id}">
-        <td>${formatFirebaseTime(paymentHistory.ngayThanhToan || "N/A")}</td>
-        <td>${paymentHistory.idCongViec || "N/A"}</td>
+        <td>${formatFirebaseTime(paymentHistory.createdAt || "N/A")}</td>
+        <td>${paymentHistory.appTransId || "N/A"}</td>
         <td>${formattedVND || 0}</td>
-        <td>${paymentHistory.trangThai || "Chưa xác định"}</td>
+        <td>${paymentHistory.status || "Chưa xác định"}</td>
       </tr>
     `;
   });
@@ -108,49 +129,133 @@ function renderPaymentHistoryList(data) {
 
 }
 
-function showItemDetail(itemId) {
-  const item = allPaymentHistoryData.find((data) => data.id === itemId);
-  
-  if (!item) {
-    alert("Không tìm thấy chi tiết cho mục này.");
+
+function renderSerivceList(data) {
+  const paymentHistoryListContainer =
+    document.getElementById("dichvu-contract-list");
+  paymentHistoryListContainer.innerHTML = "";
+
+  if (data.length === 0) {
+    paymentHistoryListContainer.innerHTML =
+      "<p>Không có lịch sử giao dịch dịch vụ nào phù hợp.</p>";
     return;
   }
 
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = data.slice(startIndex, endIndex);
+
+  let tableHTML = `
+    <table class="payment-history-table">
+      <thead>
+        <tr>
+          <th>Thời gian</th>
+          <th>Mã giao dịch</th>
+          <th>Tổng hoá đơn</th>
+          <th>Trạng thái</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  paginatedData.forEach((paymentHistory) => {
+    const formattedVND = new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(paymentHistory.amount);
+
+    tableHTML += `
+      <tr class="payment-item" data-id="${paymentHistory.id}">
+        <td>${formatFirebaseTime(paymentHistory.createdAt || "N/A")}</td>
+        <td>${paymentHistory.appTransId || "N/A"}</td>
+        <td>${formattedVND || 0}</td>
+        <td>${paymentHistory.status || "Chưa xác định"}</td>
+      </tr>
+    `;
+  });
+
+  tableHTML += `
+      </tbody>
+    </table>
+  `;
+
+  paymentHistoryListContainer.innerHTML = tableHTML;
+
+  // Thêm sự kiện click vào từng hàng
+  document.querySelectorAll(".payment-item").forEach((row) => {
+    row.addEventListener("click", (event) => {
+      const itemId = event.currentTarget.getAttribute("data-id");
+      showItemDetail(itemId);
+    });
+  });
+
+
+}
+function showItemDetail(itemId) {
+  const item = allPaymentHistoryData.find((data) => data.id === itemId);
+  const itemDichVu = allServiceData.find((data) => data.id === itemId);
+  
+  // Xác định đối tượng chi tiết
+  const newItem = item || itemDichVu;
+
+  // Kiểm tra loại giao dịch và xác định nội dung hiển thị mã
+  const itemTypeLabel = item ? "Mã hợp đồng:" : "Mã dịch vụ:";
+  const itemTypeValue = item ? newItem.contractId : newItem.serviceId;
+
   const itemDetailContent = document.getElementById("itemDetailContent");
   itemDetailContent.innerHTML = `
-    <p><strong>Thời gian thanh toán:</strong> ${formatFirebaseTime(item.ngayThanhToan)}</p>
-    <p><strong>Mã công việc:</strong> ${item.idCongViec || "N/A"}</p>
-    <p><strong>Mã hợp đồng:</strong> ${item.idHopDong || "N/A"}</p>
-    <p><strong>Mã nhân viên:</strong> ${item.idNhanVien || "N/A"}</p>
-     <p><strong>Tiền cọc:</strong> ${new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(item.chiTietHoaDon?.tienCoc)}</p>
-      <p><strong>Tiền phòng:</strong> ${new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(item.chiTietHoaDon.tienPhong)}</p>
-    <p><strong>Tổng hoá đơn:</strong> ${new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(item.tongHoaDon)}</p>
-     <p><strong>Tổng tiền đã gửi:</strong> ${new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(item.tongTienDaGui)}</p>
-    <p><strong>Tổng tiền đã gửi:</strong> ${new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(item.tongTienDaTru)}</p>
-    <p><strong>Trạng thái:</strong> ${item.trangThai || "Chưa xác định"}</p>
-    <p><strong>Người thuê:</strong> ${item.nguoiThue?.hoTen || "N/A"}</p>
-    <p><strong>Chủ nhà:</strong> ${item.chuNha?.hoTen || "N/A"}</p>
-     <p><strong>Địa chỉ:</strong> ${item.Dc_quanhuyen}, ${item.Dc_tinhthanhpho}</p>
+    <h3>Chi Tiết Giao Dịch ${item ? "Hợp Đồng" : "Dịch Vụ"}</h3>
+    <table class="item-detail-table">
+      <tr><td><strong>Số tiền:</strong></td><td>${formatCurrency(newItem.amount)}</td></tr>
+      <tr><td><strong>${itemTypeLabel}</strong></td><td>${itemTypeValue || "N/A"}</td></tr>
+      <tr><td><strong>Mã ứng dụng:</strong></td><td>${newItem.appId || "N/A"}</td></tr>
+      <tr><td><strong>Thời gian giao dịch:</strong></td><td>${formatFirebaseTimes(newItem.appTime)}</td></tr>
+      <tr><td><strong>Mã giao dịch:</strong></td><td>${newItem.appTransId || "N/A"}</td></tr>
+      <tr><td><strong>Ngân hàng:</strong></td><td>${newItem.bankCode || "N/A"}</td></tr>
+      <tr><td><strong>Mã hoá đơn:</strong></td><td>${newItem.billId || "N/A"}</td></tr>
+      <tr><td><strong>Kênh:</strong></td><td>${newItem.channel || "N/A"}</td></tr>
+      <tr><td><strong>Thời gian tạo:</strong></td><td>${formatFirebaseTimes(newItem.createdAt)}</td></tr>
+      <tr><td><strong>Mô tả:</strong></td><td>${newItem.description || "N/A"}</td></tr>
+      <tr><td><strong>Thời gian hết hạn (giây):</strong></td><td>${newItem.expireDurationSeconds || "N/A"}</td></tr>
+      <tr><td><strong>ID Thanh Toán:</strong></td><td>${newItem.idThanhToan || "N/A"}</td></tr>
+      <tr><td><strong>URL đặt hàng:</strong></td><td><a href="${newItem.orderUrl}" target="_blank">Xem chi tiết</a></td></tr>
+      <tr><td><strong>Thời gian server:</strong></td><td>${formatFirebaseTimes(newItem.serverTime)}</td></tr>
+      <tr><td><strong>Trạng thái:</strong></td><td>${newItem.status || "N/A"}</td></tr>
+      <tr><td><strong>Loại hoá đơn:</strong></td><td>${newItem.typeBill || "N/A"}</td></tr>
+      <tr><td><strong>Cập nhật vào lúc:</strong></td><td>${formatFirebaseTimestamp(newItem.updateAt || "N/A")}</td></tr>
+      <tr><td><strong>Mã giao dịch ZaloPay:</strong></td><td>${newItem.zpTransId || "N/A"}</td></tr>
+      <tr><td><strong>Token giao dịch:</strong></td><td>${newItem.zpTransToken || "N/A"}</td></tr>
+      <tr><td><strong>Mã người dùng ZaloPay:</strong></td><td>${newItem.zpUserId || "N/A"}</td></tr>
+    </table>
   `;
 
   const modal = document.getElementById("itemDetailModal");
   modal.style.display = "block";
 }
+
+
+function formatCurrency(amount) {
+  return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
+}
+
+function formatFirebaseTimes(timestamp) {
+  if (!timestamp) return "N/A";
+  const date = new Date(timestamp);
+  return date.toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" });
+}
+function formatFirebaseTimestamp(timestamp) {
+  if (!timestamp || typeof timestamp !== "object") {
+    return "Không có thông tin thời gian";
+  }
+
+  // Kiểm tra và chuyển đổi timestamp từ seconds và nanoseconds
+  const date = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
+  
+  // Định dạng thời gian hiển thị
+  return date.toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" });
+}
+
+
 
 
 const closeModal = document.getElementById("closeModal");
@@ -203,18 +308,18 @@ function formatFirebaseTime(times) {
   return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
 }
 
-function filterLichSuThanhToan(event) {
+function filterLichSuHopDong(event) {
   const keyword = removeVietnameseTones(event.target.value).toLowerCase(); // Từ khóa không dấu và chuyển thành chữ thường
   // Lọc danh sách gốc để tìm dịch vụ phù hợp
   const filteredLichSu = allPaymentHistoryData.filter((paymentHistory) => {
     return (
-      removeVietnameseTones(paymentHistory.idCongViec || "")
+      removeVietnameseTones(paymentHistory.appTransId || "")
         .toLowerCase()
         .includes(keyword) || // Kiểm tra theo mã công việc
-      removeVietnameseTones(paymentHistory.idNhanVien || "")
+      removeVietnameseTones(paymentHistory.idThanhToan || "")
         .toLowerCase()
         .includes(keyword) || // Kiểm tra theo mã nhân viên
-      removeVietnameseTones(paymentHistory.trangThai || "")
+      removeVietnameseTones(paymentHistory.status || "")
         .toLowerCase()
         .includes(keyword) // Kiểm tra theo trạng thái
     );
@@ -227,6 +332,32 @@ function filterLichSuThanhToan(event) {
   }
 }
 
+
+function filterLichSuDichVu(event) {
+  const keyword = removeVietnameseTones(event.target.value).toLowerCase(); // Từ khóa không dấu và chuyển thành chữ thường
+  // Lọc danh sách gốc để tìm dịch vụ phù hợp
+  const filteredLichSu = allServiceData.filter((service) => {
+    return (
+      removeVietnameseTones(service.appTransId || "")
+        .toLowerCase()
+        .includes(keyword) || // Kiểm tra theo mã công việc
+      removeVietnameseTones(service.idThanhToan || "")
+        .toLowerCase()
+        .includes(keyword) || // Kiểm tra theo mã nhân viên
+      removeVietnameseTones(service.status || "")
+        .toLowerCase()
+        .includes(keyword) // Kiểm tra theo trạng thái
+    );
+  });
+
+  if (filteredLichSu.length === 0) {
+    showNoResultMessageDichVu(); // Hiển thị thông báo không tìm thấy
+  } else {
+    renderSerivceList(filteredLichSu); // Hiển thị danh sách đã lọc
+  }
+}
+
+
 function removeVietnameseTones(str) {
   return str
     .normalize("NFD")
@@ -237,7 +368,17 @@ function removeVietnameseTones(str) {
 }
 
 function showNoResultMessage() {
-  const informationListContainer = document.getElementById("paymentHistoryList");
+  const informationListContainer = document.getElementById("hopdong-contract-list");
+  informationListContainer.innerHTML = `
+    <div class="no-result-message">
+        <img src="../public/assets/imgs/icons/ic-sad-face.png" alt="">
+      <p>Không tìm thấy kết quả phù hợp.</p>
+    </div>
+  `;
+}
+
+function showNoResultMessageDichVu() {
+  const informationListContainer = document.getElementById("dichvu-contract-list");
   informationListContainer.innerHTML = `
     <div class="no-result-message">
         <img src="../public/assets/imgs/icons/ic-sad-face.png" alt="">
@@ -256,9 +397,11 @@ function goBack() {
 
 document.addEventListener("DOMContentLoaded", () => {
   fetchAllPaymentHistoris(); // Gọi hàm để tải danh sách phòng trọ khi trang tải xong
+  fetchAllServices()
   const searchInput = document.getElementById("searchInput");
-  searchInput.addEventListener("input", filterLichSuThanhToan); // Lắng nghe sự kiện tìm kiếm
+  searchInput.addEventListener("input", filterLichSuHopDong); // Lắng nghe sự kiện tìm kiếm
+  searchInput.addEventListener("input", filterLichSuDichVu); // Lắng nghe sự kiện tìm kiếm
 });
 
 window.goBack = goBack;
-window.filterLichSuThanhToan = filterLichSuThanhToan;
+window.filterLichSuHopDong = filterLichSuHopDong;

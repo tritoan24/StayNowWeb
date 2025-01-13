@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lịch sử thanh toán</title>
+    <title>Lịch sử giao dịch</title>
     <link rel="stylesheet" href="./assets/css/LichSuGiaoDichStyle.css" />
   </head>
   <body>
@@ -11,11 +11,11 @@
       <div class="back-button">
         <button onclick="goBack()">Quay lại</button>
       </div>
-      <h1>Lịch sử thanh toán</h1>
+      <h1>Lịch sử giao dịch</h1>
     </header>
 
     <div class="container">
-      <h2>Danh sách lịch sử thanh toán</h2>
+      <h2>Danh sách lịch sử giao dịch</h2>
 
       <!-- Thanh tìm kiếm -->
       <div class="search-view">
@@ -30,27 +30,27 @@
       </div>
 
       <div class="tab-container">
-        <div class="tab active" data-tab="tab-dichvu">Dịch vụ</div>
-        <div class="tab" data-tab="tab-hopdong">Hợp đồng</div>
+        <div class="tab active" data-tab="tab-hopdong">Hợp đồng</div>
+        <div class="tab" data-tab="tab-dichvu">Dịch vụ</div>
       </div>
 
-      <div id="tab-dichvu" class="tab-content active">
-        <div class="table-container" id="paymentHistoryList">
-          <!-- Waiting contracts will be populated here -->
-        </div>
-      </div>
-      
-      <div id="tab-hopdong" class="tab-content">
+      <div id="tab-hopdong" class="tab-content active">
         <div class="table-container" id="hopdong-contract-list">
           <!-- Paid contracts will be populated here -->
         </div>
       </div>
+
+      <div id="tab-dichvu" class="tab-content">
+        <div class="table-container" id="dichvu-contract-list">
+          <!-- Waiting contracts will be populated here -->
+        </div>
+      </div>
+      
       
 
       <div id="itemDetailModal" class="modal">
         <div class="modal-content">
           <span id="closeModal" class="close">&times;</span>
-          <h3>Chi Tiết Lịch Sử Thanh Toán</h3>
           <div id="itemDetailContent"></div>
         </div>
       </div>
