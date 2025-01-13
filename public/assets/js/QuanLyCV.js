@@ -350,7 +350,7 @@ window.thanhToan = async function (contractId) {
 
       
     });
-
+//chưa sửa nènè
     const notification = {
       title: 'Thông báo thành công',
       message: `Hợp đồng của phòng ${contractData.thongtinphong.tenPhong} đã thanh toán thành công `,
