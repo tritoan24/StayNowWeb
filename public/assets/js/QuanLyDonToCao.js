@@ -256,7 +256,7 @@ async function lockUserAndRooms(userId, complaintId, complainantId) {
     const userRef = ref(database, `NguoiDung/${userId}`);
     await update(userRef, {
       trangThaiTaiKhoan: 'Khoa',
-      ngayCapNhat: new Date().toISOString()
+      ngayCapNhat:  Date.now()
     });
 
     // 2. Lấy danh sách phòng trọ liên quan từ Firestore
@@ -294,7 +294,7 @@ async function lockUserAndRoomsN(userId, complaintId, complainantId) {
     const userRef = ref(database, `NguoiDung/${userId}`);
     await update(userRef, {
       trangThaiTaiKhoan: 'Khoa',
-      ngayCapNhat: new Date().toISOString()
+      ngayCapNhat:  Date.now()
     });
 
     // 2. Lấy danh sách phòng trọ liên quan từ Firestore

@@ -107,7 +107,7 @@ function fetchStaffs() {
                   const updates = {};
                   updates[`/NguoiDung/${userId}/trangThaiTaiKhoan`] = "Khoa";
                   updates[`/NguoiDung/${userId}/ngayCapNhat`] =
-                    new Date().toISOString();
+                  Date.now();
 
                   update(ref(database), updates)
                     .then(() => {
@@ -127,7 +127,7 @@ function fetchStaffs() {
                   updates[`/NguoiDung/${userId}/trangThaiTaiKhoan`] =
                     "HoatDong";
                   updates[`/NguoiDung/${userId}/ngayCapNhat`] =
-                    new Date().toISOString();
+                  Date.now();
 
                   update(ref(database), updates)
                     .then(() => {
@@ -295,7 +295,7 @@ function searchUsers() {
             updates[`/NguoiDung/${user.maNguoiDung}/trangThaiTaiKhoan`] =
               "Khoa";
             updates[`/NguoiDung/${user.maNguoiDung}/ngayCapNhat`] =
-              new Date().toISOString();
+            Date.now();
 
             update(ref(database), updates)
               .then(() => {
@@ -315,7 +315,7 @@ function searchUsers() {
             updates[`/NguoiDung/${user.maNguoiDung}/trangThaiTaiKhoan`] =
               "HoatDong";
             updates[`/NguoiDung/${user.maNguoiDung}/ngayCapNhat`] =
-              new Date().toISOString();
+            Date.now();
 
             update(ref(database), updates)
               .then(() => {
@@ -451,8 +451,8 @@ async function handleFormSubmit(event) {
       email: staffEmail,
       loaiTaiKhoan: "NhanVien",
       trangThaiTaiKhoan: "HoatDong",
-      ngayTaoTaiKhoan: new Date().toISOString(),
-      ngayCapNhat: new Date().toISOString(),
+      ngayTaoTaiKhoan:  Date.now(),
+      ngayCapNhat:  Date.now(),
       thoiGianKichHoatCuoiCung: new Date().getTime(),
     };
 
