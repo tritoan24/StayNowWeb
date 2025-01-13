@@ -89,8 +89,8 @@ async function fetchAllRooms() {
   try {
     const roomsQuery = query(
       roomsRef,
-      where("Trang_thailuu", "==", false),
-      where("Trang_thaiphong", "==", false)
+      where("trangThaiLuu", "==", false),
+      where("trangThaiPhong", "==", false)
     );
     const querySnapshot = await getDocs(roomsQuery);
     querySnapshot.forEach((doc) => {
@@ -104,11 +104,11 @@ async function fetchAllRooms() {
 
     querySnapshot.forEach((doc) => {
       const room = { id: doc.id, ...doc.data() };
-      if (room.Trang_thaiduyet === "DaDuyet") {
+      if (room.trangThaiDuyet === "DaDuyet") {
         approvedRooms.push(room);
-      } else if (room.Trang_thaiduyet === "BiHuy") {
+      } else if (room.trangThaiDuyet === "BiHuy") {
         canceledRooms.push(room);
-      } else if (room.Trang_thaiduyet === "ChoDuyet") {
+      } else if (room.trangThaiDuyet === "ChoDuyet") {
         pendingRooms.push(room);
       }
     });
@@ -153,19 +153,19 @@ function renderRoomList(rooms, containerId) {
     const formattedPrice = new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
-    }).format(room.Gia_phong);
+    }).format(room.giaPhong);
 
     const roomDiv = document.createElement("div");
     roomDiv.className = "room";
 
     // Thêm logic hiển thị nút theo trạng thái
     let actionButtons = "";
-    if (room.Trang_thaiduyet === "ChoDuyet") {
+    if (room.trangThaiDuyet === "ChoDuyet") {
       actionButtons = `
         <button class="btn approve">Duyệt</button>
         <button class="btn cancel">Hủy</button>
       `;
-    } else if (room.Trang_thaiduyet === "BiHuy") {
+    } else if (room.trangThaiDuyet === "BiHuy") {
       actionButtons = `
         <button class="btn revert">Duyệt lại</button>
       `;
@@ -175,16 +175,16 @@ function renderRoomList(rooms, containerId) {
     roomDiv.innerHTML = `
       <div class="room-card">
         <div class="room-image">
-          <img src="${room.imageUrls[0]}" alt="${room.Ten_phongtro}" />
+          <img src="${room.imageUrls[0]}" alt="${room.tenPhongTro}" />
         </div>
         <div class="room-info">
-          <h3 class="room-title">${room.Ten_phongtro}</h3>
+          <h3 class="room-title">${room.tenPhongTro}</h3>
           <div class="room-address">
-            <img src="./assets/imgs/icons/ic-ping.svg" alt="${room.Dia_chi}">
-            <p>${room.Dia_chi}</p>
+            <img src="./assets/imgs/icons/ic-ping.svg" alt="${room.diaChi}">
+            <p>${room.diaChi}</p>
           </div>
           <div class="room-price">
-            <img src="./assets/imgs/icons/ic-monny.svg" alt="${room.Dia_chi}">
+            <img src="./assets/imgs/icons/ic-monny.svg" alt="${room.diaChi}">
             <p>${formattedPrice}</p>
           </div>
           <div class="room-details">
@@ -196,18 +196,18 @@ function renderRoomList(rooms, containerId) {
     `;
 
     // Thêm sự kiện cho các nút hành động
-    if (room.Trang_thaiduyet !== "DaDuyet") {
+    if (room.trangThaiDuyet !== "DaDuyet") {
       roomDiv
         .querySelector(".approve")
         ?.addEventListener("click", () => approveRoom(room.id));
     }
-    if (room.Trang_thaiduyet !== "BiHuy") {
+    if (room.trangThaiDuyet !== "BiHuy") {
       roomDiv
         .querySelector(".cancel")
         ?.addEventListener("click", () => cancelRoom(room.id));
     }
 
-    if (room.Trang_thaiduyet !== "ChoDuyet") {
+    if (room.trangThaiDuyet !== "ChoDuyet") {
       roomDiv
         .querySelector(".revert")
         ?.addEventListener("click", () => revertToPending(room.id));
@@ -226,7 +226,7 @@ async function getUserInfo(maNguoiDung) {
     if (snapshot.exists()) {
       return snapshot.val(); // Trả về dữ liệu người dùng
     } else {
-      console.error("Không tìm thấy người dùng với Ma_nguoidung:", maNguoiDung);
+      console.error("Không tìm thấy người dùng với maNguoiDung:", maNguoiDung);
       return null;
     }
   } catch (error) {
@@ -243,7 +243,7 @@ async function getNoiThatByPhongTro(maPhongTro) {
   const querySnapshot = await getDocs(q);
   const noiThat = [];
   querySnapshot.forEach((doc) => {
-    noiThat.push(doc.data().ma_noithat); // Lấy ma_noithat
+    noiThat.push(doc.data().maNoiThat); // Lấy ma_noithat
   });
   return noiThat;
 }
@@ -265,7 +265,7 @@ async function getNoiThatData(noiThatIds) {
 // Hàm render danh sách Ten_noithat
 function renderNoiThatList(noiThatData) {
   if (noiThatData && Array.isArray(noiThatData) && noiThatData.length > 0) {
-    return noiThatData.map((item) => `<p>${item.Ten_noithat}</p>`).join(", ");
+    return noiThatData.map((item) => `<p>${item.tenNoiThat}</p>`).join(", ");
   } else {
     return "<p>Không có nội thất</p>";
   }
@@ -279,7 +279,7 @@ async function getTienNghiByPhongTro(maPhongTro) {
   const querySnapshot = await getDocs(q);
   const tienNghi = [];
   querySnapshot.forEach((doc) => {
-    tienNghi.push(doc.data().ma_tiennghi); // Lấy ma_tiennghi
+    tienNghi.push(doc.data().maTienNghi); // Lấy ma_tiennghi
   });
   return tienNghi;
 }
@@ -301,7 +301,7 @@ async function getTienNghiData(tienNghiIds) {
 // Hàm render danh sách Ten_noithat
 function renderTienNghiList(tienNghiData) {
   if (tienNghiData && Array.isArray(tienNghiData) && tienNghiData.length > 0) {
-    return tienNghiData.map((item) => `<p>${item.Ten_tiennghi}</p>`).join(", ");
+    return tienNghiData.map((item) => `<p>${item.tenTienNghi}</p>`).join(", ");
   } else {
     return "<p>Không có tiện nghi</p>";
   }
@@ -310,7 +310,7 @@ function renderTienNghiList(tienNghiData) {
 async function getDichVuByPhongTro(maPhongTro) {
   const q = query(
     collection(db, "ChiTietThongTin"),
-    where("ma_phongtro", "==", maPhongTro)
+    where("maPhongTro", "==", maPhongTro)
   );
   const querySnapshot = await getDocs(q);
   const dichVuData = [];
@@ -326,8 +326,8 @@ function renderDichVuList(dichVuData) {
       .map(
         (item) => `
     <div class="item-dichvu">
-      <img class="ic-dichvu" src="${item.icon_thongtin}" alt="">
-      <p>${item.ten_thongtin}: ${item.so_luong_donvi} ${item.don_vi}</p>
+      <img class="ic-dichvu" src="${item.iconThongTin}" alt="">
+      <p>${item.tenThongTin}: ${item.soLuongDonVi} ${item.donVi}</p>
     </div>
       `
       )
@@ -340,7 +340,7 @@ function renderDichVuList(dichVuData) {
 async function getPhiDichVuByPhongTro(maPhongTro) {
   const q = query(
     collection(db, "PhiDichVu"),
-    where("ma_phongtro", "==", maPhongTro)
+    where("maPhongTro", "==", maPhongTro)
   );
   const querySnapshot = await getDocs(q);
   const phiDichVuData = [];
@@ -360,11 +360,11 @@ function renderPhiDichVuList(phiDichVuData) {
       .map(
         (item) => `
     <div class="item-dichvu">
-      <img class="ic-dichvu" src="${item.icon_dichvu}" alt="">
-      <p>${item.ten_dichvu}:  ${new Intl.NumberFormat("vi-VN", {
+      <img class="ic-dichvu" src="${item.iconDichVu}" alt="">
+      <p>${item.tenDichVu}:  ${new Intl.NumberFormat("vi-VN", {
           style: "currency",
           currency: "VND",
-        }).format(item.so_tien)}/${item.don_vi}</p>
+        }).format(item.soTien)}/${item.donVi}</p>
     </div>
       `
       )
@@ -409,11 +409,11 @@ async function viewDetails(roomId) {
       updateDetailLoadingState();
 
       // Lấy thông tin người dùng và loại phòng (như trong đoạn code trước)
-      const userInfo = await getUserInfo(room.Ma_nguoidung);
-      const loaiPhongRef = doc(db, "LoaiPhong", room.Ma_loaiphong);
+      const userInfo = await getUserInfo(room.maNguoiDung);
+      const loaiPhongRef = doc(db, "LoaiPhong", room.maLoaiNhaTro);
       const loaiPhongSnapshot = await getDoc(loaiPhongRef);
 
-      const gioiTinhRef = doc(db, "GioiTinh", room.Ma_gioiTinh);
+      const gioiTinhRef = doc(db, "GioiTinh", room.maGioiTinh);
       const gioiTinhSnapshot = await getDoc(gioiTinhRef);
       const gioiTinhData = gioiTinhSnapshot.data();
 
@@ -438,8 +438,8 @@ async function viewDetails(roomId) {
 
         const roomDetails = document.getElementById("roomDetails");
         roomDetails.innerHTML = `
-          <p class="room-name">${room.Ten_phongtro}</p>    <br>
-           <p class="room-address-detail">${room.Dia_chi}</p>  <br>
+          <p class="room-name">${room.tenPhongTro}</p>    <br>
+           <p class="room-address-detail">${room.diaChi}</p>  <br>
            <div class="line-detail"></div>
            <div class="grid-price">
               <div class="room-price-detail">
@@ -448,7 +448,7 @@ async function viewDetails(roomId) {
                   ${new Intl.NumberFormat("vi-VN", {
                     style: "currency",
                     currency: "VND",
-                  }).format(room.Gia_phong)} / tháng
+                  }).format(room.giaPhong)} / tháng
                  </p>
                 
               </div>
@@ -457,7 +457,7 @@ async function viewDetails(roomId) {
            </div>
            <div class="room-description-detail">
               <strong>Thông tin mô tả</strong> <br> <br> 
-              <p>${room.Mota_chitiet}</p> <br>
+              <p>${room.moTaChiTiet}</p> <br>
             </div>
 
             <div class"describe-container">
@@ -478,7 +478,7 @@ async function viewDetails(roomId) {
                       <h5>Loại phòng</h5>
                    </div>
                     <div class="item-content">
-                      <p>${loaiPhongData.Ten_loaiphong}</p>  <br>
+                      <p>${loaiPhongData.tenLoaiPhong}</p>  <br>
                     </div>
                   </div>
                    <div class="line-detail"></div>
@@ -498,7 +498,7 @@ async function viewDetails(roomId) {
                       <h5>Thời giạn tạo</h5>
                    </div>
                     <div class="item-content">
-                      <p>${formatFirebaseTime(room.ThoiGian_taophong)}</p>  <br>
+                      <p>${formatFirebaseTime(room.thoiGianTaoPhong)}</p>  <br>
                     </div>
                   </div>
 
@@ -509,7 +509,7 @@ async function viewDetails(roomId) {
                       <h5>Số lượt xem phòng</h5>
                    </div>
                     <div class="item-content">
-                      <p>${room.So_luotxemphong}</p>  <br>
+                      <p>${room.soLuotXemPhong}</p>  <br>
                     </div>
                   </div>
                 </div>
@@ -524,9 +524,9 @@ async function viewDetails(roomId) {
                    </div>
                     <div class="item-content">
                       <img class="ic-item" src="${
-                        gioiTinhData.ImgUrl_gioitinh
+                        gioiTinhData.imgUrlGioiTinh
                       }" alt="" />
-                      <p>${gioiTinhData.Ten_gioitinh}</p>  <br>
+                      <p>${gioiTinhData.tenGioiTinh}</p>  <br>
                     </div>
                   </div>
                    <div class="line-detail"></div>
@@ -549,7 +549,7 @@ async function viewDetails(roomId) {
                       <h5>Ngày cập nhật</h5>
                    </div>
                     <div class="item-content">
-                      <p>${formatFirebaseTime(room.Ngay_capnhat)}</p>  <br>
+                      <p>${formatFirebaseTime(room.ngayCapNhat)}</p>  <br>
                     </div>
                   </div>
 
@@ -560,7 +560,7 @@ async function viewDetails(roomId) {
                       <h5>Địa chỉ chi tiết</h5>
                    </div>
                     <div class="item-content">
-                      <p>${room.Dia_chichitiet}</p>  <br>
+                      <p>${room.diaChiChiTiet}</p>  <br>
                     </div>
                   </div>
 
@@ -581,7 +581,7 @@ async function viewDetails(roomId) {
           // Ảnh trong slide
           const imgElement = document.createElement("img");
           imgElement.src = url;
-          imgElement.alt = room.Ten_phongtro;
+          imgElement.alt = room.tenPhongTro;
           carouselImages.appendChild(imgElement);
 
           // Ảnh thu nhỏ
@@ -598,9 +598,9 @@ async function viewDetails(roomId) {
           ".user-info-container"
         );
         userInfoContainer.querySelector(".img-avt-user").src =
-          userInfo.anh_daidien || "./assets/imgs/default-avatar.png";
+          userInfo.anhDaiDien || "./assets/imgs/default-avatar.png";
         userInfoContainer.querySelector(".user-name").textContent =
-          userInfo.ho_ten;
+          userInfo.hoTen;
         userInfoContainer.querySelector(
           ".late-time-stamp"
         ).textContent = `${formatTimestamp(userInfo.lastActiveTime)}`;
@@ -611,17 +611,17 @@ async function viewDetails(roomId) {
         const userChatWithUser = document.querySelector(
           ".chat-with-user-container"
         );
-        userChatWithUser.setAttribute("data-user-id", room.Ma_nguoidung);
+        userChatWithUser.setAttribute("data-user-id", room.maNguoiDung);
         userChatWithUser.onclick = () => redirectToChat(userChatWithUser);
 
         // Điều kiện ẩn/hiện các nút Duyệt và Hủy
         const actionsContainer = document.querySelector(".actions");
-        if (room.Trang_thaiduyet === "ChoDuyet") {
+        if (room.trangThaiDuyet === "ChoDuyet") {
           actionsContainer.innerHTML = `
           <button class="btn approve" onclick="approveRoom('${roomId}')">Duyệt</button>
           <button class="btn cancel" onclick="cancelRoom('${roomId}')">Hủy</button>
         `;
-        } else if (room.Trang_thaiduyet === "BiHuy") {
+        } else if (room.trangThaiDuyet === "BiHuy") {
           actionsContainer.innerHTML = `
           <button class="btn revert" onclick="revertToPending('${roomId}')">Duyệt lại</button>
         `;
@@ -750,8 +750,8 @@ function searchRooms() {
   // Lọc danh sách dựa trên giá trị tìm kiếm
   const filteredRooms = allRooms.filter(
     (room) =>
-      room.Ten_phongtro.toLowerCase().includes(searchInput) ||
-      room.Dia_chi.toLowerCase().includes(searchInput)
+      room.tenPhongTro.toLowerCase().includes(searchInput) ||
+      room.diaChi.toLowerCase().includes(searchInput)
   );
 
   // Xóa nội dung hiển thị cũ
@@ -761,15 +761,15 @@ function searchRooms() {
 
   // Hiển thị danh sách kết quả theo trạng thái
   renderRoomList(
-    filteredRooms.filter((room) => room.Trang_thaiduyet === "ChoDuyet"),
+    filteredRooms.filter((room) => room.trangThaiDuyet === "ChoDuyet"),
     "pendingRoomList"
   );
   renderRoomList(
-    filteredRooms.filter((room) => room.Trang_thaiduyet === "DaDuyet"),
+    filteredRooms.filter((room) => room.trangThaiDuyet === "DaDuyet"),
     "approvedRoomList"
   );
   renderRoomList(
-    filteredRooms.filter((room) => room.Trang_thaiduyet === "BiHuy"),
+    filteredRooms.filter((room) => room.trangThaiDuyet === "BiHuy"),
     "canceledRoomList"
   );
 }
@@ -785,9 +785,9 @@ function approveRoom(roomId) {
 
   // Sử dụng updateDoc để cập nhật dữ liệu trong Firestore
   updateDoc(roomRef, {
-    Trang_thaiduyet: "DaDuyet",
-    Trang_thailuu: false,
-    Trang_thaiphong: false,
+    trangThaiDuyet: "DaDuyet",
+    trangThaiLuu: false,
+    trangThaiPhong: false,
   })
     .then(() => {
       showToast("Phòng đã được duyệt")
@@ -805,7 +805,7 @@ function cancelRoom(roomId) {
   const roomRef = doc(db, "PhongTro", roomId);
 
   updateDoc(roomRef, {
-    Trang_thaiduyet: "BiHuy",
+    trangThaiDuyet: "BiHuy",
   })
     .then(() => {
       showToastFalse("Phòng đã bị huỷ!")
@@ -822,7 +822,7 @@ function revertToPending(roomId) {
   const roomRef = doc(db, "PhongTro", roomId);
 
   updateDoc(roomRef, {
-    Trang_thaiduyet: "ChoDuyet",
+    trangThaiDuyet: "ChoDuyet",
   })
     .then(() => {
       showToast("Phòng đã chuyển về trạng thái Chờ duyệt!")

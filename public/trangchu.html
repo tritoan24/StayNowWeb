@@ -7,86 +7,94 @@
     <link rel="stylesheet" href="./assets/css/style.css" />
     <style>
       body {
-        font-family: Arial, sans-serif;
+        font-family: 'Roboto', Arial, sans-serif;
         text-align: center;
         margin: 0;
         padding: 0;
+        background: #f5f6fa; /* Màu nền tổng thể */
+        color: #333;
       }
-      /* Container setup */
+    
       .button-container {
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
         flex-wrap: wrap;
-        gap: 30px;
+        gap: 20px;
         padding: 20px;
-        margin-top: 100px;
+        margin-top: 50px;
       }
-
+    
       .column {
         display: flex;
         flex-direction: column;
-        gap: 30px;
+        gap: 20px;
       }
-
-      /* Card chung */
+    
       .card {
         display: flex;
         align-items: center;
         justify-content: flex-start;
-        width: 330px;
-        height: 120px;
+        width: 320px;
+        height: 110px;
         padding: 15px;
         font-size: 18px;
         font-weight: bold;
         cursor: pointer;
         border: none;
         border-radius: 15px;
-        color: white;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
         background-size: 200% 200%;
         background-position: center;
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
+        color: white;
+        overflow: hidden;
+        position: relative;
       }
-
+    
       .card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
         background-position: left center;
+        border: 2px solid rgba(255, 255, 255, 0.6);
       }
-
+    
       /* Gradients for each card */
       .phongtro {
         background: linear-gradient(135deg, #42a5f5, #478ed1);
       }
-
+    
       .dichvu {
         background: linear-gradient(135deg, #ff9800, #e65100);
       }
-
+    
       .thongtin {
         background: linear-gradient(135deg, #66bb6a, #388e3c);
       }
-
+    
       .tiennghi {
-        background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+        background: linear-gradient(135deg, #f4c842, #dbb523);
       }
-
+    
       .noithat {
         background: linear-gradient(135deg, #ef5350, #d32f2f);
       }
-
+    
       .nhanvien {
         background: linear-gradient(135deg, #3f51b5, #303f9f);
       }
-
+    
       .lichsuthanhtoan {
         background: linear-gradient(135deg, #ff5722, #e64a19);
       }
-
+    
       .lichsugiaodich {
-        background: linear-gradient(135deg, #2252ff, #2019e6);
+        background: linear-gradient(135deg, #2252ff, #1c39b5);
       }
-
+    
+      .loaiphong {
+        background: linear-gradient(135deg, #d81b60, #c2185b);
+      }
+    
       /* Icon setup */
       .card .icon {
         width: 60px;
@@ -95,37 +103,42 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: background 0.3s ease;
       }
-
+    
       .card .icon img {
-        width: 100%;
+        width: 70%;
         height: auto;
         filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
       }
-
+    
       /* Text setup */
       .card .text {
         flex-grow: 1;
         text-align: left;
         font-size: 18px;
       }
-
+    
       /* Responsive design */
       @media (max-width: 768px) {
         .button-container {
           flex-direction: column;
           align-items: center;
         }
-
+    
         .card {
-          width: 95%;
+          width: 90%;
         }
       }
-
+    
       .hidden {
         display: none !important;
       }
     </style>
+    
   </head>
   <body>
     <!-- =============== Navigation ================ -->
@@ -242,22 +255,23 @@
               /></span>
               <span class="text">Quản Lý Phòng Trọ</span>
             </button>
-            <button id="btndichvu" class="card dichvu">
+
+            <button id="btnloaiphong" class="card loaiphong">
               <span class="icon"
                 ><img
-                  src="./assets/imgs/icons/ic-customer-service.png"
+                  src="./assets/imgs/icons/ic-roomtype.png"
                   alt="Service Icon"
               /></span>
-              <span class="text">Quản Lý Dịch Vụ</span>
+              <span class="text">Quản Lý Loại Phòng</span>
             </button>
-          </div>
-          <div class="column">
             <button id="btnthongtin" class="card thongtin">
               <span class="icon"
                 ><img src="./assets/imgs/icons/ic-info.png" alt="Info Icon"
               /></span>
               <span class="text">Quản lý Thông Tin</span>
             </button>
+          </div>
+          <div class="column">
             <button id="btntiennghi" class="card tiennghi">
               <span class="icon"
                 ><img
@@ -266,8 +280,6 @@
               /></span>
               <span class="text">Quản Lý Tiện Nghi</span>
             </button>
-          </div>
-          <div class="column">
             <button id="btnnoithat" class="card noithat">
               <span class="icon"
                 ><img
@@ -276,11 +288,13 @@
               /></span>
               <span class="text">Quản Lý Nội Thất</span>
             </button>
-            <button id="btnNhanVien" class="card nhanvien">
+            <button id="btndichvu" class="card dichvu">
               <span class="icon"
-                ><img src="./assets/imgs/icons/ic-people.png" alt="Staff Icon"
+                ><img
+                  src="./assets/imgs/icons/ic-customer-service.png"
+                  alt="Service Icon"
               /></span>
-              <span class="text">Quản Lý Nhân Viên</span>
+              <span class="text">Quản Lý Dịch Vụ</span>
             </button>
           </div>
           <div class="column">
@@ -300,7 +314,18 @@
               /></span>
               <span class="text">Lich Sử Giao Dịch</span>
             </button>
+
+            <button id="btnNhanVien" class="card nhanvien">
+              <span class="icon"
+                ><img src="./assets/imgs/icons/ic-people.png" alt="Staff Icon"
+              /></span>
+              <span class="text">Quản Lý Nhân Viên</span>
+            </button>
+            
           </div>
+          
+          
+          
         </div>
       </div>
     </div>

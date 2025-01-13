@@ -55,7 +55,7 @@ function fetchUserDetails(userId) {
 
 // Hàm lắng nghe danh sách chat
 function listenToChatList(senderId) {
-  const chatListRef = ref(database, `ChatList/${senderId}`);
+  const chatListRef = ref(database, `DanhSachTroChuyen/${senderId}`);
 
   // Lắng nghe sự thay đổi trong danh sách chat
   onValue(chatListRef, (snapshot) => {
@@ -73,7 +73,7 @@ async function renderChatList(userChatData) {
 
   for (const chatId in userChatData) {
     const chat = userChatData[chatId];
-    const otherUserId = chat.otherUserId;
+    const otherUserId = chat.maNguoiDungKhac;
 
     // Lấy thông tin người dùng khác
     const userDetails = await fetchUserDetails(otherUserId);
@@ -98,11 +98,11 @@ async function renderChatList(userChatData) {
 
     const lastMessage = document.createElement("p");
     lastMessage.classList.add("last-message");
-    lastMessage.textContent = chat.lastMessage;
+    lastMessage.textContent = chat.tinNhanCuoi;
 
     const messageTime = document.createElement("span");
     messageTime.classList.add("message-time");
-    messageTime.textContent = formatTimestamp(chat.lastMessageTime);
+    messageTime.textContent = formatTimestamp(chat.thoiGianTinNhanCuoi    );
 
     messageContent.appendChild(userName);
     messageContent.appendChild(lastMessage);
@@ -111,7 +111,7 @@ async function renderChatList(userChatData) {
     messageItem.appendChild(messageContent);
     messageItem.appendChild(messageTime);
 
-    const userId = chat.otherUserId;
+    const userId = chat.maNguoiDungKhac;
     messageItem.addEventListener("click", () => {
       console.log("id: ", userId);
 
@@ -148,7 +148,7 @@ const displayedMessageIds = new Set(); // Lưu trữ các ID tin nhắn đã hi�
 
 function fetchChatDetails(chatId) {
   return new Promise((resolve, reject) => {
-    const chatRef = ref(database, `Chats/${chatId}/messages`);
+    const chatRef = ref(database, `TroChuyen/${chatId}/messages`);
 
     // Lấy toàn bộ danh sách tin nhắn ban đầu
     get(chatRef)

@@ -115,7 +115,7 @@ function filterFurniture(event) {
   const keyword = removeVietnameseTones(event.target.value); // Từ khóa không dấu
   // Lọc danh sách gốc để tìm dịch vụ phù hợp
   const filteredFurnitures = allFurnitures.filter((furniture) =>
-    removeVietnameseTones(furniture.Ten_noithat).includes(keyword)
+    removeVietnameseTones(furniture.tenNoiThat).includes(keyword)
   );
 
     // Kiểm tra nếu không có kết quả
@@ -131,10 +131,10 @@ function renderFurnitureList(furnitures) {
   furnitureListContainer.innerHTML = ""; // Xóa nội dung cũ
 
   const activeFurnitures = furnitures.filter(
-    (furniture) => furniture.Status === true
+    (furniture) => furniture.trangThai === true
   );
   const inactiveFurnitures = furnitures.filter(
-    (furniture) => furniture.Status === false
+    (furniture) => furniture.trangThai === false
   );
 
   // Hiển thị dịch vụ hoạt động
@@ -148,10 +148,10 @@ function renderFurnitureList(furnitures) {
     furnitureDiv.innerHTML = `
       <div class="furniture-card">
         <div class="furniture-image">
-            <img src="${furniture.Icon_noithat}" alt="${furniture.Ten_noithat}" />
+            <img src="${furniture.iconNoiThat}" alt="${furniture.tenNoiThat}" />
         </div>
         <div class="furniture-info">
-            <h3 class="furniture-title">${furniture.Ten_noithat}</h3>
+            <h3 class="furniture-title">${furniture.tenNoiThat}</h3>
              <div class="status-layout">
                <img src="../public/assets/imgs/icons/ic-dot-active.svg" alt="">
                       <p class="furniture-status">Hoạt động</p>
@@ -178,10 +178,10 @@ function renderFurnitureList(furnitures) {
     furnitureDiv.innerHTML = `
       <div class="furniture-card">
         <div class="furniture-image">
-            <img src="${furniture.Icon_noithat}" alt="${furniture.Ten_noithat}" />
+            <img src="${furniture.iconNoiThat}" alt="${furniture.tenNoiThat}" />
         </div>
         <div class="furniture-info">
-            <h3 class="furniture-title">${furniture.Ten_noithat}</h3>
+            <h3 class="furniture-title">${furniture.tenNoiThat}</h3>
      <div class="status-layout">
                 <img src="../public/assets/imgs/icons/ic-dot-cancel.svg" alt="">
             <p class="furniture-status">Đã hủy</p>
@@ -209,9 +209,9 @@ async function cancelFurniture(furnitureId) {
     try {
       // Cập nhật trạng thái trong Firestore
       const furnitureRef = doc(db, "NoiThat", furnitureId); // Tạo tham chiếu đến dịch vụ trong Firestore
-      await updateDoc(furnitureRef, { Status: false }); // Cập nhật trạng thái thành false
+      await updateDoc(furnitureRef, { trangThai: false }); // Cập nhật trạng thái thành false
 
-      furniture.Status = false;
+      furniture.trangThai = false;
       // Làm mới giao diện để hiển thị trạng thái mới
       renderFurnitureList(furnitures);
       showToastFalse("Huỷ nội thất thành công")
@@ -232,9 +232,9 @@ async function activateFurniture(furnitureId) {
     try {
       // Cập nhật trạng thái trong Firestore
       const furnitureRef = doc(db, "NoiThat", furnitureId); // Tạo tham chiếu đến dịch vụ trong Firestore
-      await updateDoc(furnitureRef, { Status: true }); // Cập nhật trạng thái thành true
+      await updateDoc(furnitureRef, { trangThai: true }); // Cập nhật trạng thái thành true
 
-      furniture.Status = true;
+      furniture.trangThai = true;
 
       // Làm mới giao diện để hiển thị trạng thái mới
       renderFurnitureList(furnitures);
@@ -298,16 +298,16 @@ async function handleFormSubmit(event) {
       // Thêm mới
       const furnituresRef = collection(db, "NoiThat");
       const docRef = await addDoc(furnituresRef, {
-        Ten_noithat: furnitureName,
-        Icon_noithat: furnitureIcon,
-        Status: furnitureStatus,
+        tenNoiThat: furnitureName,
+        iconNoiThat: furnitureIcon,
+        trangThai: furnitureStatus,
       });
 
       await setDoc(docRef, {
-        Ma_noithat: docRef.id, // ID tự động của Firestore
-        Ten_noithat: furnitureName,
-        Icon_noithat: furnitureIcon,
-        Status: furnitureStatus,
+        maNoiThat: docRef.id, // ID tự động của Firestore
+        tenNoiThat: furnitureName,
+        iconNoiThat: furnitureIcon,
+        trangThai: furnitureStatus,
       });
   
       showSuccessModal("Nội thất đã được thêm thành công.", () => {
@@ -325,10 +325,10 @@ async function handleFormSubmit(event) {
       // Cập nhật dịch vụ
       const furnitureRef = doc(db, "NoiThat", furnitureId);
       await updateDoc(furnitureRef, {
-        Ma_noithat: furnitureId, // ID tự động của Firestore
-        Ten_noithat: furnitureName,
-        Icon_noithat: furnitureIcon,
-        Status: furnitureStatus,
+        maNoiThat: furnitureId, // ID tự động của Firestore
+        tenNoiThat: furnitureName,
+        iconNoiThat: furnitureIcon,
+        trangThai: furnitureStatus,
       });
       showSuccessModal("Nội thất đã được cập nhật thành công.", () => {
         clearForm();
@@ -349,11 +349,11 @@ function updateFurniture(furnitureId) {
   if (selectedFurniture) {
     // Điền thông tin vào form
     document.getElementById("furnitureName").value =
-    selectedFurniture.Ten_noithat || "";
+    selectedFurniture.tenNoiThat || "";
     document.getElementById("furnitureIcon").value =
-    selectedFurniture.Icon_noithat || "";
+    selectedFurniture.iconNoiThat || "";
     document.getElementById("furnitureStatus").value =
-    selectedFurniture.Status.toString();
+    selectedFurniture.trangThai.toString();
 
     // Chuyển form sang chế độ cập nhật
     const form = document.getElementById("insertFurnitureForm");

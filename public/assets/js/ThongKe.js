@@ -3,10 +3,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebas
 import {
   getFirestore,
   collection,
-  onSnapshot
+  onSnapshot,
+  where,
+  query,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
 
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+import { getDatabase, ref, get  } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
 import { signOut, getAuth} from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
 
 
@@ -96,8 +99,8 @@ async function fetchDataPhongTro(startDate = null, endDate = null, selectedProvi
 
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      const province = data.Dc_tinhtp || "Khác";
-      const region = `${province} - ${data.Dc_quanhuyen || "Khác"}`;
+      const province = data.dcTinhTP || "Khác";
+      const region = `${province} - ${data.dcQuanHuyen || "Khác"}`;
       
        // Kiểm tra bộ lọc tỉnh/thành phố
        if (selectedProvince) {
@@ -112,10 +115,10 @@ async function fetchDataPhongTro(startDate = null, endDate = null, selectedProvi
       }
     
       // Chuyển đổi thời gian tạo phòng
-      const createdTime = convertToDate(data.ThoiGian_taophong);
+      const createdTime = convertToDate(data.thoiGianTaoPhong);
       
       // Chuyển đổi thời gian thuê phòng
-      const rentedTime = convertToDate(data.Ngay_duocthue);
+      const rentedTime = convertToDate(data.ngayDuocThue);
 
       if (!regionData[region]) {
         regionData[region] = { rented: 0, created: 0 };
@@ -123,14 +126,14 @@ async function fetchDataPhongTro(startDate = null, endDate = null, selectedProvi
     
       // Điều kiện cho phòng đã thuê
       const isRented = 
-        data.Trang_thailuu === false &&
-        data.Trang_thaiphong === true &&
+        data.trangThaiLuu === false &&
+        data.trangThaiPhong === true &&
         isDateInRange(rentedTime, startDate, endDate);
 
       // Điều kiện cho phòng đã tạo
       const isCreated = 
-        data.Trang_thailuu === false &&
-        data.Trang_thaiphong === false &&
+        data.trangThaiLuu === false &&
+        data.trangThaiPhong === false &&
         isDateInRange(createdTime, startDate, endDate);
 
       if (isRented) {
@@ -371,8 +374,8 @@ async function fetchRevenueData(startDate = null, endDate = null, selectedProvin
       if (data.trangThai !== "DONE") return;
 
       // Lấy thông tin địa điểm
-      const province = data.Dc_tinhthanhpho ? data.Dc_tinhthanhpho.trim() : "Khác";
-      const district = data.Dc_quanhuyen ? data.Dc_quanhuyen.trim() : "Khác";
+      const province = data.dcTinhThanhPho ? data.dcTinhThanhPho.trim() : "Khác";
+      const district = data.dcQuanHuyen ? data.dcQuanHuyen.trim() : "Khác";
       const region = `${province} - ${district}`;
 
       // Kiểm tra lọc tỉnh/thành phố
@@ -555,7 +558,7 @@ async function fetchEmployeeRevenueData(startDate = null, endDate = null, select
       
 
       // Lấy thông tin tỉnh/thành phố
-      const province = data.Dc_tinhthanhpho ? data.Dc_tinhthanhpho.trim() : "Khác";
+      const province = data.dcTinhThanhPho ? data.dcTinhThanhPho.trim() : "Khác";
 
       // Kiểm tra lọc tỉnh/thành phố
       if (selectedProvince) {
@@ -574,7 +577,7 @@ async function fetchEmployeeRevenueData(startDate = null, endDate = null, select
       if (!isDateInRange(paymentDate, startDate, endDate)) return;
 
       // Lấy tên nhân viên từ bảng NguoiDung
-      const employeeName = users && users[employeeId] ? users[employeeId].ho_ten : "Không xác định";
+      const employeeName = users && users[employeeId] ? users[employeeId].hoTen : "Không xác định";
 
       // Khởi tạo dữ liệu cho nhân viên nếu chưa tồn tại
       if (!employeeRevenueByRegion[employeeId]) {
@@ -803,6 +806,70 @@ const updateTableHeader = (activeTab) => {
 document.querySelector('.tab[data-tab="rooms"]').click();
 
 
+// Lắng nghe sự kiện click vào nút tìm kiếm
+document.getElementById('thongKePhongTroBtn').addEventListener('click', async () => {
+  const maNguoiDung = document.getElementById('thongKePhongTroTheoId').value.trim();
+
+  if (!maNguoiDung) {
+    showToast("Vui lòng nhập mã người dùng!");
+    return;
+  }
+
+  // Gọi hàm lấy danh sách phòng trọ từ Firestore
+  await getRoomsByUser(maNguoiDung);
+});
+
+// Hàm lấy danh sách phòng trọ của người dùng từ Firestore
+const getRoomsByUser = async (maNguoiDung) => {
+  const db = getFirestore();
+  const roomsRef = collection(db, "PhongTro");
+
+  // Tạo query để lấy các phòng trọ của người dùng
+  const q = query(roomsRef, where("maNguoiDung", "==", maNguoiDung));
+
+  try {
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      showToastFalse("Không tìm thấy phòng trọ của người dùng này!");
+      return;
+    }
+
+    // Mảng chứa các phòng của người dùng
+    let totalRooms = 0;
+    let rentedRooms = 0;
+
+    querySnapshot.forEach(doc => {
+      const roomData = doc.data();
+      totalRooms += 1; // Tăng số lượng phòng
+      if (roomData.isRented) rentedRooms += 1; // Kiểm tra nếu phòng đã được thuê
+    });
+
+    // Cập nhật bảng thống kê phòng trọ
+    updateRoomStatsTable(totalRooms, rentedRooms);
+
+  } catch (error) {
+    console.error("Lỗi khi lấy dữ liệu phòng trọ:", error);
+    alert("Có lỗi xảy ra khi lấy dữ liệu phòng trọ!");
+  }
+};
+
+// Hàm cập nhật bảng thống kê phòng trọ
+const updateRoomStatsTable = (totalRooms, rentedRooms) => {
+  const tableBody = document.getElementById('statsTable');
+  tableBody.innerHTML = ''; // Xóa các dữ liệu cũ
+  
+  const row = `<tr>
+    <td>Toàn bộ</td>
+    <td>${totalRooms}</td>
+    <td>${rentedRooms}</td>
+  </tr>`;
+  
+  tableBody.innerHTML = row;
+};
+
+
+
 
 document.getElementById("logoutButton").addEventListener("click", function () {
   
@@ -887,12 +954,29 @@ function showToast(message) {
 }
 
 
+function showToastFalse(message) {
+  const toastContainer = document.getElementById("toastContainerFalse");
+
+  // Tạo toast
+  const toast = document.createElement("div");
+  toast.className = "toast-false";
+  toast.textContent = message;
+
+  // Thêm toast vào container
+  toastContainer.appendChild(toast);
+
+  // Xóa toast sau khi animation kết thúc
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const userId = localStorage.getItem("userId");
 
   if (!userId) {
     alert("Bạn chưa đăng nhập!");
-    window.location.href = "../../../public/Login/Login.html";
+    window.location.href = "../../../public/Login.html";
     return;
   }
 
@@ -906,7 +990,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         // Kiểm tra vai trò và ẩn nút nếu cần
-        if (userData.loai_taikhoan
+        if (userData.loaiTaiKhoan
           === "NhanVien") {
           const btnNhanVien = document.getElementById("btnNhanVien");
           const btnLichSuThanhToan = document.getElementById("btnLichSuThanhToan");
@@ -919,7 +1003,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         }
 
-        if(userData.loai_taikhoan === "Admin") {
+        if(userData.loaiTaiKhoan === "Admin") {
           const liCongVien = document.getElementById("li-congviec")
           liCongVien.style.display = "none"
         }
