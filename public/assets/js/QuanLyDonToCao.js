@@ -5,18 +5,18 @@ import {
   getDocs,
   doc,
   updateDoc,
-  where
+  where,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
-import {
-  getAuth,
-} from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
 import {
   getDatabase,
   ref,
   update,
-  query
+  query,
+  set,
+  push
 } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
-
 
 const firebaseConfig = {
   apiKey: "AIzaSyA-EHInpdkzzNF3z_GhMSQsqLC5GI7mYsc",
@@ -98,7 +98,6 @@ async function fetchAllComplaints() {
     renderComplaintList(penddingComplaintData, "pending-contract-list");
     renderComplaintList(approvedComplaintData, "approved-contract-list");
     renderComplaintList(canceledComplaintData, "canceled-contract-list");
-
   } catch (e) {
     console.error("Lỗi khi lấy danh sách đơn tố cáo:", e);
   }
@@ -134,7 +133,9 @@ function renderComplaintList(data, containerId) {
     tableHTML += `
       <tr class="complaint-item" data-id="${complaint.id}">
         <td>${complaint.id}</td>
-        <td>${formatFirebaseTime(complaint.time)}</td> <!-- Chỉnh sửa lại để hiển thị thời gian -->
+        <td>${formatFirebaseTime(
+          complaint.time
+        )}</td> <!-- Chỉnh sửa lại để hiển thị thời gian -->
         <td>${complaint.vanDePhong}</td>
         <td><a class="view-details">Xem chi tiết</a></td>
       </tr>
@@ -151,18 +152,22 @@ function renderComplaintList(data, containerId) {
   // Thêm sự kiện click vào từng hàng
   document.querySelectorAll(".view-details").forEach((button) => {
     button.addEventListener("click", (event) => {
-      const itemId = event.currentTarget.closest(".complaint-item").getAttribute("data-id");
+      const itemId = event.currentTarget
+        .closest(".complaint-item")
+        .getAttribute("data-id");
       showItemDetail(itemId);
     });
   });
-
-  renderPagination(data); // Render phân trang
 }
 
 // Hàm hiển thị chi tiết đơn tố cáo
 function showItemDetail(itemId) {
-  const item = [...penddingComplaintData, ...approvedComplaintData, ...canceledComplaintData].find((data) => data.id === itemId);
-  
+  const item = [
+    ...penddingComplaintData,
+    ...approvedComplaintData,
+    ...canceledComplaintData,
+  ].find((data) => data.id === itemId);
+
   if (!item) {
     alert("Không tìm thấy chi tiết cho đơn tố cáo này.");
     return;
@@ -179,47 +184,73 @@ function showItemDetail(itemId) {
     <div>
       <strong>Ảnh liên quan:</strong>
       <div class="image-list">
-        ${item.images && item.images.length > 0 ? item.images.map((img) => `<img src="${img}" alt="Complaint Image" />`).join('') : 'Không có ảnh'}
+        ${
+          item.images && item.images.length > 0
+            ? item.images
+                .map((img) => `<img src="${img}" alt="Complaint Image" />`)
+                .join("")
+            : "Không có ảnh"
+        }
       </div>
     </div>
   `;
 
+  // Hiển thị nội dung nếu đơn tố cáo đã duyệt
+  if (item.trangThai === "APPROVED" && item.noiDung) {
+    itemDetailContent.innerHTML += `
+      <p><strong>Nội dung:</strong> ${item.noiDung}</p>
+    `;
+  }
+
   const modal = document.getElementById("itemDetailModal");
   modal.style.display = "block";
 
-
-  // Các nút hành động trong modal
+  // Lấy các nút trong modal
   const lockAccComplainantBtn = document.getElementById("lockAccComplainant");
   const lockAccDefendantBtn = document.getElementById("lockAccDefendant");
   const cancelComplaintBtn = document.getElementById("cancelComplaint");
 
+  // Ẩn các nút nếu trạng thái đơn là "APPROVED" hoặc "CANCELED"
+  if (item.trangThai === "APPROVED" || item.trangThai === "CANCELED") {
+    lockAccComplainantBtn.style.display = "none";
+    lockAccDefendantBtn.style.display = "none";
+    cancelComplaintBtn.style.display = "none";
+  } else {
+    lockAccComplainantBtn.style.display = "block";
+    lockAccDefendantBtn.style.display = "block";
+    cancelComplaintBtn.style.display = "block";
+  }
+
   lockAccComplainantBtn.onclick = async () => {
-    lockUserAndRooms(item.maNguoiToCao);
-    const itemId = item.id; 
-    await approvedComplaintInDatabase(itemId)
+    await lockUserAndRoomsN(item.maNguoiToCao, item.id, item.maNguoiBiToCao);
+    const itemId = item.id;
+    await approvedComplaintInDatabase(itemId);
+    closeModalAndReloadList();
   };
 
   lockAccDefendantBtn.onclick = async () => {
-    lockUserAndRooms(item.maNguoiBiToCao);
-    const itemId = item.id; 
-    await approvedComplaintInDatabase(itemId)
+    await lockUserAndRooms(item.maNguoiBiToCao, item.id, item.maNguoiToCao);
+    const itemId = item.id;
+    await approvedComplaintInDatabase(itemId);
+    closeModalAndReloadList();
   };
 
   cancelComplaintBtn.onclick = async () => {
-    const itemId = item.id; // Lấy ID của đơn tố cáo đang xem chi tiết
-    await cancelComplaintInDatabase(itemId); // Cập nhật trạng thái đơn tố cáo trong cơ sở dữ liệu
-
-    // Cập nhật giao diện: loại bỏ đơn tố cáo đã huỷ và render lại danh sách
-    penddingComplaintData = penddingComplaintData.filter((complaint) => complaint.id !== itemId);
-    renderComplaintList(penddingComplaintData, "pending-contract-list"); // Cập nhật lại danh sách đơn tố cáo PENDING
-    renderComplaintList(canceledComplaintData, "canceled-contract-list"); 
-    // Đóng modal
-    const modal = document.getElementById("itemDetailModal");
-    modal.style.display = "none";
+    const itemId = item.id;
+    await cancelComplaintInDatabase(itemId);
+    closeModalAndReloadList();
   };
 }
 
-async function lockUserAndRooms(userId) {
+
+
+function closeModalAndReloadList() {
+  const modal = document.getElementById("itemDetailModal");
+  modal.style.display = "none"; // Đóng modal
+  fetchAllComplaints(); // Reload lại danh sách đơn tố cáo
+}
+
+async function lockUserAndRooms(userId, complaintId, complainantId) {
   try {
     // 1. Khóa tài khoản người dùng trong Realtime Database
     const userRef = ref(database, `NguoiDung/${userId}`);
@@ -242,9 +273,88 @@ async function lockUserAndRooms(userId) {
       console.log("Tất cả phòng trọ liên quan đã bị khoá.");
     }
 
-    alert(`Tài khoản người dùng ${userId} và các phòng trọ liên quan đã bị khóa.`);
+    // 3. Cập nhật nội dung vào đơn tố cáo đã duyệt (trường `noiDung` cho biết tài khoản đã bị khóa)
+    const complaintRef = doc(db, "ToCaoPhongTro", complaintId);
+    await updateDoc(complaintRef, {
+      noiDung: `Đã khóa tài khoản của người bị tố cáo với ID: ${userId}`
+    });
+
+    // Gửi thông báo cho người tố cáo
+    await notifyComplainant(complaintId, complainantId, userId);
   } catch (error) {
     console.error("Lỗi khi khóa tài khoản và phòng trọ:", error);
+  }
+}
+
+
+
+async function lockUserAndRoomsN(userId, complaintId, complainantId) {
+  try {
+    // 1. Khóa tài khoản người dùng trong Realtime Database
+    const userRef = ref(database, `NguoiDung/${userId}`);
+    await update(userRef, {
+      trangThaiTaiKhoan: 'Khoa',
+      ngayCapNhat: new Date().toISOString()
+    });
+
+    // 2. Lấy danh sách phòng trọ liên quan từ Firestore
+    const roomQuery = query(collection(db, 'PhongTro'), where('maNguoiDung', '==', userId));
+    const roomSnapshot = await getDocs(roomQuery);
+
+    if (!roomSnapshot.empty) {
+      const roomUpdates = roomSnapshot.docs.map(docSnapshot =>
+        updateDoc(doc(db, 'PhongTro', docSnapshot.id), { trangThaiDuyet: 'BiHuy' })
+      );
+      
+      // Cập nhật trạng thái tất cả phòng trọ liên quan
+      await Promise.all(roomUpdates);
+      console.log("Tất cả phòng trọ liên quan đã bị khoá.");
+    }
+
+    // 3. Cập nhật nội dung vào đơn tố cáo đã duyệt (trường `noiDung` cho biết tài khoản đã bị khóa)
+    const complaintRef = doc(db, "ToCaoPhongTro", complaintId);
+    await updateDoc(complaintRef, {
+      noiDung: `Đã khóa tài khoản của người bị tố cáo với ID: ${userId}`
+    });
+
+  } catch (error) {
+    console.error("Lỗi khi khóa tài khoản và phòng trọ:", error);
+  }
+}
+
+
+async function notifyComplainant(complaintId, complainantId, defendantId) {
+  try {
+    const complaintRef = doc(db, "ToCaoPhongTro", complaintId);
+    const complaintSnapshot = await getDoc(complaintRef);
+
+    if (complaintSnapshot.exists()) {
+      const complaintData = complaintSnapshot.data();
+      const { tenPhongTro, vanDePhong } = complaintData;
+
+      // Tạo timestamp cho thời gian gửi thông báo
+      const timestamp = Date.now();  // Số mili giây kể từ 01/01/1970
+
+      // Tạo thông báo cho người tố cáo
+      const notification = {
+        tieuDe: "Tài khoản của người bị tố cáo đã bị khóa",
+        tinNhan: `Đơn tố cáo của bạn đã được ghi nhận. Tài khoản bạn tố cáo về phòng trọ ${tenPhongTro} đã bị khóa. Vấn đề: ${vanDePhong}`,
+        thoiGianGuiThongBao: timestamp, // Lưu thời gian dưới dạng timestamp
+        loaiThongBao: 'khoa_tai_khoan_vi_pham',
+        daGui: true,
+      };
+
+      // Sử dụng Firestore để tự sinh ID cho thông báo
+      const notificationsRef = ref(database, `ThongBao/${complainantId}`);
+      const newNotificationRef = push(notificationsRef); // Tạo ID tự sinh cho thông báo
+      await set(newNotificationRef, notification); // Lưu thông báo vào Firebase
+
+      console.log("Thông báo đã được gửi cho người tố cáo.");
+
+    }
+  } catch (error) {
+    console.error("Lỗi khi gửi thông báo cho người tố cáo:", error);
+    showToastFalse("Có lỗi xảy ra khi gửi thông báo.");
   }
 }
 
@@ -255,7 +365,7 @@ const closeModal = document.querySelector(".close");
 closeModal.onclick = () => {
   const modal = document.getElementById("itemDetailModal");
   modal.style.display = "none";
-}
+};
 
 // Đóng modal nếu người dùng nhấn ra ngoài modal
 window.onclick = (event) => {
@@ -269,45 +379,84 @@ window.onclick = (event) => {
 async function cancelComplaintInDatabase(itemId) {
   const complaintRef = doc(db, "ToCaoPhongTro", itemId); // Lấy reference của đơn tố cáo
   try {
-    await updateDoc(complaintRef, { trangThai: "CANCELED" }); // Cập nhật trạng thái thành "CANCELED"
-    alert("Đơn tố cáo đã được huỷ!");
+    // Cập nhật trạng thái đơn tố cáo thành "CANCELED"
+    await updateDoc(complaintRef, { trangThai: "CANCELED" });
+
+    // Lấy thông tin đơn tố cáo
+    const complaintSnapshot = await getDoc(complaintRef);
+    if (complaintSnapshot.exists()) {
+      const complaintData = complaintSnapshot.data();
+      const { maNguoiToCao, tenPhongTro, vanDePhong } = complaintData;
+
+      // Tạo thông báo cho người tố cáo
+      const timestamp = Date.now();
+      const notification = {
+        tieuDe: "Đơn tố cáo của bạn không được chấp nhận",
+        tinNhan: `Đơn tố cáo của bạn về phòng trọ ${tenPhongTro} đã bị huỷ. Vấn đề: ${vanDePhong}`,
+        thoiGianGuiThongBao: timestamp, // Thời gian thông báo
+        loaiThongBao: 'huy_don_to_cao', // Loại thông báo
+        daGui: true,
+      };
+
+      // Sử dụng Realtime Database để gửi thông báo cho người tố cáo
+      const notificationsRef = ref(database, `ThongBao/${maNguoiToCao}`);
+      const newNotificationRef = push(notificationsRef); // Tạo ID tự sinh cho thông báo
+      await set(newNotificationRef, notification); // Lưu thông báo vào Firebase
+
+      showToast("Đơn tố cáo đã được huỷ!");
+    }
   } catch (e) {
     console.error("Lỗi khi huỷ đơn tố cáo:", e);
-    alert("Có lỗi xảy ra khi huỷ đơn tố cáo.");
+    showToastFalse("Có lỗi xảy ra khi huỷ đơn tố cáo.");
   }
 }
+
 
 async function approvedComplaintInDatabase(itemId) {
   const complaintRef = doc(db, "ToCaoPhongTro", itemId); // Lấy reference của đơn tố cáo
   try {
     await updateDoc(complaintRef, { trangThai: "APPROVED" }); // Cập nhật trạng thái thành "CANCELED"
-    alert("Đơn tố cáo đã được duyệt!");
+    showToast("Đơn tố cáo đã được duyệt!");
   } catch (e) {
     console.error("Lỗi khi duyệt tố cáo:", e);
-    alert("Có lỗi xảy ra khi duyệt đơn tố cáo.");
+    showToastFalse("Có lỗi xảy ra khi duyệt đơn tố cáo.");
   }
 }
 
 
-function renderPagination(data) {
-  const paginationContainer = document.getElementById("pagination");
-  paginationContainer.innerHTML = ""; // Xóa nội dung cũ
+function showToast(message) {
+  const toastContainer = document.getElementById("toastContainer");
 
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  // Tạo toast
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
 
-  for (let i = 1; i <= totalPages; i++) {
-    const button = document.createElement("button");
-    button.textContent = i;
-    button.className = "pagination-button";
-    if (i === currentPage) {
-      button.classList.add("active");
-    }
-    button.addEventListener("click", () => {
-      currentPage = i;
-      renderComplaintList(data, "pending-contract-list"); // Sửa lại tên hàm renderComplaintList cho đúng
-    });
-    paginationContainer.appendChild(button);
-  }
+  // Thêm toast vào container
+  toastContainer.appendChild(toast);
+
+  // Xóa toast sau khi animation kết thúc
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+
+function showToastFalse(message) {
+  const toastContainer = document.getElementById("toastContainerFalse");
+
+  // Tạo toast
+  const toast = document.createElement("div");
+  toast.className = "toast-false";
+  toast.textContent = message;
+
+  // Thêm toast vào container
+  toastContainer.appendChild(toast);
+
+  // Xóa toast sau khi animation kết thúc
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
 }
 
 function formatFirebaseTime(times) {
@@ -327,6 +476,52 @@ function formatFirebaseTime(times) {
 }
 
 
+function filterDonToCao(event) {
+  const keyword = removeVietnameseTones(event.target.value).toLowerCase(); // Từ khóa không dấu và chuyển thành chữ thường
+  
+  let filteredData = [];
+
+  // Lọc dữ liệu cho từng tab đang hiển thị
+  const activeTab = document.querySelector(".tab.active").dataset.tab;
+  
+  if (activeTab === "pending") {
+    filteredData = penddingComplaintData.filter((complaint) => {
+      return (
+        removeVietnameseTones(complaint.id || "").toLowerCase().includes(keyword) ||
+        removeVietnameseTones(complaint.maPhongTro || "").toLowerCase().includes(keyword) ||
+        removeVietnameseTones(complaint.maNguoiToCao || "").toLowerCase().includes(keyword) ||
+        removeVietnameseTones(complaint.trangThai || "").toLowerCase().includes(keyword)
+      );
+    });
+    renderComplaintList(filteredData, "pending-contract-list");
+  } else if (activeTab === "approved") {
+    filteredData = approvedComplaintData.filter((complaint) => {
+      return (
+        removeVietnameseTones(complaint.id || "").toLowerCase().includes(keyword) ||
+        removeVietnameseTones(complaint.maPhongTro || "").toLowerCase().includes(keyword) ||
+        removeVietnameseTones(complaint.maNguoiToCao || "").toLowerCase().includes(keyword) ||
+        removeVietnameseTones(complaint.trangThai || "").toLowerCase().includes(keyword)
+      );
+    });
+    renderComplaintList(filteredData, "approved-contract-list");
+  } else if (activeTab === "canceled") {
+    filteredData = canceledComplaintData.filter((complaint) => {
+      return (
+        removeVietnameseTones(complaint.id || "").toLowerCase().includes(keyword) ||
+        removeVietnameseTones(complaint.maPhongTro || "").toLowerCase().includes(keyword) ||
+        removeVietnameseTones(complaint.maNguoiToCao || "").toLowerCase().includes(keyword) ||
+        removeVietnameseTones(complaint.trangThai || "").toLowerCase().includes(keyword)
+      );
+    });
+    renderComplaintList(filteredData, "canceled-contract-list");
+  }
+
+  if (filteredData.length === 0) {
+    showNoResultMessage(); // Hiển thị thông báo không tìm thấy
+  }
+}
+
+
 function removeVietnameseTones(str) {
   return str
     .normalize("NFD")
@@ -337,7 +532,13 @@ function removeVietnameseTones(str) {
 }
 
 function showNoResultMessage() {
-  const informationListContainer = document.getElementById("paymentHistoryList");
+  // Lấy tab đang được chọn
+  const activeTab = document.querySelector(".tab.active").dataset.tab;
+  
+  // Chọn đúng container dựa trên tab hiện tại
+  const informationListContainer =
+    document.getElementById(`${activeTab}-contract-list`);
+  
   informationListContainer.innerHTML = `
     <div class="no-result-message">
         <img src="../public/assets/imgs/icons/ic-sad-face.png" alt="">
@@ -345,6 +546,7 @@ function showNoResultMessage() {
     </div>
   `;
 }
+
 
 function goBack() {
   if (document.referrer) {
@@ -354,8 +556,13 @@ function goBack() {
   }
 }
 
+
+
 document.addEventListener("DOMContentLoaded", () => {
-  fetchAllComplaints(); // Gọi hàm để tải danh sách đơn tố cáo khi trang tải xong
+  fetchAllComplaints(); // Gọi hàm để tải danh sách phòng trọ khi trang tải xong
+  const searchInput = document.getElementById("searchInput");
+  searchInput.addEventListener("input", filterDonToCao); // Lắng nghe sự kiện tìm kiếm
 });
 
 window.goBack = goBack;
+window.filterDonToCao = filterDonToCao

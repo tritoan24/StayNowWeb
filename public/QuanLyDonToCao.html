@@ -15,27 +15,13 @@
     </header>
 
     <div class="container">
-      <div id="successModal" class="modal modalHidden">
-        <div class="modal-content">
-          <span id="closeModal" class="close">&times;</span>
-          <div class="modal-icon">
-            <img
-              src="./assets/imgs/icons/ic-tick-success.svg"
-              alt="Success Icon"
-            />
-          </div>
-          <h2 class="modal-title">Thành công!</h2>
-          <p id="modalMessage">Tiện nghi đã được thêm thành công.</p>
-          <button id="modalAction" class="modal-button">OK</button>
-        </div>
-      </div>
 
       <div id="deleteConfirmModal" class="modal modalHidden">
         <div class="modal-content">
-          <h2 class="modal-title">Xác nhận xóa</h2>
-          <p>Bạn có chắc chắn muốn xóa tiện nghi này không?</p>
+          <h2 class="modal-title">Xác nhận huỷ</h2>
+          <p>Bạn có chắc chắn muốn huỷ đơn này không?</p>
           <div class="modal-actions">
-            <button id="confirmDelete" class="modal-button danger">Xóa</button>
+            <button id="confirmDelete" class="modal-button danger">Đồng ý</button>
             <button id="cancelDelete" class="modal-button">Hủy</button>
           </div>
         </div>
@@ -55,10 +41,9 @@
                 alt="Search Icon"
               />
               <input
-                type="text"
-                id="searchComfort"
-                placeholder="Tìm kiếm đơn tố cáo"
-                oninput="filterComfort(event)"
+              type="text"
+              id="searchInput"
+              placeholder="Tìm kiếm"
               />
             </div>
             <div class="search-actions">
@@ -81,7 +66,6 @@
                 <!-- Danh sách -->
                 <div class="table-container"></div>
               </div>
-              <div id="pagination" class="pagination"></div>
             </div>
 
             <div id="approved" class="tab-content">
@@ -89,7 +73,6 @@
                 <!-- Danh sách -->
                 <div class="table-container"></div>
               </div>
-              <div id="pagination" class="pagination"></div>
             </div>
 
             <div id="canceled" class="tab-content">
@@ -97,25 +80,29 @@
                 <!-- Danh sách -->
                 <div class="table-container"></div>
               </div>
-              <div id="pagination" class="pagination"></div>
             </div>
           </div>
 
           <!-- Modal chi tiết đơn tố cáo -->
-         <!-- Modal chi tiết đơn tố cáo -->
-<div id="itemDetailModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Chi tiết đơn tố cáo</h2>
-    <div id="itemDetailContent"></div>
-    <div class="modal-actions">
-      <button id="lockAccComplainant" class="modal-btn">Khoá tài khoản người tố cáo</button>
-      <button id="lockAccDefendant" class="modal-btn">Khoá tài khoản người bị tố cáo</button>
-      <button id="cancelComplaint" class="modal-btn cancel-btn">Huỷ đơn</button>
-    </div>
-  </div>
-</div>
-
+          <!-- Modal chi tiết đơn tố cáo -->
+          <div id="itemDetailModal" class="modal">
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              <h2>Chi tiết đơn tố cáo</h2>
+              <div id="itemDetailContent"></div>
+              <div class="modal-actions">
+                <button id="lockAccComplainant" class="modal-btn">
+                  Khoá tài khoản người tố cáo
+                </button>
+                <button id="lockAccDefendant" class="modal-btn">
+                  Khoá tài khoản người bị tố cáo
+                </button>
+                <button id="cancelComplaint" class="modal-btn cancel-btn">
+                  Huỷ đơn
+                </button>
+              </div>
+            </div>
+          </div>
 
           <div id="toastContainer" class="toast-container"></div>
           <div id="toastContainerFalse" class="toast-container-false"></div>
