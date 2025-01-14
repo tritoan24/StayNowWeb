@@ -1,0 +1,246 @@
+/* Reset một số thuộc tính mặc định */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f9;
+  color: #2a3547;
+}
+
+header {
+  display: grid;
+  grid-template-columns: 10fr 90fr;
+  background-color: #471bc4;
+  color: white;
+  padding: 15px;
+  text-align: center;
+}
+
+header .back-button button {
+  background-color: white;
+  color: #471bc4;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+header .back-button button:hover {
+  background-color: #cfc1ff;
+}
+
+header h1 {
+  font-size: 24px;
+  margin-top: 10px;
+  margin-right: 10%;
+}
+
+.container {
+  padding: 40px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+  border-radius: 12px;
+  background-color: #fff;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+.search-view {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 90% 10%;
+  margin-bottom: 2%;
+}
+
+/* Container của thanh tìm kiếm */
+.search-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 4px; /* Đường viền bo tròn */
+  padding: 5px 15px; /* Khoảng cách trong */
+  max-width: 100%; /* Độ rộng tối đa */
+  border: 1px solid #eaeff4;
+}
+
+/* Biểu tượng tìm kiếm */
+.search-container img:first-child {
+  width: 20px; /* Kích thước biểu tượng tìm kiếm */
+  height: 20px;
+  margin-right: 10px;
+}
+
+/* Input tìm kiếm */
+.search-container input {
+  flex: 1; /* Chiếm không gian còn lại trong container */
+  padding: 10px 15px;
+  font-size: 16px;
+  border: none; /* Xóa viền */
+  border-radius: 4px; /* Đường viền bo tròn */
+  outline: none; /* Xóa viền focus */
+  background-color: transparent; /* Nền trong suốt */
+  color: #2a3547; /* Màu chữ */
+}
+
+/* Phần chứa các biểu tượng (Sort, Fill) */
+.search-actions {
+  display: flex;
+  gap: 10px; /* Khoảng cách giữa các biểu tượng */
+  justify-content: center;
+}
+
+/* Biểu tượng Sort và Fill */
+.search-actions img {
+  width: 20px; /* Kích thước biểu tượng */
+  height: 20px;
+  cursor: pointer; /* Hiển thị con trỏ khi hover */
+}
+
+.search-actions img:hover {
+  opacity: 0.7; /* Hiệu ứng mờ khi hover */
+}
+
+
+
+
+/* Nút quay lại */
+.back-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #555;
+}
+
+.back-button:hover {
+  color: #000;
+}
+
+
+.id-cong-viec{
+  color: #2a3547;
+  font-size: 16px;
+  font-weight: 400;
+  margin-bottom: 5px;
+}
+.title-manhanvien{
+  color: #9a9a9a;
+  font-size: 14px;
+  font-weight: 400;
+}
+.ma-nhan-vien{
+  color: #9a9a9a;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+
+.no-result-message {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  text-align: center;
+  font-size: 16px;
+  color: #999;
+  margin-top: 20px;
+  align-items: center;
+}
+
+.no-result-message img{
+  width: 25px;
+  height: 25px;
+}
+
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.payment-history-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.payment-item {
+  position: relative;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  margin-bottom: 8px;
+  border-radius: 5px;
+}
+
+.payment-item.unread::after {
+  content: "●";
+  color: #007bff;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 14px;
+}
+
+.payment-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.payment-item.unread {
+  font-weight: bold;
+  background-color: #f1f5f9;
+  border-left: 4px solid #007bff;
+}
+
+
+.payment-item.read {
+  font-weight: normal;
+  background-color: white;
+}
+
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: white;
+  margin: 15% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 500px;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+}

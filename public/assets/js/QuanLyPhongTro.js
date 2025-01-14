@@ -238,7 +238,7 @@ async function getUserInfo(maNguoiDung) {
 async function getNoiThatByPhongTro(maPhongTro) {
   const q = query(
     collection(db, "PhongTroNoiThat"),
-    where("ma_phongtro", "==", maPhongTro)
+    where("maPhongTro", "==", maPhongTro)
   );
   const querySnapshot = await getDocs(q);
   const noiThat = [];
@@ -274,7 +274,7 @@ function renderNoiThatList(noiThatData) {
 async function getTienNghiByPhongTro(maPhongTro) {
   const q = query(
     collection(db, "PhongTroTienNghi"),
-    where("ma_phongtro", "==", maPhongTro)
+    where("maPhongTro", "==", maPhongTro)
   );
   const querySnapshot = await getDocs(q);
   const tienNghi = [];

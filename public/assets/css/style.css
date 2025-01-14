@@ -231,6 +231,9 @@ body {
   font-weight: 600;
 }
 
+.info-user img:active{
+  opacity: 0.3;
+}
 /* ======================= Cards ====================== */
 .cardBox {
   position: relative;
