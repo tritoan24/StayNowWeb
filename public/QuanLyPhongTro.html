@@ -34,24 +34,29 @@
         </div>
       </div>
 
-      <!-- Danh sách phòng trọ -->
-      <div id="columns">
-        <!-- <div id="successRooms" class="column">
-          <h3>Phòng đã cho thuê</h3>
-          <div id="successRoomList"></div>
-        </div> -->
-        <div id="approvedRooms" class="column">
-          <h3>Phòng đã duyệt</h3>
-          <div id="approvedRoomList"></div>
+      <div class="tab-container">
+        <div class="tab active" data-tab="tab-daduyet">Phòng đã duyệt</div>
+        <div class="tab" data-tab="tab-bihuy">Phòng bị huỷ</div>
+        <div class="tab" data-tab="tab-choduyet">Phòng chờ duyệt</div>
+      </div>
+
+      <div id="tab-daduyet" class="tab-content active">
+        <div class="table-container" id="approvedRoomList">
+          <!-- Paid contracts will be populated here -->
         </div>
-        <div id="canceledRooms" class="column">
-          <h3>Phòng bị hủy</h3>
-          <div id="canceledRoomList"></div>
+      </div>
+
+      <div id="tab-bihuy" class="tab-content">
+        <div class="table-container" id="canceledRoomList">
+          <!-- Paid contracts will be populated here -->
         </div>
-        <div id="pendingRooms" class="column">
-          <h3>Phòng đang chờ duyệt</h3>
-          <div id="pendingRoomList"></div>
+      </div>
+
+      <div id="tab-choduyet" class="tab-content">
+        <div class="table-container" id="pendingRoomList">
+          <!-- Paid contracts will be populated here -->
         </div>
+      </div>
 
         <div id="loadingSpinnerColumn" style="display: none; text-align: center; margin-top: 20px;">
           <img src="https://i.giphy.com/3oEjI6SIIHBdRxXI40.webp" alt="Loading..." />
@@ -61,7 +66,7 @@
         <div id="toastContainer" class="toast-container"></div>
         <div id="toastContainerFalse" class="toast-container-false"></div>
 
-      </div>
+
 
       <!-- Đây là nơi sẽ hiển thị danh sách phòng trọ -->
     </div>
