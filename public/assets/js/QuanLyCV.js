@@ -16,7 +16,6 @@ import { getAuth, onAuthStateChanged, signOut} from "https://www.gstatic.com/fir
 import { getDatabase, ref, get, push } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
 
 
-
 const firebaseConfig = {
   apiKey: "AIzaSyA-EHInpdkzzNF3z_GhMSQsqLC5GI7mYsc",
   authDomain: "reactnative-8e2ca.firebaseapp.com",
@@ -350,24 +349,36 @@ window.thanhToan = async function (contractId) {
 
       
     });
+
+    const formatDate = () => {
+      const today = new Date();
+      const day = String(today.getDate()).padStart(2, '0'); // Lấy ngày, thêm số 0 nếu cần
+      const month = String(today.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0, cần +1
+      const year = today.getFullYear(); // Lấy năm
+      return `${day}-${month}-${year}`; // Ghép thành chuỗi dd-mm-yyyy
+    };
+
+    const ngayGuiThongBao = formatDate();
+    console.log(ngayGuiThongBao);
 //chưa sửa nènè
     const notification = {
-      title: 'Thông báo thành công',
-      message: `Hợp đồng của phòng ${contractData.thongtinphong.tenPhong} đã thanh toán thành công `,
-      timestamp: Date.now(),
-      isRead: false,
-      date: new Date().toLocaleDateString('vi-VN'),
-      time: new Date().toLocaleTimeString('vi-VN'),
-      mapLink : null,
-      isPushed : true,
-      typeNotification : "NotiNoti",
+      tieuDe: 'Thông báo thành công',
+      tinNhan: `Hợp đồng của phòng ${contractData.thongtinphong.tenPhong} đã thanh toán thành công `,
+      thoiGianGuiThongBao: Date.now(),
+      ngayGuiThongBao: ngayGuiThongBao,
+      loaiThongBao : "NotiNoti",
       idModel : "idHopDong"
-    
     };
     
-    const notificationRef = ref(database, `ThongBao/${contractData.chuNha.maNguoiDung}`);
-    await push(notificationRef, notification);
+    // const notificationRef = ref(database, `ThongBao/${contractData.chuNha.maNguoiDung}`);
+    // await push(notificationRef, notification);
+// Push notification
+const notificationRef = ref(database, `ThongBao/${contractData.chuNha.maNguoiDung}`);
 
+// Thêm thông báo mới
+await push(notificationRef, notification);
+
+    
     // Update the contract status
     batch.update(contractRef, {
       trangThai: "ACTIVE",
