@@ -25,6 +25,30 @@ let canceledRooms = [];
 let isLoading = false;
 
 
+// Tab functionality
+const tabs = document.querySelectorAll(".tab");
+const tabContents = document.querySelectorAll(".tab-content");
+
+// Tab chuyển đổi và hiển thị nội dung
+tabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    tabs.forEach((t) => t.classList.remove("active"));
+    tabContents.forEach((tc) => tc.classList.remove("active"));
+
+    tab.classList.add("active");
+    document.getElementById(tab.dataset.tab).classList.add("active");
+
+    // Lưu trạng thái tab vào localStorage
+    localStorage.setItem("activeTab", tab.dataset.tab);
+  });
+});
+
+// Hiển thị tab mặc định hoặc tab lưu trữ khi tải trang
+const savedTab = localStorage.getItem("activeTab") || "tab-daduyet";
+document.querySelector(`[data-tab="${savedTab}"]`).click();
+
+
+
 function showToast(message) {
   const toastContainer = document.getElementById("toastContainer");
 
@@ -63,20 +87,14 @@ function showToastFalse(message) {
 
 function updateLoadingState() {
   const loadingElement = document.getElementById("loadingSpinnerColumn"); 
-  const approvedRooms = document.getElementById("approvedRooms");
-  const canceledRooms = document.getElementById("canceledRooms");
-  const pendingRooms = document.getElementById("pendingRooms");
+ 
 
   if (isLoading) {
     loadingElement.style.display = "block"; // Hiển thị loading
-    approvedRooms.style.display = "none"; // Ẩn danh sách
-    canceledRooms.style.display = "none"; // Ẩn danh sách
-    pendingRooms.style.display = "none"; // Ẩn danh sách
+   
   } else {
     loadingElement.style.display = "none"; // Ẩn loading
-    approvedRooms.style.display = "block"; // Ẩn danh sách
-    canceledRooms.style.display = "block"; // Ẩn danh sách
-    pendingRooms.style.display = "block"; // Ẩn danh sách
+   
   }
 }
 
@@ -238,7 +256,7 @@ async function getUserInfo(maNguoiDung) {
 async function getNoiThatByPhongTro(maPhongTro) {
   const q = query(
     collection(db, "PhongTroNoiThat"),
-    where("ma_phongtro", "==", maPhongTro)
+    where("maPhongTro", "==", maPhongTro)
   );
   const querySnapshot = await getDocs(q);
   const noiThat = [];
@@ -274,7 +292,7 @@ function renderNoiThatList(noiThatData) {
 async function getTienNghiByPhongTro(maPhongTro) {
   const q = query(
     collection(db, "PhongTroTienNghi"),
-    where("ma_phongtro", "==", maPhongTro)
+    where("maPhongTro", "==", maPhongTro)
   );
   const querySnapshot = await getDocs(q);
   const tienNghi = [];

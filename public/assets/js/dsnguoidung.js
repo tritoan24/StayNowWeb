@@ -488,3 +488,8 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Lỗi kết nối đến máy chủ:", error.message);
     });
 });
+
+
+document.getElementById("notificationIcon").onclick = function () {
+  window.location.href = "ThongBao.html";  // Thay "notification.html" bằng URL bạn muốn
+};

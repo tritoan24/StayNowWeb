@@ -577,3 +577,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 });
+
+document.getElementById("notificationIcon").onclick = function () {
+  window.location.href = "ThongBao.html";  // Thay "notification.html" bằng URL bạn muốn
+};
