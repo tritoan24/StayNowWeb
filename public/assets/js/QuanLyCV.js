@@ -203,7 +203,6 @@ async function fetchContracts(userId) {
           if (trangThai === "PROCESSING") {
             actionButtons = `
              <button class="btn btn-primary" onclick="openPaymentConfirmationDialog('${contract.id}')">Thanh toán</button>
-             <button class="btn btn-danger" onclick="chuyenCongViec('${assignmentDoc.id}')">Chuyển công việc</button>
              `;
           }
 
@@ -293,8 +292,8 @@ window.thanhToan = async function (contractId) {
       ...phongDoc.data(),
     };
 
-    const DcQuanHuyen = phongData.Dc_quanhuyen || "";
-    const DcTinhThanhPho = phongData.Dc_tinhtp || "";
+    const DcQuanHuyen = phongData.dcQuanHuyen || "";
+    const DcTinhThanhPho = phongData.dcTinhTP || "";
 
     console.log(`Địa chỉ quận huyện: ${DcQuanHuyen}`);
     console.log(`Địa chỉ tỉnh thành phố: ${DcTinhThanhPho}`);
@@ -318,8 +317,8 @@ window.thanhToan = async function (contractId) {
       tongHoaDon: tongHoaDon,
       tongTienDaTru: tongTienDaTru,
       tongTienDaGui: tongTienDaGui,
-      Dc_quanhuyen: DcQuanHuyen,
-      Dc_tinhthanhpho: DcTinhThanhPho,
+      dcQuanHuyen: DcQuanHuyen,
+      dcTinhTP: DcTinhThanhPho,
       nguoiThue: {
         maNguoiDung: contractData.nguoiThue?.maNguoiDung || "",
         hoTen: contractData.nguoiThue?.hoTen || "Không rõ",
@@ -363,7 +362,7 @@ window.thanhToan = async function (contractId) {
 //chưa sửa nènè
     const notification = {
       tieuDe: 'Thông báo thành công',
-      tinNhan: `Hợp đồng của phòng ${contractData.thongtinphong.tenPhong} đã thanh toán thành công `,
+      tinNhan: `Hợp đồng của phòng ${contractData.thongtinphong.tenPhong} đã được chúng tôi thanh toán thành công. Lưu ý chúng tôi đã trừ 10% tiền phòng của hóa đơn tiền phòng của hóa đơn hợp đồng.`,
       thoiGianGuiThongBao: Date.now(),
       ngayGuiThongBao: ngayGuiThongBao,
       loaiThongBao : "NotiNoti",
@@ -397,94 +396,6 @@ await push(notificationRef, notification);
 };
 
 
-window.chuyenCongViec = async function(idCongViec) {
-
-  await checkAuthStatus(); 
-  try {
-    // Kiểm tra xem người dùng hiện tại đã đăng nhập chưa
-    if (!currentUserId) {
-      alert('Vui lòng đăng nhập để thực hiện chức năng này');
-      return;
-    }
-
-    // Lấy danh sách nhân viên từ Realtime Database
-    const staffRef = ref(database, 'NguoiDung');
-    const staffSnapshot = await get(staffRef);
-
-    if (!staffSnapshot.exists()) {
-      alert('Không tìm thấy danh sách nhân viên');
-      return;
-    }
-
-    // Lọc danh sách nhân viên
-    const staffList = [];
-    staffSnapshot.forEach((childSnapshot) => {
-      const staffData = childSnapshot.val();
-      if (staffData.Loai_taikhoan === 'NhanVien' && childSnapshot.key !== currentUserId) {
-        staffList.push({
-          id: childSnapshot.key,
-          ...staffData
-        });
-      }
-    });
-
-    // Nếu không có nhân viên khác để chuyển
-    if (staffList.length === 0) {
-      alert('Không tìm thấy nhân viên để chuyển công việc');
-      return;
-    }
-
-    // Chọn ngẫu nhiên một nhân viên từ danh sách
-    const selectedStaff = staffList[Math.floor(Math.random() * staffList.length)];
-
-    // Lấy thông tin công việc hiện tại từ Firestore
-    const currentTaskRef = doc(db, 'PhanChiaCV', idCongViec);
-    const currentTaskDoc = await getDoc(currentTaskRef);
-
-    if (!currentTaskDoc.exists()) {
-      alert('Không tìm thấy công việc để chuyển');
-      return;
-    }
-
-    const currentTaskData = currentTaskDoc.data();
-
-    // Kiểm tra xem công việc có phải đang ở trạng thái PROCESSING không
-    if (currentTaskData.trangThai !== 'PROCESSING') {
-      alert('Chỉ có thể chuyển công việc đang ở trạng thái PROCESSING');
-      return;
-    }
-
-    // Sử dụng writeBatch
-    const batch = writeBatch(db);
-
-    // Cập nhật trạng thái công việc cũ
-    batch.update(currentTaskRef, {
-      trangThai: 'AUTOCANCEL',
-      lyDoHuy: 'Công việc được chuyển sang nhân viên khác',
-      thoiGianHuy: serverTimestamp()
-    });
-
-    // Tạo document mới cho nhân viên được chọn
-    const newTaskRef = doc(collection(db, 'PhanChiaCV'));
-    batch.set(newTaskRef, {
-      idNhanVien: selectedStaff.id,
-      idHopDong: currentTaskData.idHopDong,
-      thoigian: serverTimestamp(),
-      trangThai: 'PROCESSING',
-      lyDoChuyenCongViec: 'Được chuyển từ nhân viên trước'
-    });
-
-    // Commit batch
-    await batch.commit();
-
-    // Làm mới danh sách công việc
-    await fetchContracts(currentUserId);
-
-  } catch (error) {
-    console.error('Lỗi khi chuyển công việc:', error);
-    alert('Đã xảy ra lỗi khi chuyển công việc');
-  }
-};
 
 // Function to open payment confirmation dialog
 window.openPaymentConfirmationDialog = async function (contractId) {
@@ -537,13 +448,13 @@ window.openPaymentConfirmationDialog = async function (contractId) {
        contract.hoaDonHopDong.tienPhong + contract.hoaDonHopDong.tienCoc
      ).toLocaleString("vi-VN")}</p>
 <p><strong>Phí hoa hồng:</strong> - 10% (${(
-      (contract.hoaDonHopDong.tienPhong + contract.hoaDonHopDong.tienCoc) *
+      (contract.hoaDonHopDong.tienPhong) *
       0.1
     ).toLocaleString("vi-VN")})</p>
 <p style="color: red; font-weight: bold; margin-top: 40px; "> Tổng cần thanh toán: ${(
       contract.hoaDonHopDong.tienPhong +
       contract.hoaDonHopDong.tienCoc -
-      (contract.hoaDonHopDong.tienPhong + contract.hoaDonHopDong.tienCoc) * 0.1
+      (contract.hoaDonHopDong.tienPhong) * 0.1
     ).toLocaleString("vi-VN")}</p>
       </div>
         <div class="content-right">

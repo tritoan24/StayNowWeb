@@ -134,7 +134,7 @@ function redirectToChat(element) {
     localStorage.setItem("chatUserId", userId);
 
     // Chuyển hướng đến trang chat
-    window.location.href = "../../public/QuanLyTinNhanHoTro.html";
+    window.location.href = "/QuanLyTinNhanHoTro.html";
   } else {
     console.error("User ID not found!");
   }
