@@ -144,73 +144,89 @@ h2 {
 }
 
 
-.no-result-message {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  text-align: center;
-  font-size: 16px;
-  color: #999;
-  margin-top: 20px;
-  align-items: center;
-}
-
-.no-result-message img{
-  width: 25px;
-  height: 25px;
-}
-
-
-/* Animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.payment-history-list {
+/* Danh sách thông báo */
+.notification-list {
   list-style-type: none;
   padding: 0;
+  margin: 0;
 }
 
-.payment-item {
+.notification-item {
   position: relative;
-  padding: 10px;
-  background-color: #f9f9f9;
+  padding: 15px;
+  background-color: #f9f9f9; /* Màu nền mặc định */
   border: 1px solid #ddd;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   border-radius: 5px;
+  transition: box-shadow 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
 }
 
-.payment-item.unread::after {
+.notification-item.unread::after {
   content: "●";
-  color: #007bff;
+  color: #007bff; /* Chấm màu xanh cho mục chưa đọc */
   position: absolute;
   top: 10px;
   right: 10px;
   font-size: 14px;
 }
 
-.payment-item:hover {
+.notification-item.unread {
+  font-weight: bold; /* Màu đậm cho mục chưa đọc */
+  background-color: #f1f5f9; /* Nền sáng cho mục chưa đọc */
+  border-left: 4px solid #007bff; /* Viền trái màu xanh */
+}
+
+.notification-item.read {
+  font-weight: normal;
+  background-color: white; /* Màu nền cho mục đã đọc */
+}
+
+.notification-item.selected {
+  background-color: #ffffff; /* Màu nền trắng khi click vào */
+  border-left: 4px solid #6c757d; /* Viền trái màu xám khi đã click */
+}
+
+.notification-item:hover {
   transform: scale(1.02);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-.payment-item.unread {
-  font-weight: bold;
-  background-color: #f1f5f9;
-  border-left: 4px solid #007bff;
+
+.notification-item h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  color: #333;
 }
 
-
-.payment-item.read {
-  font-weight: normal;
-  background-color: white;
+.notification-item p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #666;
 }
 
+/* Không có kết quả tìm kiếm */
+.no-result-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  font-size: 16px;
+  color: #999;
+  margin-top: 20px;
+}
 
+.no-result-message img {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 10px;
+}
+
+.no-result-message p {
+  font-size: 14px;
+  color: #888;
+}
+
+/* Modal */
 .modal {
   display: none;
   position: fixed;
@@ -244,3 +260,14 @@ h2 {
 .close:focus {
   color: black;
 }
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
