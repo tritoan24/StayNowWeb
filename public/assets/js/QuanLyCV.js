@@ -203,7 +203,6 @@ async function fetchContracts(userId) {
           if (trangThai === "PROCESSING") {
             actionButtons = `
              <button class="btn btn-primary" onclick="openPaymentConfirmationDialog('${contract.id}')">Thanh toán</button>
-             <button class="btn btn-danger" onclick="chuyenCongViec('${assignmentDoc.id}')">Chuyển công việc</button>
              `;
           }
 
@@ -293,8 +292,8 @@ window.thanhToan = async function (contractId) {
       ...phongDoc.data(),
     };
 
-    const DcQuanHuyen = phongData.Dc_quanhuyen || "";
-    const DcTinhThanhPho = phongData.Dc_tinhtp || "";
+    const DcQuanHuyen = phongData.dcQuanHuyen || "";
+    const DcTinhThanhPho = phongData.dcTinhTP || "";
 
     console.log(`Địa chỉ quận huyện: ${DcQuanHuyen}`);
     console.log(`Địa chỉ tỉnh thành phố: ${DcTinhThanhPho}`);
@@ -318,8 +317,8 @@ window.thanhToan = async function (contractId) {
       tongHoaDon: tongHoaDon,
       tongTienDaTru: tongTienDaTru,
       tongTienDaGui: tongTienDaGui,
-      Dc_quanhuyen: DcQuanHuyen,
-      Dc_tinhthanhpho: DcTinhThanhPho,
+      dcQuanHuyen: DcQuanHuyen,
+      dcTinhTP: DcTinhThanhPho,
       nguoiThue: {
         maNguoiDung: contractData.nguoiThue?.maNguoiDung || "",
         hoTen: contractData.nguoiThue?.hoTen || "Không rõ",
@@ -363,7 +362,7 @@ window.thanhToan = async function (contractId) {
 //chưa sửa nènè
     const notification = {
       tieuDe: 'Thông báo thành công',
-      tinNhan: `Hợp đồng của phòng ${contractData.thongtinphong.tenPhong} đã thanh toán thành công `,
+      tinNhan: `Hợp đồng của phòng ${contractData.thongtinphong.tenPhong} đã được chúng tôi thanh toán thành công. Lưu ý chúng tôi đã trừ 10% tiền phòng của hóa đơn tiền phòng của hóa đơn hợp đồng.`,
       thoiGianGuiThongBao: Date.now(),
       ngayGuiThongBao: ngayGuiThongBao,
       loaiThongBao : "NotiNoti",
@@ -539,13 +538,13 @@ window.openPaymentConfirmationDialog = async function (contractId) {
        contract.hoaDonHopDong.tienPhong + contract.hoaDonHopDong.tienCoc
      ).toLocaleString("vi-VN")}</p>
 <p><strong>Phí hoa hồng:</strong> - 10% (${(
-      (contract.hoaDonHopDong.tienPhong + contract.hoaDonHopDong.tienCoc) *
+      (contract.hoaDonHopDong.tienPhong) *
       0.1
     ).toLocaleString("vi-VN")})</p>
 <p style="color: red; font-weight: bold; margin-top: 40px; "> Tổng cần thanh toán: ${(
       contract.hoaDonHopDong.tienPhong +
       contract.hoaDonHopDong.tienCoc -
-      (contract.hoaDonHopDong.tienPhong + contract.hoaDonHopDong.tienCoc) * 0.1
+      (contract.hoaDonHopDong.tienPhong) * 0.1
     ).toLocaleString("vi-VN")}</p>
       </div>
         <div class="content-right">

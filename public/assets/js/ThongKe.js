@@ -374,7 +374,7 @@ async function fetchRevenueData(startDate = null, endDate = null, selectedProvin
       if (data.trangThai !== "DONE") return;
 
       // Lấy thông tin địa điểm
-      const province = data.dcTinhThanhPho ? data.dcTinhThanhPho.trim() : "Khác";
+      const province = data.dcTinhTP ? data.dcTinhTP.trim() : "Khác";
       const district = data.dcQuanHuyen ? data.dcQuanHuyen.trim() : "Khác";
       const region = `${province} - ${district}`;
 
@@ -917,7 +917,7 @@ async function logoutUser() {
 
     // Delay chuyển hướng sau khi Toast hiển thị
     setTimeout(() => {
-      window.location.href = "../public/Login.html"; // Chuyển hướng về trang chính
+      window.location.href = "/Login.html"; // Chuyển hướng về trang chính
     }, 1500); // Chờ 3 giây để Toast hiển thị
 
   } catch (error) {
@@ -978,7 +978,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!userId) {
     alert("Bạn chưa đăng nhập!");
-    window.location.href = "../../../public/Login.html";
+    window.location.href = "/Login.html";
     return;
   }
 
