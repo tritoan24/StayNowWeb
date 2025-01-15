@@ -17,7 +17,6 @@
 
 .contract-item {
     flex: 1 1 calc(50% - 20px);
-    min-width: 300px;
     border: 1px solid #ddd;
     padding: 15px;
     border-radius: 8px;
@@ -103,12 +102,13 @@
     display: block;
   }
 
-  /* Contract Grid Styling */
-  .contract-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-  }
+/* Contract Grid Styling */
+.contract-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 cột cách đều */
+  gap: 15px; /* Khoảng cách giữa các ô */
+}
+
 
   .contract-grid p {
     background-color: #f5f5f5;
