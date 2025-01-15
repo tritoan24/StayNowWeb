@@ -448,6 +448,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (userData.loaiTaiKhoan === "Admin") {
           const liCongVien = document.getElementById("li-congviec");
           liCongVien.style.display = "none";
+        } else if(userData.loaiTaiKhoan === "NhanVien") {
+          const liThongKe = document.getElementById("li-thongke");
+          liThongKe.style.display = "none";
         }
 
         // Hiển thị thông tin người dùng trên màn hình chính

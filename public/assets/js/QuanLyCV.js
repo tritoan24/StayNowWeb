@@ -411,6 +411,8 @@ window.chuyenCongViec = async function(idCongViec) {
     const staffRef = ref(database, 'NguoiDung');
     const staffSnapshot = await get(staffRef);
 
+    
+
     if (!staffSnapshot.exists()) {
       alert('Không tìm thấy danh sách nhân viên');
       return;
@@ -730,6 +732,14 @@ document.addEventListener("DOMContentLoaded", () => {
     .then((snapshot) => {
       if (snapshot.exists()) {
         const userData = snapshot.val();
+
+        if (userData.loaiTaiKhoan === "Admin") {
+          const liCongVien = document.getElementById("li-congviec");
+          liCongVien.style.display = "none";
+        } else if(userData.loaiTaiKhoan === "NhanVien") {
+          const liThongKe = document.getElementById("li-thongke");
+          liThongKe.style.display = "none";
+        }
 
         // Hiển thị thông tin người dùng trên màn hình chính
         console.log("Thông tin người dùng:", userData);

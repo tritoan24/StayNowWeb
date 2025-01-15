@@ -475,6 +475,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (userData.loaiTaiKhoan === "Admin") {
           const liCongVien = document.getElementById("li-congviec");
           liCongVien.style.display = "none";
+        } else if(userData.loaiTaiKhoan === "NhanVien") {
+          const liThongKe = document.getElementById("li-thongke");
+          liThongKe.style.display = "none";
         }
         // Ví dụ: Cập nhật thông tin người dùng trên giao diện
         document.getElementById("userName").textContent = userData.hoTen;
