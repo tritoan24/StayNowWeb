@@ -12,13 +12,14 @@ import {
 
 // Cấu hình Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyBmpKO0lDHFiYb3zklAJ2zz6qC-iQrypw0",
-  authDomain: "staynowapp1.firebaseapp.com",
-  projectId: "staynowapp1",
-  storageBucket: "staynowapp1.appspot.com",
-  messagingSenderId: "918655571270",
-  appId: "1:918655571270:web:94abfaf87fbbb3e4ecc147",
-  measurementId: "G-PQP9CTPKGT",
+  apiKey: "AIzaSyA-EHInpdkzzNF3z_GhMSQsqLC5GI7mYsc",
+  authDomain: "reactnative-8e2ca.firebaseapp.com",
+  databaseURL: "https://reactnative-8e2ca-default-rtdb.firebaseio.com",
+  projectId: "reactnative-8e2ca",
+  storageBucket: "reactnative-8e2ca.appspot.com",
+  messagingSenderId: "826980793632",
+  appId: "1:826980793632:web:41722d76fb0ef372776b45",
+  measurementId: "G-DMMZ0JC2GE",
 };
 
 // Khởi tạo Firebase

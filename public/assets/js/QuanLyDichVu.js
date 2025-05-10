@@ -1,37 +1,95 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { db } from "./FireBaseConfig.js";
 import {
-  getFirestore,
   collection,
   getDocs,
-  onSnapshot,
   doc,
   updateDoc,
   addDoc,
   deleteDoc,
-  query
+  setDoc
+
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// Cấu hình Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBmpKO0lDHFiYb3zklAJ2zz6qC-iQrypw0",
-  authDomain: "staynowapp1.firebaseapp.com",
-  projectId: "staynowapp1",
-  storageBucket: "staynowapp1.appspot.com",
-  messagingSenderId: "918655571270",
-  appId: "1:918655571270:web:94abfaf87fbbb3e4ecc147",
-  measurementId: "G-PQP9CTPKGT",
-};
-
-// Khởi tạo Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
 // Biến toàn cục để lưu trữ danh sách phòng trọ
 let services = [];
 let allServices = []; // Danh sách gốc
+let isLoading = true; // Bắt đầu loading
+
+function showToast(message) {
+  const toastContainer = document.getElementById("toastContainer");
+
+  // Tạo toast
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+
+  // Thêm toast vào container
+  toastContainer.appendChild(toast);
+
+  // Xóa toast sau khi animation kết thúc
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+
+function showToastFalse(message) {
+  const toastContainer = document.getElementById("toastContainerFalse");
+
+  // Tạo toast
+  const toast = document.createElement("div");
+  toast.className = "toast-false";
+  toast.textContent = message;
+
+  // Thêm toast vào container
+  toastContainer.appendChild(toast);
+
+  // Xóa toast sau khi animation kết thúc
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+
+function updateLoadingState() {
+  const loadingElement = document.getElementById("loadingSpinner");
+  const serveListContainer = document.getElementById("serviceList");
+
+  if (isLoading) {
+    loadingElement.style.display = "block"; // Hiển thị loading
+    serveListContainer.style.display = "none"; // Ẩn danh sách
+  } else {
+    loadingElement.style.display = "none"; // Ẩn loading
+    serveListContainer.style.display = "grid"; // Hiển thị danh sách
+  }
+}
+
+function removeVietnameseTones(str) {
+  return str
+    .normalize("NFD") // Tách dấu khỏi ký tự
+    .replace(/[\u0300-\u036f]/g, "") // Loại bỏ các ký tự dấu
+    .replace(/đ/g, "d") // Thay đ thành d
+    .replace(/Đ/g, "D") // Thay Đ thành D
+    .toLowerCase(); // Chuyển về chữ thường
+}
+
+function showNoResultMessage() {
+  const informationListContainer = document.getElementById("serviceList");
+  informationListContainer.innerHTML = `
+    <div class="no-result-message">
+        <img src="../public/assets/imgs/icons/ic-sad-face.png" alt="">
+      <p>Không tìm thấy kết quả phù hợp.</p>
+    </div>
+  `;
+}
+
+
 
 async function fetchAllServices() {
   const servicesRef = collection(db, "DichVu");
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
 
   try {
     const querySnapshot = await getDocs(servicesRef);
@@ -47,28 +105,35 @@ async function fetchAllServices() {
     renderServiceList(services); // Hiển thị danh sách
   } catch (e) {
     console.error("Lỗi khi lấy danh sách dịch vụ:", e);
+  } finally {
+    isLoading = false; // Kết thúc loading
+    updateLoadingState(); // Ẩn giao diện loading
   }
 }
 
 function filterServices(event) {
-  const keyword = event.target.value.toLowerCase(); // Lấy từ khóa và chuyển về chữ thường
-
+  const keyword = removeVietnameseTones(event.target.value); // Từ khóa không dấu
   // Lọc danh sách gốc để tìm dịch vụ phù hợp
   const filteredServices = allServices.filter((service) =>
-    service.Ten_dichvu.toLowerCase().includes(keyword)
+    removeVietnameseTones(service.tenDichVu).includes(keyword)
   );
 
-  // Hiển thị danh sách đã lọc
-  renderServiceList(filteredServices);
+    // Kiểm tra nếu không có kết quả
+    if (filteredServices.length === 0) {
+      showNoResultMessage(); // Hiển thị thông báo không tìm thấy
+    } else {
+      renderServiceList(filteredServices); // Hiển thị danh sách đã lọc
+    }
 }
+
 
 function renderServiceList(services) {
   const serviceListContainer = document.getElementById("serviceList");
   serviceListContainer.innerHTML = ""; // Xóa nội dung cũ
 
-  const activeServices = services.filter((service) => service.Status === true);
+  const activeServices = services.filter((service) => service.trangThai === true);
   const inactiveServices = services.filter(
-    (service) => service.Status === false
+    (service) => service.trangThai === false
   );
 
   // Hiển thị dịch vụ hoạt động
@@ -82,13 +147,13 @@ function renderServiceList(services) {
     serviceDiv.innerHTML = `
       <div class="service-card">
         <div class="service-image">
-            <img src="${service.Icon_dichvu}" alt="${service.Ten_dichvu}" />
+            <img src="${service.iconDichVu}" alt="${service.tenDichVu}" />
         </div>
         <div class="service-info">
-            <h3 class="service-title">${service.Ten_dichvu}</h3>
-            <p class="service-unit">${service.Don_vi}</p>
+            <h3 class="service-title">${service.tenDichVu}</h3>
+            <p class="service-unit">${service.donVi}</p>
             <div class="status-layout">
-                 <img src="../image/icons/ic-dot-active.svg" alt="">
+                <img src="../public/assets/imgs/icons/ic-dot-active.svg" alt="">
                              <p class="service-status">Hoạt động</p>
             </div>
            
@@ -100,6 +165,7 @@ function renderServiceList(services) {
       </div>
     `;
     activeServicesContainer.appendChild(serviceDiv);
+
   });
 
   // Hiển thị dịch vụ đã hủy
@@ -113,13 +179,13 @@ function renderServiceList(services) {
     serviceDiv.innerHTML = `
       <div class="service-card">
         <div class="service-image">
-            <img src="${service.Icon_dichvu}" alt="${service.Ten_dichvu}" />
+            <img src="${service.iconDichVu}" alt="${service.tenDichVu}" />
         </div>
         <div class="service-info">
-            <h3 class="service-title">${service.Ten_dichvu}</h3>
-            <p class="service-unit">${service.Don_vi}</p>
+            <h3 class="service-title">${service.tenDichVu}</h3>
+            <p class="service-unit">${service.donVi}</p>
             <div class="status-layout">
-                 <img src="../image/icons/ic-dot-cancel.svg" alt="">
+            <img src="../public/assets/imgs/icons/ic-dot-cancel.svg" alt="">
             <p class="service-status">Đã hủy</p>
             </div>
            
@@ -135,25 +201,32 @@ function renderServiceList(services) {
 
   serviceListContainer.appendChild(activeServicesContainer);
   serviceListContainer.appendChild(inactiveServicesContainer);
+
 }
 
 async function cancelService(serviceId) {
   // Tìm dịch vụ trong mảng services
   const service = services.find((s) => s.id === serviceId);
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
 
   if (service) {
     try {
       // Cập nhật trạng thái trong Firestore
       const serviceRef = doc(db, "DichVu", serviceId); // Tạo tham chiếu đến dịch vụ trong Firestore
-      await updateDoc(serviceRef, { Status: false }); // Cập nhật trạng thái thành false
+      await updateDoc(serviceRef, { trangThai: false }); // Cập nhật trạng thái thành false
 
       // Cập nhật trạng thái trong mảng services
-      service.Status = false;
+      service.trangThai = false;
 
       // Làm mới giao diện để hiển thị trạng thái mới
       renderServiceList(services);
+      showToastFalse("Huỷ dịch vụ thành công")
     } catch (e) {
       console.error("Lỗi khi cập nhật trạng thái dịch vụ:", e);
+    } finally {
+      isLoading = false; // Kết thúc loading
+      updateLoadingState(); // Ẩn giao diện loading
     }
   }
 }
@@ -161,38 +234,44 @@ async function cancelService(serviceId) {
 async function activateService(serviceId) {
   // Tìm dịch vụ trong mảng services
   const service = services.find((s) => s.id === serviceId);
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
 
   if (service) {
     try {
       // Cập nhật trạng thái trong Firestore
       const serviceRef = doc(db, "DichVu", serviceId); // Tạo tham chiếu đến dịch vụ trong Firestore
-      await updateDoc(serviceRef, { Status: true }); // Cập nhật trạng thái thành true
+      await updateDoc(serviceRef, { trangThai: true }); // Cập nhật trạng thái thành true
 
       // Cập nhật trạng thái trong mảng services
-      service.Status = true;
+      service.trangThai = true;
 
       // Làm mới giao diện để hiển thị trạng thái mới
       renderServiceList(services);
+      showToast("Kích hoạt dịch vụ thành công")
     } catch (e) {
       console.error("Lỗi khi kích hoạt lại trạng thái dịch vụ:", e);
+    } finally {
+      isLoading = false; // Kết thúc loading
+      updateLoadingState(); // Ẩn giao diện loading
     }
   }
 }
 
 async function deleteService(serviceId) {
-  if (confirm("Bạn có chắc chắn muốn xóa dịch vụ này không?")) {
+  showDeleteConfirmModal(serviceId, async (id) => {
     try {
-      const serviceDocRef = doc(db, "DichVu", serviceId);
-      await deleteDoc(serviceDocRef); // Xóa dịch vụ trong Firestore
+      const serviceDocRef = doc(db, "DichVu", id);
+      await deleteDoc(serviceDocRef);
 
       // Cập nhật danh sách dịch vụ
       fetchAllServices();
-      alert("Dịch vụ đã được xóa thành công.");
+      showSuccessModal("Dịch vụ đã được xóa thành công.");
     } catch (error) {
       console.error("Lỗi khi xóa dịch vụ:", error);
       alert("Có lỗi xảy ra khi xóa dịch vụ.");
     }
-  }
+  });
 }
 
 async function handleFormSubmit(event) {
@@ -203,31 +282,64 @@ async function handleFormSubmit(event) {
 
   // Lấy dữ liệu từ các trường input
   const serviceName = document.getElementById("serviceName").value;
-  const serviceUnit = document
-    .getElementById("serviceUnit")
-    .value.split(",")
-    .map((unit) => unit.trim());
+  const serviceUnitValue = document.getElementById("serviceUnit").value.trim(); // Lấy giá trị và loại bỏ khoảng trắng
+  const serviceUnit = serviceUnitValue
+    ? serviceUnitValue.split(",").map((unit) => unit.trim())
+    : [];
   const serviceIcon = document.getElementById("serviceIcon").value;
   const serviceStatus =
     document.getElementById("serviceStatus").value === "true"; // Convert về kiểu boolean
 
-  // Kiểm tra xem các trường có hợp lệ không
-  if (!serviceName || !serviceUnit || !serviceIcon) {
-    alert("Vui lòng điền đầy đủ thông tin!");
+  let hasError = false;
+  // Kiểm tra tên dịch vụ
+  if (!serviceName) {
+    document.getElementById("serviceNameError").classList.remove("hidden");
+    hasError = true;
     return;
+  } else {
+    document.getElementById("serviceNameError").classList.add("hidden");
+  }
+
+  if (!serviceIcon) {
+    document.getElementById("serviceIconError").classList.remove("hidden");
+    hasError = true;
+    return;
+  } else {
+    document.getElementById("serviceIconError").classList.add("hidden");
+  }
+
+  if (serviceUnit.length === 0 || serviceUnit.some((unit) => unit === "")) {
+    document.getElementById("serviceUnitError").classList.remove("hidden");
+    hasError = true;
+    return;
+  } else {
+    document.getElementById("serviceUnitError").classList.add("hidden");
   }
 
   try {
     if (mode === "add") {
       // Thêm dịch vụ mới
       const servicesRef = collection(db, "DichVu");
-      await addDoc(servicesRef, {
-        Ten_dichvu: serviceName,
-        Don_vi: serviceUnit,
-        Icon_dichvu: serviceIcon,
-        Status: serviceStatus,
+    
+      const docRef = await addDoc(servicesRef, {
+        tenDichVu: serviceName,
+        donVi: serviceUnit,
+        iconDichVu: serviceIcon,
+        trangThai: serviceStatus,
       });
-      alert("Đã thêm dịch vụ mới");
+
+      await setDoc(docRef, {
+        maDichVu: docRef.id, // ID tự động của Firestore
+        tenDichVu: serviceName,
+        donVi: serviceUnit,
+        iconDichVu: serviceIcon,
+        trangThai: serviceStatus,
+      });
+      // Hiển thị modal thành công
+      showSuccessModal("Dịch vụ đã được thêm thành công.", () => {
+        clearForm();
+        fetchAllServices();
+      });
     } else if (mode === "update") {
       // Lấy ID dịch vụ đang được cập nhật (giả sử lưu trong form)
       const serviceId = form.getAttribute("data-service-id");
@@ -239,24 +351,23 @@ async function handleFormSubmit(event) {
       // Cập nhật dịch vụ
       const serviceRef = doc(db, "DichVu", serviceId);
       await updateDoc(serviceRef, {
-        Ten_dichvu: serviceName,
-        Don_vi: serviceUnit,
-        Icon_dichvu: serviceIcon,
-        Status: serviceStatus,
+        maDichVu: serviceId, // ID tự động của Firestore
+        tenDichVu: serviceName,
+        donVi: serviceUnit,
+        iconDichVu: serviceIcon,
+        trangThai: serviceStatus,
       });
-      alert("Đã cập nhật dịch vụ");
+      showSuccessModal("Dịch vụ đã được cập nhật thành công.", () => {
+        clearForm();
+        fetchAllServices();
+      });
     }
-
-    // Cập nhật lại danh sách dịch vụ
-    fetchAllServices();
-
-    // Reset form và đặt lại về chế độ thêm mới
-    clearForm();
   } catch (e) {
     console.error("Lỗi khi xử lý form:", e);
     alert("Có lỗi xảy ra.");
   }
 }
+
 function updateService(serviceId) {
   // Tìm dịch vụ theo ID từ danh sách allServices
   const selectedService = allServices.find(
@@ -266,12 +377,12 @@ function updateService(serviceId) {
   if (selectedService) {
     // Điền thông tin vào form
     document.getElementById("serviceName").value =
-      selectedService.Ten_dichvu || "";
-    document.getElementById("serviceUnit").value = selectedService.Don_vi || "";
+      selectedService.tenDichVu || "";
+    document.getElementById("serviceUnit").value = selectedService.donVi || "";
     document.getElementById("serviceIcon").value =
-      selectedService.Icon_dichvu || "";
+      selectedService.iconDichVu || "";
     document.getElementById("serviceStatus").value =
-      selectedService.Status.toString();
+      selectedService.trangThai.toString();
 
     // Chuyển form sang chế độ cập nhật
     const form = document.getElementById("addServiceForm");
@@ -282,6 +393,60 @@ function updateService(serviceId) {
     const submitButton = document.getElementById("submitServiceBtn");
     submitButton.textContent = "Cập nhật dịch vụ";
   }
+}
+
+// Hiển thị modal với thông báo tùy chỉnh
+function showSuccessModal(message, callback = null) {
+  const modal = document.getElementById("successModal");
+  const modalMessage = document.getElementById("modalMessage");
+  const modalAction = document.getElementById("modalAction");
+
+  modalMessage.textContent = message;
+  modal.classList.remove("modalHidden");
+  modal.style.display = "block";
+
+  modalAction.onclick = () => {
+    hideModal(modal);
+    if (callback) callback();
+  };
+
+  document.getElementById("closeModal").onclick = () => hideModal(modal);
+}
+
+function showDeleteConfirmModal(serviceId, deleteCallback) {
+  const modal = document.getElementById("deleteConfirmModal");
+  modal.classList.remove("modalHidden");
+  modal.style.display = "block";
+
+  // Xác nhận xóa
+  document.getElementById("confirmDelete").onclick = async function () {
+    await deleteCallback(serviceId);
+    hideModalDelete(modal);
+  };
+
+  // Hủy bỏ xóa
+  document.getElementById("cancelDelete").onclick = () =>
+    hideModalDelete(modal);
+
+  // Đóng modal khi nhấn ra ngoài
+  window.onclick = function (event) {
+    if (event.target === modal) {
+      hideModalDelete(modal);
+    }
+  };
+}
+
+// Ẩn modal
+function hideModal() {
+  const modal = document.getElementById("successModal");
+  modal.classList.add("modalHidden");
+  modal.style.display = "none";
+}
+
+function hideModalDelete() {
+  const modal = document.getElementById("deleteConfirmModal");
+  modal.classList.add("modalHidden");
+  modal.style.display = "none";
 }
 
 function goBack() {

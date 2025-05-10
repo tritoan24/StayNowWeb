@@ -1,35 +1,95 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { db } from "./FireBaseConfig.js";
 import {
-  getFirestore,
   collection,
   getDocs,
   doc,
   updateDoc,
   addDoc,
   deleteDoc,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// Cấu hình Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBmpKO0lDHFiYb3zklAJ2zz6qC-iQrypw0",
-  authDomain: "staynowapp1.firebaseapp.com",
-  projectId: "staynowapp1",
-  storageBucket: "staynowapp1.appspot.com",
-  messagingSenderId: "918655571270",
-  appId: "1:918655571270:web:94abfaf87fbbb3e4ecc147",
-  measurementId: "G-PQP9CTPKGT",
-};
 
-// Khởi tạo Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
 // Biến toàn cục để lưu trữ danh sách phòng trọ
 let comforts = [];
 let allComforts = []; // Danh sách gốc
+let isLoading = false
+
+
+function showToast(message) {
+  const toastContainer = document.getElementById("toastContainer");
+
+  // Tạo toast
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+
+  // Thêm toast vào container
+  toastContainer.appendChild(toast);
+
+  // Xóa toast sau khi animation kết thúc
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+
+function showToastFalse(message) {
+  const toastContainer = document.getElementById("toastContainerFalse");
+
+  // Tạo toast
+  const toast = document.createElement("div");
+  toast.className = "toast-false";
+  toast.textContent = message;
+
+  // Thêm toast vào container
+  toastContainer.appendChild(toast);
+
+  // Xóa toast sau khi animation kết thúc
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+
+function updateLoadingState() {
+  const loadingElement = document.getElementById("loadingSpinner");
+  const serveListContainer = document.getElementById("comfortList");
+
+  if (isLoading) {
+    loadingElement.style.display = "block"; // Hiển thị loading
+    serveListContainer.style.display = "none"; // Ẩn danh sách
+  } else {
+    loadingElement.style.display = "none"; // Ẩn loading
+    serveListContainer.style.display = "grid"; // Hiển thị danh sách
+  }
+}
+
+function removeVietnameseTones(str) {
+  return str
+    .normalize("NFD") // Tách dấu khỏi ký tự
+    .replace(/[\u0300-\u036f]/g, "") // Loại bỏ các ký tự dấu
+    .replace(/đ/g, "d") // Thay đ thành d
+    .replace(/Đ/g, "D") // Thay Đ thành D
+    .toLowerCase(); // Chuyển về chữ thường
+}
+
+function showNoResultMessage() {
+  const informationListContainer = document.getElementById("comfortList");
+  informationListContainer.innerHTML = `
+    <div class="no-result-message">
+        <img src="../public/assets/imgs/icons/ic-sad-face.png" alt="">
+      <p>Không tìm thấy kết quả phù hợp.</p>
+    </div>
+  `;
+}
+
 
 async function fetchAllComfort() {
   const comfortsRef = collection(db, "TienNghi");
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
 
   try {
     const querySnapshot = await getDocs(comfortsRef);
@@ -45,19 +105,26 @@ async function fetchAllComfort() {
     renderComfortList(comforts); // Hiển thị danh sách
   } catch (e) {
     console.error("Lỗi khi lấy danh sách tiện nghi!:", e);
+  } finally {
+    isLoading = false; // Kết thúc loading
+    updateLoadingState(); // Ẩn giao diện loading
   }
 }
 
-function filterComfort(event) {
-  const keyword = event.target.value.toLowerCase(); // Lấy từ khóa và chuyển về chữ thường
 
+function filterComfort(event) {
+  const keyword = removeVietnameseTones(event.target.value); // Từ khóa không dấu
   // Lọc danh sách gốc để tìm dịch vụ phù hợp
   const filteredComforts = allComforts.filter((comfort) =>
-    comfort.Ten_tiennghi.toLowerCase().includes(keyword)
+    removeVietnameseTones(comfort.tenTienNghi).includes(keyword)
   );
 
-  // Hiển thị danh sách đã lọc
-  renderComfortList(filteredComforts);
+    // Kiểm tra nếu không có kết quả
+    if (filteredComforts.length === 0) {
+      showNoResultMessage(); // Hiển thị thông báo không tìm thấy
+    } else {
+      renderComfortList(filteredComforts); // Hiển thị danh sách đã lọc
+    }
 }
 
 function renderComfortList(comforts) {
@@ -65,10 +132,10 @@ function renderComfortList(comforts) {
   comfortListContainer.innerHTML = ""; // Xóa nội dung cũ
 
   const activeComforts = comforts.filter(
-    (comfort) => comfort.Status === true
+    (comfort) => comfort.trangThai === true
   );
   const inactiveComforts = comforts.filter(
-    (comfort) => comfort.Status === false
+    (comfort) => comfort.trangThai === false
   );
 
   // Hiển thị dịch vụ hoạt động
@@ -82,12 +149,12 @@ function renderComfortList(comforts) {
     comfortDiv.innerHTML = `
       <div class="comfort-card">
         <div class="comfort-image">
-            <img src="${comfort.Icon_tiennghi}" alt="${comfort.Ten_tiennghi}" />
+            <img src="${comfort.iconTienNghi}" alt="${comfort.tenTienNghi}" />
         </div>
         <div class="comfort-info">
-            <h3 class="comfort-title">${comfort.Ten_tiennghi}</h3>
+            <h3 class="comfort-title">${comfort.tenTienNghi}</h3>
              <div class="status-layout">
-                 <img src="../image/icons/ic-dot-active.svg" alt="">
+              <img src="../public/assets/imgs/icons/ic-dot-active.svg" alt="">
                       <p class="comfort-status">Hoạt động</p>
             </div>
            
@@ -112,12 +179,12 @@ function renderComfortList(comforts) {
     comfortDiv.innerHTML = `
       <div class="comfort-card">
         <div class="comfort-image">
-            <img src="${comfort.Icon_tiennghi}" alt="${comfort.Ten_tiennghi}" />
+            <img src="${comfort.iconTienNghi}" alt="${comfort.tenTienNghi}" />
         </div>
         <div class="comfort-info">
-            <h3 class="comfort-title">${comfort.Ten_tiennghi}</h3>
+            <h3 class="comfort-title">${comfort.tenTienNghi}</h3>
      <div class="status-layout">
-                 <img src="../image/icons/ic-dot-cancel.svg" alt="">
+              <img src="../public/assets/imgs/icons/ic-dot-cancel.svg" alt="">
             <p class="comfort-status">Đã hủy</p>
             </div>
            
@@ -137,37 +204,48 @@ function renderComfortList(comforts) {
 
 async function cancelComfort(comfortId) {
   const comfort = comforts.find((s) => s.id === comfortId);
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
 
   if (comfort) {
     try {
       // Cập nhật trạng thái trong Firestore
       const comfortRef = doc(db, "TienNghi", comfortId); // Tạo tham chiếu đến dịch vụ trong Firestore
-      await updateDoc(comfortRef, { Status: false }); // Cập nhật trạng thái thành false
+      await updateDoc(comfortRef, { trangThai: false }); // Cập nhật trạng thái thành false
 
-      comfort.Status = false;
+      comfort.trangThai = false;
       // Làm mới giao diện để hiển thị trạng thái mới
       renderComfortList(comforts);
+      showToastFalse("Huỷ tiện nghi thành công")
     } catch (e) {
       console.error("Lỗi khi cập nhật trạng thái tiện nghi:", e);
+    } finally {
+      isLoading = false; // Kết thúc loading
+      updateLoadingState(); // Ẩn giao diện loading
     }
   }
 }
 
 async function activateComfort(comfortId) {
   const comfort = comforts.find((s) => s.id === comfortId);
-
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
   if (comfort) {
     try {
       // Cập nhật trạng thái trong Firestore
       const comfortRef = doc(db, "TienNghi", comfortId); // Tạo tham chiếu đến dịch vụ trong Firestore
-      await updateDoc(comfortRef, { Status: true }); // Cập nhật trạng thái thành true
+      await updateDoc(comfortRef, { trangThai: true }); // Cập nhật trạng thái thành true
 
-      comfort.Status = true;
+      comfort.trangThai = true;
 
       // Làm mới giao diện để hiển thị trạng thái mới
       renderComfortList(comforts);
+      showToast("Kích hoạt tiện nghi thành công")
     } catch (e) {
       console.error("Lỗi khi kích hoạt lại trạng thái tiện nghi:", e);
+    } finally {
+      isLoading = false; // Kết thúc loading
+      updateLoadingState(); // Ẩn giao diện loading
     }
   }
 }
@@ -221,11 +299,20 @@ async function handleFormSubmit(event) {
     if (mode === "add") {
       // Thêm mới
       const comfortsRef = collection(db, "TienNghi");
-      await addDoc(comfortsRef, {
-        Ten_tiennghi: comfortName,
-        Icon_tiennghi: comfortIcon,
-        Status: comfortStatus,
+
+      const docRef = await addDoc(comfortsRef, {
+        tenTienNghi: comfortName,
+        iconTienNghi: comfortIcon,
+        trangThai: comfortStatus,
       });
+
+      await setDoc(docRef, {
+        maTienNghi: docRef.id, // ID tự động của Firestore
+        tenTienNghi: comfortName,
+        iconTienNghi: comfortIcon,
+        trangThai: comfortStatus,
+      });
+
       showSuccessModal("Tiện nghi đã được thêm thành công.", () => {
         clearForm();
         fetchAllComfort();
@@ -241,9 +328,10 @@ async function handleFormSubmit(event) {
       // Cập nhật dịch vụ
       const comfortsRef = doc(db, "TienNghi", comfortId);
       await updateDoc(comfortsRef, {
-        Ten_tiennghi: comfortName,
-        Icon_tiennghi: comfortIcon,
-        Status: comfortStatus,
+        maTienNghi: comfortId, // ID tự động của Firestore
+        tenTienNghi: comfortName,
+        iconTienNghi: comfortIcon,
+        trangThai: comfortStatus,
       });
       showSuccessModal("Tiện nghi đã được cập nhật thành công.", () => {
         clearForm();
@@ -264,11 +352,11 @@ function updateComfort(comfortId) {
   if (selectedComfort) {
     // Điền thông tin vào form
     document.getElementById("comfortName").value =
-    selectedComfort.Ten_tiennghi || "";
+    selectedComfort.tenTienNghi || "";
     document.getElementById("comfortIcon").value =
-    selectedComfort.Icon_tiennghi || "";
+    selectedComfort.iconTienNghi || "";
     document.getElementById("comfortStatus").value =
-    selectedComfort.Status.toString();
+    selectedComfort.trangThai.toString();
 
     // Chuyển form sang chế độ cập nhật
     const form = document.getElementById("insertComfortForm");
@@ -370,7 +458,7 @@ window.cancelComfort = cancelComfort;
 window.activateComfort = activateComfort;
 window.deleteComfort = deleteComfort;
 window.goBack = goBack;
-window.clearForm = clearForm;
+window.clearForm = clearForm;     
 window.handleFormSubmit = handleFormSubmit;
 window.updateComfort = updateComfort;
 window.filterComfort = filterComfort;

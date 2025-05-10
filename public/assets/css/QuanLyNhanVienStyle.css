@@ -1,0 +1,628 @@
+/* Reset một số thuộc tính mặc định */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f9;
+  color: #2a3547;
+}
+
+header {
+  display: grid;
+  grid-template-columns: 10fr 90fr;
+  background-color: #471bc4;
+  color: white;
+  padding: 15px;
+  text-align: center;
+}
+
+header .back-button button {
+  background-color: white;
+  color: #471bc4;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+header .back-button button:hover {
+  background-color: #cfc1ff;
+}
+
+header h1 {
+  font-size: 24px;
+  margin-top: 10px;
+  margin-right: 10%;
+}
+
+.container {
+  padding: 40px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+  border-radius: 12px;
+  background-color: #fff;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+.search-view {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 90% 10%;
+  margin-bottom: 2%;
+}
+
+/* Container của thanh tìm kiếm */
+.search-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 4px; /* Đường viền bo tròn */
+  padding: 5px 15px; /* Khoảng cách trong */
+  max-width: 100%; /* Độ rộng tối đa */
+  border: 1px solid #eaeff4;
+  margin-top: 2%;
+}
+
+/* Biểu tượng tìm kiếm */
+.search-container img:first-child {
+  width: 20px; /* Kích thước biểu tượng tìm kiếm */
+  height: 20px;
+  margin-right: 10px;
+}
+
+/* Input tìm kiếm */
+.search-container input {
+  flex: 1; /* Chiếm không gian còn lại trong container */
+  padding: 10px 15px;
+  font-size: 16px;
+  border: none; /* Xóa viền */
+  border-radius: 4px; /* Đường viền bo tròn */
+  outline: none; /* Xóa viền focus */
+  background-color: transparent; /* Nền trong suốt */
+  color: #2a3547; /* Màu chữ */
+}
+
+/* Phần chứa các biểu tượng (Sort, Fill) */
+.search-actions {
+  display: flex;
+  gap: 10px; /* Khoảng cách giữa các biểu tượng */
+  justify-content: center;
+}
+
+/* Biểu tượng Sort và Fill */
+.search-actions img {
+  width: 20px; /* Kích thước biểu tượng */
+  height: 20px;
+  cursor: pointer; /* Hiển thị con trỏ khi hover */
+}
+
+.search-actions img:hover {
+  opacity: 0.7; /* Hiệu ứng mờ khi hover */
+}
+
+.addStaffForm {
+  border: 1px solid #eaeff4;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+}
+.staffContainerView{
+  border: 1px solid #eaeff4;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 3%;
+
+}
+
+.titleAddForm {
+  color: #2a3547;
+  font-weight: 600;
+  font-size: 16px;
+  border-bottom: 1px solid #eaeff4;
+  padding: 16px;
+}
+.inputFormContainer {
+  padding: 16px;
+}
+.staffContainer {
+  padding: 16px;
+}
+
+.inputFormContent {
+  display: grid;
+  grid-template-columns: 45% 45%;
+  justify-content: space-around;
+}
+
+.inputForm{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  color: #2a3547;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.inputForm label {
+  margin-top: 3%;
+}
+
+
+
+.inputForm input, select{
+  border: 1px solid #EAEFF4;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 1%;
+}
+
+.inputForm input:hover, select:hover {
+  border: 1px solid #471bc4;
+}
+
+.btnAddFormGroup{
+  width: 100%;
+  text-align: center;
+  margin-top: 2%;
+}
+
+.btnAddStaff{
+  padding: 10px;
+  margin-inline: 3%;
+  background-color: #471bc4;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.btnClearForm{
+  padding: 10px;
+  margin-inline: 3%;
+  background-color: #fff;
+  border: 1px solid #7C8FAC;
+  border-radius: 4px;
+  color: #7C8FAC;
+  font-weight: 400;
+  font-size: 14px;
+}
+.titleStatus{
+  margin-block: 10px;
+}
+
+
+/* Mỗi phần tử người dùng */
+.user-item {
+  width: calc(45% - 10px); /* Hai cột, khoảng cách giữa các item */
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+
+.user-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+.user-item button {
+  margin-left: 10px;
+  background-color: #007bff;
+  border: none;
+  color: #fff;
+}
+
+/* Ảnh đại diện */
+.user-item img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 15px;
+  border: 2px solid #007bff;
+}
+
+
+
+/* Thông tin người dùng */
+.user-details h3 {
+  margin: 10px 0 5px;
+  font-size: 1.1em;
+  color: #007bff;
+  font-weight: 600;
+  vertical-align: middle; /* Đảm bảo tên thẳng hàng với hình tròn */
+
+}
+
+.user-details p {
+  margin: 0;
+  font-size: 0.9em;
+  color: #555;
+}
+
+
+
+
+/* Cấu hình cho dialog */
+.dialog {
+  display: none; /* Mặc định là không hiển thị */
+  position: fixed; /* Đặt vị trí cố định */
+  z-index: 1000; /* Đặt z-index cao để hiển thị trên các phần tử khác */
+  left: 0;
+  top: 0;
+  width: 100%; /* Chiều rộng 100% */
+  height: 100%; /* Chiều cao 100% */
+  background-color: rgba(0, 0, 0, 0.5); /* Màu nền trong suốt */
+  display: flex; /* Sử dụng flexbox để căn giữa */
+  justify-content: center; /* Căn giữa theo chiều ngang */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  animation: fadeIn 0.3s ease; /* Hiệu ứng hiển thị */
+}
+
+/* Nội dung của dialog */
+.dialog-content {
+  position: relative; /* Đặt vị trí tương đối để canh giữa */
+  margin: auto;
+  padding: 20px;
+  background-color: #fff; /* Màu nền trắng */
+  border-radius: 10px; /* Bo góc */
+  max-width: 500px; /* Chiều rộng tối đa */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Hiệu ứng đổ bóng */
+  animation: fadeIn 0.3s ease; /* Hiệu ứng hiển thị */
+}
+
+/* Hiệu ứng cho phần đóng */
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  color: #aaa; /* Màu cho nút đóng */
+  font-size: 24px; /* Kích thước chữ */
+  font-weight: bold; /* Đậm */
+  cursor: pointer; /* Con trỏ chuột */
+}
+
+.close:hover {
+  color: #f00; /* Đổi màu khi hover */
+}
+
+/* Ảnh đại diện */
+#dialogAvatar {
+  width: 150px; /* Chiều rộng ảnh */
+  height: 150px; /* Chiều cao ảnh */
+  border-radius: 50%; /* Bo tròn ảnh */
+  margin: 10px auto; /* Canh giữa */
+  display: block; /* Hiển thị block */
+}
+
+/* Các thông tin trong dialog */
+.dialog-content h3 {
+  margin: 10px 0; /* Đặt khoảng cách */
+  text-align: center; /* Canh giữa */
+  font-size: 1.5em; /* Kích thước chữ */
+}
+
+.dialog-content p {
+  margin: 5px 0; /* Đặt khoảng cách */
+  text-align: center; /* Canh giữa */
+}
+
+
+
+
+.status-circle {
+  display: inline-block;
+  width: 15px; /* Đường kính của hình tròn */
+  height: 15px;
+  border-radius: 50%; /* Làm tròn */
+  margin-left: 10px; /* Khoảng cách giữa các trạng thái */
+  margin-bottom: 12px;
+}
+
+/* Màu sắc cho trạng thái Online */
+.online {
+  background-color: #4CAF50; /* Màu xanh cho online */
+}
+
+/* Màu sắc cho trạng thái Offline */
+.offline {
+  background-color: #B0B0B0; /* Màu xám cho offline */
+}
+
+
+
+.offline-info {
+  font-size: 12px;
+  color: #999999;
+  margin-left: 25px;
+}
+/* Nút chi tiết (ẩn mặc định) */
+.detail-button {
+  position: absolute;
+  bottom: 10px; /* Đặt nút ở phía dưới cùng */
+  right: 10px; /* Đặt nút ở phía bên phải */
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  display: none; /* Ẩn nút khi không hover */
+  font-size: 0.9em;
+}
+
+/* Hiển thị nút khi hover vào phần tử */
+.user-item:hover .detail-button {
+  display: block;
+}
+
+
+/* Hiệu ứng fadeIn cho dialog */
+@keyframes fadeIn {
+  from {
+      opacity: 0; /* Bắt đầu trong suốt */
+  }
+  to {
+      opacity: 1; /* Kết thúc ở trạng thái hiển thị */
+  }
+}
+
+
+/* Danh sách các phòng */
+#staffList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+/* Container tổng cho từng phòng */
+.staff-card {
+  width: 600px;
+  display: flex;
+  flex-direction: row; /* Sắp xếp theo chiều ngang */
+  align-items: center;
+  justify-content: space-around;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-bottom: 20px;
+}
+
+.staff-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Hình ảnh của phòng */
+.staff-image img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Thông tin phòng */
+.staff-info {
+  flex: 1;
+  margin-left: 15px; /* Khoảng cách giữa hình ảnh và thông tin */
+}
+
+.staff-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.staff-address {
+  font-size: 14px;
+  color: #666;
+  margin: 5px 0;
+}
+
+/* Khu vực hành động */
+.staff-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.staff-actions .btn {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.active-column {
+  background-color: #e0ffe0; /* Màu nền nhẹ cho cột "Hoạt động" */
+}
+
+.inactive-column {
+  background-color: #ffe0e0; /* Màu nền nhẹ cho cột "Đã hủy" */
+}
+
+.btn.update {
+  background-color: #4caf50;
+  color: white;
+}
+
+.btn.approve:hover {
+  background-color: #45a049;
+}
+
+.btn.cancel {
+  background-color: #f44336;
+  color: white;
+}
+
+.btn.cancel:hover {
+  background-color: #d32f2f;
+}
+
+/* Liên kết xem chi tiết */
+.staff-details {
+  margin-top: 10px;
+}
+
+.status-layout{
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+}
+
+/* Chi tiết phòng trọ */
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 1;
+}
+
+
+button.close {
+  background-color: #471bc4;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 15px;
+  display: block;
+  width: 100%;
+  font-size: 16px;
+}
+
+button.close:hover {
+  background-color: #471bc4;
+}
+
+.error {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 3%;
+}
+.error-message {
+  margin: 3px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #FA896B;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Kiểu dáng tổng quát cho modal */
+.modal {
+  display: none; /* Ẩn mặc định */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.6); /* Mờ nền */
+  backdrop-filter: blur(5px); /* Làm mờ nền */
+}
+
+/* Kiểu dáng nội dung của modal */
+.modal-content {
+  background: linear-gradient(135deg, #471bc4, #481bc48a); /* Hiệu ứng gradient */
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 10px; /* Góc bo tròn */
+  width: 35%;
+  max-width: 400px;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.5s ease-in-out; /* Hiệu ứng xuất hiện */
+}
+
+/* Hiệu ứng khi xuất hiện modal */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+
+/* Biểu tượng thành công */
+.modal-icon img {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 15px;
+  animation: bounce 1s ease-in-out infinite; /* Hiệu ứng động */
+}
+
+/* Hiệu ứng nhún cho biểu tượng */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Tiêu đề modal */
+.modal-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Nút hành động */
+.modal-button {
+  background-color: #fff;
+  border: none;
+  color: #471bc4;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background-color 0.3s ease-in-out, transform 0.2s;
+}
+
+.modal-button:hover {
+  background-color: #998db6;
+  transform: scale(1.05);
+}
+

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản Lý Nhân Viên</title>
+    <link rel="stylesheet" href="./assets/css/QuanLyNhanVienStyle.css" />
+  </head>
+  <body>
+    <header>
+      <div class="back-button">
+        <button onclick="goBack()">Quay lại</button>
+      </div>
+      <h1>Quản Lý Nhân Viên</h1>
+    </header>
+
+    <div class="container">
+      <!-- Form Thêm nhân viên Mới -->
+      <form id="addStaffForm" class="addStaffForm" data-mode="add">
+        <div class="titleAddForm">
+          <h3 id="formTitle">Thêm nhân viên mới</h3>
+        </div>
+        <div class="inputFormContainer">
+          <div class="inputFormContent">
+            <div class="inputForm">
+              <label for="staffName">Tên nhân viên:</label>
+              <input
+                type="text"
+                id="staffName"
+                placeholder="Tên nhân viên"
+                required
+              />
+              <div id="staffNameError" class="error hidden">
+                <img src="./assets/imgs/icons/ic-error.svg" alt="Error icon" />
+                <p id="nameErrorMessage" class="error-message"></p>
+              </div>
+
+              <label for="staffPhone">Số điện thoại:</label>
+              <input
+                type="text"
+                id="staffPhone"
+                placeholder="Số điện thoại"
+                required
+              />
+              <div id="staffPhoneError" class="error hidden">
+                <img src="./assets/imgs/icons/ic-error.svg" alt="Error icon" />
+                <p id="phoneErrorMessage" class="error-message"></p>
+              </div>
+
+              <label for="staffAvt">Ảnh đại diện:</label>
+              <input
+                type="text"
+                id="staffAvt"
+                placeholder="Nhập url ảnh"
+                required
+              />
+              <div id="staffAvtError" class="error hidden">
+                <img src="./assets/imgs/icons/ic-error.svg" alt="Error avt" />
+                <p id="avtErrorMessage" class="error-message"></p>
+              </div>
+            </div>
+
+            <div class="inputForm">
+              <label for="staffEmail">Email:</label>
+              <input
+                type="text"
+                id="staffEmail"
+                placeholder="Nhập email"
+                required
+              />
+              <div id="staffEmailError" class="error hidden">
+                <img src="./assets/imgs/icons/ic-error.svg" alt="Error icon" />
+                <p id="emailErrorMessage" class="error-message"></p>
+              </div>
+              <label for="staffPassword">Mật khẩu:</label>
+              <input
+                type="password"
+                id="staffPassword"
+                placeholder="Mật khẩu"
+                required
+              />
+              <div id="staffPasswordError" class="error hidden">
+                <img src="./assets/imgs/icons/ic-error.svg" alt="" />
+                <p id="passwordErrorMessage" class="error-message"></p>
+              </div>
+
+              <label for="staffRePassword">Xác thực mật khẩu:</label>
+              <input
+                type="password"
+                id="staffRePassword"
+                placeholder="Mật khẩu xác thực"
+                required
+              />
+              <div id="staffRePasswordError" class="error hidden">
+                <img src="./assets/imgs/icons/ic-error.svg" alt="" />
+                <p id="rePasswordErrorMessage" class="error-message"></p>
+              </div>
+            </div>
+          </div>
+          <div class="btnAddFormGroup">
+            <button class="btnAddStaff" type="button" id="submitStaffBtn">
+              Thêm nhân viên
+            </button>
+    
+            <button class="btnClearForm" type="reset" id="clearFormBtn">Nhập lại</button>
+          </div>
+        </div>
+      </form>
+
+      <div id="successModal" class="modal modalHidden">
+        <div class="modal-content">
+          <span id="closeModal" class="close">&times;</span>
+          <div class="modal-icon">
+            <img
+              src="./assets/imgs/icons/ic-tick-success.svg"
+              alt="Success Icon"
+            />
+          </div>
+          <h2 class="modal-title">Thành công!</h2>
+          <p id="modalMessage">Nhân viên đã được thêm thành công.</p>
+          <button id="modalAction" class="modal-button">OK</button>
+        </div>
+      </div>
+
+      <div id="deleteConfirmModal" class="modal modalHidden">
+        <div class="modal-content">
+          <h2 class="modal-title">Xác nhận xóa</h2>
+          <p>Bạn có chắc chắn muốn xóa nhân viên này không?</p>
+          <div class="modal-actions">
+            <button id="confirmDelete" class="modal-button danger">Xóa</button>
+            <button id="cancelDelete" class="modal-button">Hủy</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="staffContainerView">
+        <div class="titleAddForm">
+          <h3>Danh sách nhân viên</h3>
+        </div>
+
+        <div class="staffContainer">
+          <!-- Thanh tìm kiếm -->
+          <div class="search-view">
+            <div class="search-container">
+              <img
+                src="./assets/imgs/icons/ic-search-gray.svg"
+                alt="Search Icon"
+              />
+              <input
+                type="text"
+                id="searchStaff"
+                placeholder="Tìm kiếm nhân viên..."
+              />
+            </div>
+            <div class="search-actions">
+              <img src="./assets/imgs/icons/ic-sort.svg" alt="Sort Icon" />
+              <img src="./assets/imgs/icons/ic-fill.svg" alt="Fill Icon" />
+            </div>
+          </div>
+
+          <div id="staffList"></div>
+
+          <div id="userDialog" class="dialog">
+            <div class="dialog-content">
+              <span class="close" id="closeDialog">&times;</span>
+              <h3 id="dialogName"></h3>
+              <img id="dialogAvatar" src="" alt="Avatar" />
+              <p id="dialogPhone"></p>
+              <p id="dialogEmail"></p>
+              <p id="dialogAccountType"></p>
+              <!-- Loại tài khoản -->
+              <p id="dialogUserId"></p>
+              <!-- Mã người dùng -->
+              <p id="dialogAccountStatus"></p>
+              <!-- Trạng thái tài khoản -->
+              <p id="dialogCreatedDate"></p>
+              <!-- Ngày tạo tài khoản -->
+              <p id="dialogUpdatedDate"></p>
+              <!-- Ngày cập nhật -->
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./assets/js/QuanLyNhanVien.js" type="module"></script>
+  </body>
+</html>

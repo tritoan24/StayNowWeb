@@ -1,25 +1,383 @@
-tr{
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #2a3547;
+  }
+  .contract-flex {
     display: flex;
-    width: 40%;
-    justify-content: center;
-    align-items: center;
-    margin: 10px;
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    color: rgb(12, 4, 4); /* Đảm bảo văn bản nổi bật trên nền */
-    border-radius: 5.5px; /* Viền bo góc nhẹ */
-    padding: 20px; /* Khoảng cách bên trong */
     flex-wrap: wrap;
+    gap: 20px;
 }
-td{
+
+.contract-item {
+    flex: 1 1 calc(50% - 20px);
+    min-width: 300px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.content{
+    margin-top: 62px;
+}
+  
+  .contract-info {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin: 5px;
+    gap: 8px;
+  }
+  
+  .contract-info p {
+    margin: 0; /* Loại bỏ khoảng cách mặc định */
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+  }
+  
+  .actions button {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .actions button:hover {
+    background-color: #0056b3;
+  }
+  
+  .tab-container {
+    display: flex;
+    justify-content: space-around;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  /* Tab Styling */
+  .tab {
+    padding: 12px 20px;
+    cursor: pointer;
+    text-align: center;
+    flex-grow: 1;
+    background-color: #f7f7f7;
+    color: #555;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+  }
+
+  .tab:hover {
+    background-color: #eaeaea;
+  }
+
+  .tab.active {
+    background-color: #ffffff;
+    color: #2a3547;
+    border-bottom: 3px solid #ffffff;
+    box-shadow: inset 0 3px 0 #471bc4;
+  }
+
+  /* Tab Content Styling */
+  .tab-content {
+    display: none;
+    padding: 20px;
+    background-color: #ffffff;
+    border-top: none;
+    margin-top: -1px;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  /* Contract Grid Styling */
+  .contract-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+  }
+
+  .contract-grid p {
+    background-color: #f5f5f5;
     padding: 10px;
-    color: rgb(20, 12, 12); /* Đảm bảo văn bản nổi bật trên nền */
-    border-radius: 5.5px; /* Viền bo góc nhẹ */
-    padding: 2px; /* Khoảng cách bên trong */
+    text-align: center;
+    border-radius: 6px;
+  }
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 60%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    border-radius: 20px;
+}
+
+button {
+    background-color: #2a2185;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.payment-confirmation-dialog {
+    width: 800px;
+    height: 600px ;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+  
+  .payment-confirmation-dialog h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+  }
+  
+  .payment-confirmation-dialog .content-left {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .payment-confirmation-dialog .contract-details {
+    flex: 1;
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .payment-confirmation-dialog .contract-details p {
+    margin: 8px 0;
+    color: #555;
+  }
+  
+  .payment-confirmation-dialog .contract-details p strong {
+    color: #333;
+    display: inline-block;
+    width: 100px;
+  }
+  
+  
+  .payment-confirmation-dialog .content-right {
+    flex: 1;
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .payment-confirmation-dialog .content-right h3 {
+    color: #333;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 10px;
+  }
+  
+  .payment-confirmation-dialog .content-right p {
+    margin: 8px 0;
+    color: #555;
+  }
+  
+  .payment-confirmation-dialog .content-right p strong {
+    color: #333;
+    display: inline-block;
+    width: 120px;
+  }
+  
+  .payment-confirmation-dialog .content-right img {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 8px;
+    margin-top: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .payment-confirmation-dialog .dialog-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 2px solid #e0e0e0;
+  }
+  
+  .payment-confirmation-dialog .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+  }
+  
+  .payment-confirmation-dialog .btn-success {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .payment-confirmation-dialog .btn-success:hover {
+    background-color: #218838;
+  }
+  
+  .payment-confirmation-dialog .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  .payment-confirmation-dialog .btn-secondary:hover {
+    background-color: #545b62;
+  }
+  
+  @media (max-width: 768px) {
+    .payment-confirmation-dialog .content-left {
+      flex-direction: column;
+    }
+  }
+
+  
+
+.hidden {
+  display: none;
+}
+
+
+/* Hiệu ứng khi xuất hiện modal */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Kiểu dáng nút đóng */
+.close {
+  color: #fff;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  transition: color 0.3s;
+}
+
+.close:hover {
+  color: #ff7979;
+}
+
+/* Biểu tượng thành công */
+.modal-icon img {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 15px;
+  animation: bounce 1s ease-in-out infinite; /* Hiệu ứng động */
+}
+
+/* Hiệu ứng nhún cho biểu tượng */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Tiêu đề modal */
+.modal-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Nút hành động */
+.modal-button {
+  background-color: #fff;
+  color: #471bc4;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background-color 0.3s ease-in-out, transform 0.2s;
+}
+
+.modal-button:hover {
+  background-color: #998db6;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+
+.toast-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.toast {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  animation: fadeInOut 3s forwards;
+}
+
+@keyframes fadeInOut {
+  0%, 90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
 }

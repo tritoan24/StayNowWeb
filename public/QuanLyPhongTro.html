@@ -34,29 +34,97 @@
         </div>
       </div>
 
-      <!-- Danh sách phòng trọ -->
-      <div id="roomList"></div>
+      <div class="tab-container">
+        <div class="tab active" data-tab="tab-daduyet">Phòng đã duyệt</div>
+        <div class="tab" data-tab="tab-bihuy">Phòng bị huỷ</div>
+        <div class="tab" data-tab="tab-choduyet">Phòng chờ duyệt</div>
+      </div>
+
+      <div id="tab-daduyet" class="tab-content active">
+        <div class="table-container" id="approvedRoomList">
+          <!-- Paid contracts will be populated here -->
+        </div>
+      </div>
+
+      <div id="tab-bihuy" class="tab-content">
+        <div class="table-container" id="canceledRoomList">
+          <!-- Paid contracts will be populated here -->
+        </div>
+      </div>
+
+      <div id="tab-choduyet" class="tab-content">
+        <div class="table-container" id="pendingRoomList">
+          <!-- Paid contracts will be populated here -->
+        </div>
+      </div>
+
+        <div id="loadingSpinnerColumn" style="display: none; text-align: center; margin-top: 20px;">
+          <img src="https://i.giphy.com/3oEjI6SIIHBdRxXI40.webp" alt="Loading..." />
+          <p>Đang tải dữ liệu...</p>
+        </div>
+        
+        <div id="toastContainer" class="toast-container"></div>
+        <div id="toastContainerFalse" class="toast-container-false"></div>
+
+
+
       <!-- Đây là nơi sẽ hiển thị danh sách phòng trọ -->
     </div>
 
+    <!-- chi tiet phong  -->
     <div id="overlay" onclick="closeDetails()"></div>
     <div id="detailDialog">
-      <h3>Chi tiết phòng</h3>
-      <div id="roomImages" class="image-carousel">
-        <div class="carousel-container">
-          <button class="prev" onclick="changeSlide(-1)">&#10094;</button>
-          <div class="carousel-images">
-            <!-- Các ảnh sẽ được hiển thị ở đây -->
-          </div>
-          <button class="next" onclick="changeSlide(1)">&#10095;</button>
+      <div id="detailDialogContent">
+        <div>
+          <button onclick="closeDetails()" id="back-button" class="back-button">
+            &larr;
+          </button>
         </div>
-      </div>
-      <div id="roomDetails"></div>
 
-      <div class="actions">
-        <button class="approve" onclick="approveRoomDetail()">Duyệt</button>
-        <button class="cancel" onclick="cancelRoomDetail()">Hủy</button>
+        <!-- slide ảnh -->
+        <div class="grid-slide-and-user-container">
+          <div id="roomImages" class="image-carousel">
+            <div class="carousel-container">
+              <button class="prev" onclick="changeSlide(-1)">&#10094;</button>
+              <div class="carousel-images">
+                <!-- Các ảnh slide sẽ được hiển thị ở đây -->
+              </div>
+              <button class="next" onclick="changeSlide(1)">&#10095;</button>
+            </div>
+            <div class="thumbnails">
+              <!-- Ảnh thu nhỏ sẽ được hiển thị ở đây -->
+            </div>
+          </div>
+
+          <div class="user-info-container">
+            <img class="img-avt-user" src="" alt="" />
+            <p class="user-name"></p>
+            <p class="late-time-stamp"></p>
+            <div class="user-phone-container">
+              <p class="user-phone">Hiện số</p>
+            </div>
+            <div
+              data-user-id="USER_ID"
+              onclick="redirectToChat(this)"
+              class="chat-with-user-container"
+            >
+              <p>Chat với người dùng</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="roomDetails"></div>
       </div>
+
+      <div id="loadingSpinner">
+        <img
+          src="https://i.giphy.com/3oEjI6SIIHBdRxXI40.webp"
+          alt="Loading..."
+        />
+        <p>Đang tải dữ liệu...</p>
+      </div>
+
+      <div class="actions"></div>
       <button class="close" onclick="closeDetails()">Đóng</button>
     </div>
 

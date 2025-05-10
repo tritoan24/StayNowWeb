@@ -1,35 +1,95 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { db } from "./FireBaseConfig.js";
 import {
-  getFirestore,
   collection,
   getDocs,
   doc,
   updateDoc,
   addDoc,
   deleteDoc,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// Cấu hình Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBmpKO0lDHFiYb3zklAJ2zz6qC-iQrypw0",
-  authDomain: "staynowapp1.firebaseapp.com",
-  projectId: "staynowapp1",
-  storageBucket: "staynowapp1.appspot.com",
-  messagingSenderId: "918655571270",
-  appId: "1:918655571270:web:94abfaf87fbbb3e4ecc147",
-  measurementId: "G-PQP9CTPKGT",
-};
 
-// Khởi tạo Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
 // Biến toàn cục để lưu trữ danh sách phòng trọ
 let furnitures = [];
 let allFurnitures = []; // Danh sách gốc
+let isLoading = false;
+
+
+function showToast(message) {
+  const toastContainer = document.getElementById("toastContainer");
+
+  // Tạo toast
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+
+  // Thêm toast vào container
+  toastContainer.appendChild(toast);
+
+  // Xóa toast sau khi animation kết thúc
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+
+function showToastFalse(message) {
+  const toastContainer = document.getElementById("toastContainerFalse");
+
+  // Tạo toast
+  const toast = document.createElement("div");
+  toast.className = "toast-false";
+  toast.textContent = message;
+
+  // Thêm toast vào container
+  toastContainer.appendChild(toast);
+
+  // Xóa toast sau khi animation kết thúc
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+
+function updateLoadingState() {
+  const loadingElement = document.getElementById("loadingSpinner");
+  const serveListContainer = document.getElementById("furnitureList");
+
+  if (isLoading) {
+    loadingElement.style.display = "block"; // Hiển thị loading
+    serveListContainer.style.display = "none"; // Ẩn danh sách
+  } else {
+    loadingElement.style.display = "none"; // Ẩn loading
+    serveListContainer.style.display = "grid"; // Hiển thị danh sách
+  }
+}
+
+function removeVietnameseTones(str) {
+  return str
+    .normalize("NFD") // Tách dấu khỏi ký tự
+    .replace(/[\u0300-\u036f]/g, "") // Loại bỏ các ký tự dấu
+    .replace(/đ/g, "d") // Thay đ thành d
+    .replace(/Đ/g, "D") // Thay Đ thành D
+    .toLowerCase(); // Chuyển về chữ thường
+}
+
+function showNoResultMessage() {
+  const informationListContainer = document.getElementById("furnitureList");
+  informationListContainer.innerHTML = `
+    <div class="no-result-message">
+        <img src="../public/assets/imgs/icons/ic-sad-face.png" alt="">
+      <p>Không tìm thấy kết quả phù hợp.</p>
+    </div>
+  `;
+}
+
 
 async function fetchAllFurniture() {
   const furnituresRef = collection(db, "NoiThat");
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
 
   try {
     const querySnapshot = await getDocs(furnituresRef);
@@ -45,19 +105,25 @@ async function fetchAllFurniture() {
     renderFurnitureList(furnitures); // Hiển thị danh sách
   } catch (e) {
     console.error("Lỗi khi lấy danh sách nội thất!:", e);
+  }  finally {
+    isLoading = false; // Kết thúc loading
+    updateLoadingState(); // Ẩn giao diện loading
   }
 }
 
 function filterFurniture(event) {
-  const keyword = event.target.value.toLowerCase(); // Lấy từ khóa và chuyển về chữ thường
-
+  const keyword = removeVietnameseTones(event.target.value); // Từ khóa không dấu
   // Lọc danh sách gốc để tìm dịch vụ phù hợp
   const filteredFurnitures = allFurnitures.filter((furniture) =>
-    furniture.Ten_noithat.toLowerCase().includes(keyword)
+    removeVietnameseTones(furniture.tenNoiThat).includes(keyword)
   );
 
-  // Hiển thị danh sách đã lọc
-  renderFurnitureList(filteredInformations);
+    // Kiểm tra nếu không có kết quả
+    if (filteredFurnitures.length === 0) {
+      showNoResultMessage(); // Hiển thị thông báo không tìm thấy
+    } else {
+      renderFurnitureList(filteredFurnitures); // Hiển thị danh sách đã lọc
+    }
 }
 
 function renderFurnitureList(furnitures) {
@@ -65,10 +131,10 @@ function renderFurnitureList(furnitures) {
   furnitureListContainer.innerHTML = ""; // Xóa nội dung cũ
 
   const activeFurnitures = furnitures.filter(
-    (furniture) => furniture.Status === true
+    (furniture) => furniture.trangThai === true
   );
   const inactiveFurnitures = furnitures.filter(
-    (furniture) => furniture.Status === false
+    (furniture) => furniture.trangThai === false
   );
 
   // Hiển thị dịch vụ hoạt động
@@ -82,12 +148,12 @@ function renderFurnitureList(furnitures) {
     furnitureDiv.innerHTML = `
       <div class="furniture-card">
         <div class="furniture-image">
-            <img src="${furniture.Icon_noithat}" alt="${furniture.Ten_noithat}" />
+            <img src="${furniture.iconNoiThat}" alt="${furniture.tenNoiThat}" />
         </div>
         <div class="furniture-info">
-            <h3 class="furniture-title">${furniture.Ten_noithat}</h3>
+            <h3 class="furniture-title">${furniture.tenNoiThat}</h3>
              <div class="status-layout">
-                 <img src="../image/icons/ic-dot-active.svg" alt="">
+               <img src="../public/assets/imgs/icons/ic-dot-active.svg" alt="">
                       <p class="furniture-status">Hoạt động</p>
             </div>
            
@@ -112,12 +178,12 @@ function renderFurnitureList(furnitures) {
     furnitureDiv.innerHTML = `
       <div class="furniture-card">
         <div class="furniture-image">
-            <img src="${furniture.Icon_noithat}" alt="${furniture.Ten_noithat}" />
+            <img src="${furniture.iconNoiThat}" alt="${furniture.tenNoiThat}" />
         </div>
         <div class="furniture-info">
-            <h3 class="furniture-title">${furniture.Ten_noithat}</h3>
+            <h3 class="furniture-title">${furniture.tenNoiThat}</h3>
      <div class="status-layout">
-                 <img src="../image/icons/ic-dot-cancel.svg" alt="">
+                <img src="../public/assets/imgs/icons/ic-dot-cancel.svg" alt="">
             <p class="furniture-status">Đã hủy</p>
             </div>
            
@@ -137,37 +203,47 @@ function renderFurnitureList(furnitures) {
 
 async function cancelFurniture(furnitureId) {
   const furniture = furnitures.find((s) => s.id === furnitureId);
-
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
   if (furniture) {
     try {
       // Cập nhật trạng thái trong Firestore
       const furnitureRef = doc(db, "NoiThat", furnitureId); // Tạo tham chiếu đến dịch vụ trong Firestore
-      await updateDoc(furnitureRef, { Status: false }); // Cập nhật trạng thái thành false
+      await updateDoc(furnitureRef, { trangThai: false }); // Cập nhật trạng thái thành false
 
-      furniture.Status = false;
+      furniture.trangThai = false;
       // Làm mới giao diện để hiển thị trạng thái mới
       renderFurnitureList(furnitures);
+      showToastFalse("Huỷ nội thất thành công")
     } catch (e) {
       console.error("Lỗi khi cập nhật trạng thái nội thất:", e);
+    }  finally {
+      isLoading = false; // Kết thúc loading
+      updateLoadingState(); // Ẩn giao diện loading
     }
   }
 }
 
 async function activateFurniture(furnitureId) {
   const furniture = furnitures.find((s) => s.id === furnitureId);
-
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
   if (furniture) {
     try {
       // Cập nhật trạng thái trong Firestore
       const furnitureRef = doc(db, "NoiThat", furnitureId); // Tạo tham chiếu đến dịch vụ trong Firestore
-      await updateDoc(furnitureRef, { Status: true }); // Cập nhật trạng thái thành true
+      await updateDoc(furnitureRef, { trangThai: true }); // Cập nhật trạng thái thành true
 
-      furniture.Status = true;
+      furniture.trangThai = true;
 
       // Làm mới giao diện để hiển thị trạng thái mới
       renderFurnitureList(furnitures);
+      showToast("Kích hoạt nội thất thành công")
     } catch (e) {
       console.error("Lỗi khi kích hoạt lại trạng thái nội thất:", e);
+    }  finally {
+      isLoading = false; // Kết thúc loading
+      updateLoadingState(); // Ẩn giao diện loading
     }
   }
 }
@@ -221,11 +297,19 @@ async function handleFormSubmit(event) {
     if (mode === "add") {
       // Thêm mới
       const furnituresRef = collection(db, "NoiThat");
-      await addDoc(furnituresRef, {
-        Ten_noithat: furnitureName,
-        Icon_noithat: furnitureIcon,
-        Status: furnitureStatus,
+      const docRef = await addDoc(furnituresRef, {
+        tenNoiThat: furnitureName,
+        iconNoiThat: furnitureIcon,
+        trangThai: furnitureStatus,
       });
+
+      await setDoc(docRef, {
+        maNoiThat: docRef.id, // ID tự động của Firestore
+        tenNoiThat: furnitureName,
+        iconNoiThat: furnitureIcon,
+        trangThai: furnitureStatus,
+      });
+  
       showSuccessModal("Nội thất đã được thêm thành công.", () => {
         clearForm();
         fetchAllFurniture();
@@ -241,9 +325,10 @@ async function handleFormSubmit(event) {
       // Cập nhật dịch vụ
       const furnitureRef = doc(db, "NoiThat", furnitureId);
       await updateDoc(furnitureRef, {
-        Ten_noithat: furnitureName,
-        Icon_noithat: furnitureIcon,
-        Status: furnitureStatus,
+        maNoiThat: furnitureId, // ID tự động của Firestore
+        tenNoiThat: furnitureName,
+        iconNoiThat: furnitureIcon,
+        trangThai: furnitureStatus,
       });
       showSuccessModal("Nội thất đã được cập nhật thành công.", () => {
         clearForm();
@@ -264,11 +349,11 @@ function updateFurniture(furnitureId) {
   if (selectedFurniture) {
     // Điền thông tin vào form
     document.getElementById("furnitureName").value =
-    selectedFurniture.Ten_noithat || "";
+    selectedFurniture.tenNoiThat || "";
     document.getElementById("furnitureIcon").value =
-    selectedFurniture.Icon_noithat || "";
+    selectedFurniture.iconNoiThat || "";
     document.getElementById("furnitureStatus").value =
-    selectedFurniture.Status.toString();
+    selectedFurniture.trangThai.toString();
 
     // Chuyển form sang chế độ cập nhật
     const form = document.getElementById("insertFurnitureForm");

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý loại phòng</title>
+    <link rel="stylesheet" href="./assets/css/QuanLyLoaiPhongStyle.css" />
+  </head>
+  <body>
+    <header>
+      <div class="back-button">
+        <button onclick="goBack()">Quay lại</button>
+      </div>
+      <h1>Quản lý loại phòng</h1>
+    </header>
+
+    <div class="container">
+      <h2>Danh sách loại phòng</h2>
+
+      <!-- Thanh tìm kiếm -->
+      <div class="search-view">
+        <div class="search-container">
+          <img src="./assets/imgs/icons/ic-search-gray.svg" alt="Search Icon" />
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Tìm kiếm"
+      
+          />
+        </div>
+        <div class="search-actions">
+          <img src="./assets/imgs/icons/ic-sort.svg" alt="Sort Icon" />
+          <img src="./assets/imgs/icons/ic-fill.svg" alt="Fill Icon" />
+        </div>
+      </div>
+
+      <div class="add-btn-view">
+        <div class="action-container">
+          <input
+          class="add-input"
+            type="text"
+            id="addTypeRoomInput"
+            placeholder="Thêm loại phòng trọ"
+          />
+        <button class="btn-add-type-room">Thêm</button>
+        </div>
+      </div>
+
+      <div id="successModal" class="modal modalHidden">
+        <div class="modal-content">
+          <span id="closeModal" class="close">&times;</span>
+          <div class="modal-icon">
+            <img src="./assets/imgs/icons/ic-tick-success.svg" alt="Success Icon" />
+          </div>
+          <h2 class="modal-title">Thành công!</h2>
+          <p id="modalMessage">Tiện nghi đã được thêm thành công.</p>
+          <button id="modalAction" class="modal-button">OK</button>
+        </div>
+      </div>
+
+      <div id="deleteConfirmModal" class="modal modalHidden">
+        <div class="modal-content">
+          <h2 class="modal-title">Xác nhận xóa</h2>
+          <p>Bạn có chắc chắn muốn xóa tiện nghi này không?</p>
+          <div class="modal-actions">
+            <button id="confirmDelete" class="modal-button danger">Xóa</button>
+            <button id="cancelDelete" class="modal-button">Hủy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danh sách lich su -->
+      <div id="roomTypeList" class="table-container"></div>
+      <div id="pagination" class="pagination"></div>
+        
+
+    </div>
+
+    
+
+
+    <!-- Đính kèm file JavaScript -->
+    <script src="./assets/js/QuanLyLoaiPhong.js" type="module"></script>
+  </body>
+</html>

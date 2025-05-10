@@ -1,36 +1,61 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { db } from "./FireBaseConfig.js";
 import {
-  getFirestore,
   collection,
   getDocs,
   doc,
   updateDoc,
   addDoc,
   deleteDoc,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// Cấu hình Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBmpKO0lDHFiYb3zklAJ2zz6qC-iQrypw0",
-  authDomain: "staynowapp1.firebaseapp.com",
-  projectId: "staynowapp1",
-  storageBucket: "staynowapp1.appspot.com",
-  messagingSenderId: "918655571270",
-  appId: "1:918655571270:web:94abfaf87fbbb3e4ecc147",
-  measurementId: "G-PQP9CTPKGT",
-};
-
-// Khởi tạo Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
 // Biến toàn cục để lưu trữ danh sách phòng trọ
 let informations = [];
 let allInformations = []; // Danh sách gốc
+let isLoading = false;
+
+
+function showToast(message) {
+  const toastContainer = document.getElementById("toastContainer");
+
+  // Tạo toast
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+
+  // Thêm toast vào container
+  toastContainer.appendChild(toast);
+
+  // Xóa toast sau khi animation kết thúc
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+
+function showToastFalse(message) {
+  const toastContainer = document.getElementById("toastContainerFalse");
+
+  // Tạo toast
+  const toast = document.createElement("div");
+  toast.className = "toast-false";
+  toast.textContent = message;
+
+  // Thêm toast vào container
+  toastContainer.appendChild(toast);
+
+  // Xóa toast sau khi animation kết thúc
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
 
 async function fetchAllInformations() {
   const informationsRef = collection(db, "ThongTin");
-
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
   try {
     const querySnapshot = await getDocs(informationsRef);
     informations = []; // Reset danh sách
@@ -45,30 +70,71 @@ async function fetchAllInformations() {
     renderInformationList(informations); // Hiển thị danh sách
   } catch (e) {
     console.error("Lỗi khi lấy danh sách thông tin:", e);
+  } finally {
+    isLoading = false; // Kết thúc loading
+    updateLoadingState(); // Ẩn giao diện loading
   }
 }
 
+function updateLoadingState() {
+  const loadingElement = document.getElementById("loadingSpinner");
+  const informationListContainer = document.getElementById("informationList");
+
+  if (isLoading) {
+    loadingElement.style.display = "block"; // Hiển thị loading
+    informationListContainer.style.display = "none"; // Ẩn danh sách
+  } else {
+    loadingElement.style.display = "none"; // Ẩn loading
+    informationListContainer.style.display = "grid"; // Hiển thị danh sách
+  }
+}
+
+function removeVietnameseTones(str) {
+  return str
+    .normalize("NFD") // Tách dấu khỏi ký tự
+    .replace(/[\u0300-\u036f]/g, "") // Loại bỏ các ký tự dấu
+    .replace(/đ/g, "d") // Thay đ thành d
+    .replace(/Đ/g, "D") // Thay Đ thành D
+    .toLowerCase(); // Chuyển về chữ thường
+}
+
+function showNoResultMessage() {
+  const informationListContainer = document.getElementById("informationList");
+  informationListContainer.innerHTML = `
+    <div class="no-result-message">
+        <img src="../public/assets/imgs/icons/ic-sad-face.png" alt="">
+      <p>Không tìm thấy kết quả phù hợp.</p>
+    </div>
+  `;
+}
+
+
 function filterInformation(event) {
-  const keyword = event.target.value.toLowerCase(); // Lấy từ khóa và chuyển về chữ thường
+  const keyword = removeVietnameseTones(event.target.value); // Từ khóa không dấu
 
   // Lọc danh sách gốc để tìm dịch vụ phù hợp
   const filteredInformations = allInformations.filter((information) =>
-    information.Ten_thongtin.toLowerCase().includes(keyword)
+    removeVietnameseTones(information.tenThongTin).includes(keyword)
   );
 
-  // Hiển thị danh sách đã lọc
-  renderInformationList(filteredInformations);
+  // Kiểm tra nếu không có kết quả
+  if (filteredInformations.length === 0) {
+    showNoResultMessage(); // Hiển thị thông báo không tìm thấy
+  } else {
+    renderInformationList(filteredInformations); // Hiển thị danh sách đã lọc
+  }
 }
+
 
 function renderInformationList(informations) {
   const informationListContainer = document.getElementById("informationList");
   informationListContainer.innerHTML = ""; // Xóa nội dung cũ
 
   const activeInformations = informations.filter(
-    (information) => information.Status === true
+    (information) => information.trangThai === true
   );
   const inactiveInformations = informations.filter(
-    (information) => information.Status === false
+    (information) => information.trangThai === false
   );
 
   // Hiển thị dịch vụ hoạt động
@@ -78,17 +144,16 @@ function renderInformationList(informations) {
     const informationDiv = document.createElement("div");
     informationDiv.className = "information";
     informationDiv.id = `information${information.id}`;
-
     informationDiv.innerHTML = `
       <div class="information-card">
         <div class="information-image">
-            <img src="${information.Icon_thongtin}" alt="${information.Ten_thongtin}" />
+            <img src="${information.iconThongTin}" alt="${information.tenThongTin}" />
         </div>
         <div class="information-info">
-            <h3 class="information-title">${information.Ten_thongtin}</h3>
-            <p class="information-unit">${information.Don_vi}</p>
+            <h3 class="information-title">${information.tenThongTin}</h3>
+            <p class="information-unit">${information.donVi}</p>
              <div class="status-layout">
-                 <img src="../image/icons/ic-dot-active.svg" alt="">
+                 <img src="../public/assets/imgs/icons/ic-dot-active.svg" alt="">
                       <p class="service-status">Hoạt động</p>
             </div>
            
@@ -100,6 +165,7 @@ function renderInformationList(informations) {
       </div>
     `;
     activeInformationContainer.appendChild(informationDiv);
+    
   });
 
   // Hiển thị dịch vụ đã hủy
@@ -113,13 +179,13 @@ function renderInformationList(informations) {
     informationDiv.innerHTML = `
       <div class="information-card">
         <div class="information-image">
-            <img src="${information.Icon_thongtin}" alt="${information.Ten_thongtin}" />
+            <img src="${information.iconThongTin}" alt="${information.tenThongTin}" />
         </div>
         <div class="information-info">
-            <h3 class="information-title">${information.Ten_thongtin}</h3>
-            <p class="information-unit">${information.Don_vi}</p>
+            <h3 class="information-title">${information.tenThongTin}</h3>
+            <p class="information-unit">${information.donVi}</p>
      <div class="status-layout">
-                 <img src="../image/icons/ic-dot-cancel.svg" alt="">
+                 <img src="../public/assets/imgs/icons/ic-dot-cancel.svg" alt="">
             <p class="service-status">Đã hủy</p>
             </div>
            
@@ -139,57 +205,65 @@ function renderInformationList(informations) {
 
 async function cancelInformation(informationId) {
   const information = informations.find((s) => s.id === informationId);
-
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
   if (information) {
     try {
       // Cập nhật trạng thái trong Firestore
       const informationRef = doc(db, "ThongTin", informationId); // Tạo tham chiếu đến dịch vụ trong Firestore
-      await updateDoc(informationRef, { Status: false }); // Cập nhật trạng thái thành false
-
-      information.Status = false;
+      await updateDoc(informationRef, { trangThai: false }); // Cập nhật trạng thái thành false
+      showToastFalse("Huỷ thông tin thành công")
+      information.trangThai = false;
 
       // Làm mới giao diện để hiển thị trạng thái mới
       renderInformationList(informations);
     } catch (e) {
       console.error("Lỗi khi cập nhật trạng thái thông tin:", e);
+    } finally {
+      isLoading = false; // Kết thúc loading
+      updateLoadingState(); // Ẩn giao diện loading
     }
   }
 }
 
 async function activateInformation(informationId) {
   const information = informations.find((s) => s.id === informationId);
+  isLoading = true; // Bắt đầu loading
+  updateLoadingState();
 
   if (information) {
     try {
       // Cập nhật trạng thái trong Firestore
       const informationRef = doc(db, "ThongTin", informationId); // Tạo tham chiếu đến dịch vụ trong Firestore
-      await updateDoc(informationRef, { Status: true }); // Cập nhật trạng thái thành true
+      await updateDoc(informationRef, { trangThai: true }); // Cập nhật trạng thái thành true
 
-
-      information.Status = true;
-
+      information.trangThai = true;
+      showToast("Kích hoạt thông tin thành công")
       // Làm mới giao diện để hiển thị trạng thái mới
       renderInformationList(informations);
     } catch (e) {
       console.error("Lỗi khi kích hoạt lại trạng thái thông tin:", e);
+    } finally {
+      isLoading = false; // Kết thúc loading
+      updateLoadingState(); // Ẩn giao diện loading
     }
   }
 }
 
 async function deleteInformation(informationId) {
-  if (confirm("Bạn có chắc chắn muốn xóa thông tin này không?")) {
+  showDeleteConfirmModal(informationId, async (id) => {
     try {
-      const informationDocRef = doc(db, "ThongTin", informationId);
-      await deleteDoc(informationDocRef); // Xóa dịch vụ trong Firestore
+      const informationDocRef = doc(db, "ThongTin", id);
+      await deleteDoc(informationDocRef);
 
       // Cập nhật danh sách dịch vụ
       fetchAllInformations();
-      alert("Thông tin đã được xóa thành công.");
+      showSuccessModal("Thông tin đã được xóa thành công.");
     } catch (error) {
       console.error("Lỗi khi xóa thông tin:", error);
       alert("Có lỗi xảy ra khi xóa thông tin.");
     }
-  }
+  });
 }
 
 async function handleFormSubmit(event) {
@@ -204,24 +278,54 @@ async function handleFormSubmit(event) {
   const informationIcon = document.getElementById("informationIcon").value;
   const informationStatus =
     document.getElementById("informationStatus").value === "true"; // Convert về kiểu boolean
+  let hasError = false;
 
   // Kiểm tra xem các trường có hợp lệ không
-  if (!informationName || !informationUnit || !informationIcon) {
-    alert("Vui lòng điền đầy đủ thông tin!");
+  if (!informationName) {
+    document.getElementById("informationNameError").classList.remove("hidden");
+    hasError = true;
     return;
+  } else {
+    document.getElementById("informationNameError").classList.add("hidden");
+  }
+  if (!informationIcon) {
+    document.getElementById("informationIconError").classList.remove("hidden");
+    hasError = true;
+    return;
+  } else {
+    document.getElementById("informationIconError").classList.add("hidden");
+  }
+  if (!informationUnit) {
+    document.getElementById("informationUnitError").classList.remove("hidden");
+    hasError = true;
+    return;
+  } else {
+    document.getElementById("informationUnitError").classList.add("hidden");
   }
 
   try {
     if (mode === "add") {
       // Thêm dịch vụ mới
       const informationsRef = collection(db, "ThongTin");
-      await addDoc(informationsRef, {
-        Ten_thongtin: informationName,
-        Don_vi: informationUnit,
-        Icon_dichvu: informationIcon,
-        Status: informationStatus,
+      const docRef = await addDoc(informationsRef, {
+        tenThongTin: informationName,
+        donVi: informationUnit,
+        iconDichVu: informationIcon,
+        trangThai: informationStatus,
       });
-      alert("Đã thêm thông tin mới");
+
+      await setDoc(docRef, {
+        maThongTin: docRef.id, // ID tự động của Firestore
+        tenThongTin: informationName,
+        donVi: informationUnit,
+        iconThongTin: informationIcon,
+        trangThai: informationStatus,
+      });
+ 
+      showSuccessModal("Thông tin đã được thêm thành công.", () => {
+        clearForm();
+        fetchAllInformations();
+      });
     } else if (mode === "update") {
       // Lấy ID dịch vụ đang được cập nhật (giả sử lưu trong form)
       const informationId = form.getAttribute("data-information-id");
@@ -233,19 +337,17 @@ async function handleFormSubmit(event) {
       // Cập nhật dịch vụ
       const informationRef = doc(db, "ThongTin", informationId);
       await updateDoc(informationRef, {
-        Ten_thongtin: informationName,
-        Don_vi: informationUnit,
-        Icon_dichvu: informationIcon,
-        Status: informationStatus,
+        maThongTin: informationId,
+        tenThongTin: informationName,
+        donVi: informationUnit,
+        iconThongTin: informationIcon,
+        trangThai: informationStatus,
       });
-      alert("Đã cập nhật thông tin");
+      showSuccessModal("Thông tin đã được cập nhật thành công.", () => {
+        clearForm();
+        fetchAllInformations();
+      });
     }
-
-    // Cập nhật lại danh sách dịch vụ
-    fetchAllInformations();
-
-    
-    clearForm();
   } catch (e) {
     console.error("Lỗi khi xử lý form:", e);
     alert("Có lỗi xảy ra.");
@@ -260,12 +362,13 @@ function updateInformation(informationId) {
   if (selectedInformation) {
     // Điền thông tin vào form
     document.getElementById("informationName").value =
-    selectedInformation.Ten_thongtin || "";
-    document.getElementById("informationUnit").value = selectedInformation.Don_vi || "";
+      selectedInformation.tenThongTin || "";
+    document.getElementById("informationUnit").value =
+      selectedInformation.donVi || "";
     document.getElementById("informationIcon").value =
-    selectedInformation.Icon_dichvu || "";
+      selectedInformation.iconThongTin || "";
     document.getElementById("informationStatus").value =
-    selectedInformation.Status.toString();
+      selectedInformation.trangThai.toString();
 
     // Chuyển form sang chế độ cập nhật
     const form = document.getElementById("insertInformationForm");
@@ -276,6 +379,59 @@ function updateInformation(informationId) {
     const submitButton = document.getElementById("submitInformationBtn");
     submitButton.textContent = "Cập nhật thông tin";
   }
+}
+
+function showSuccessModal(message, callback = null) {
+  const modal = document.getElementById("successModal");
+  const modalMessage = document.getElementById("modalMessage");
+  const modalAction = document.getElementById("modalAction");
+
+  modalMessage.textContent = message;
+  modal.classList.remove("modalHidden");
+  modal.style.display = "block";
+
+  modalAction.onclick = () => {
+    hideModal(modal);
+    if (callback) callback();
+  };
+
+  document.getElementById("closeModal").onclick = () => hideModal(modal);
+}
+
+function showDeleteConfirmModal(serviceId, deleteCallback) {
+  const modal = document.getElementById("deleteConfirmModal");
+  modal.classList.remove("modalHidden");
+  modal.style.display = "block";
+
+  // Xác nhận xóa
+  document.getElementById("confirmDelete").onclick = async function () {
+    await deleteCallback(serviceId);
+    hideModalDelete(modal);
+  };
+
+  // Hủy bỏ xóa
+  document.getElementById("cancelDelete").onclick = () =>
+    hideModalDelete(modal);
+
+  // Đóng modal khi nhấn ra ngoài
+  window.onclick = function (event) {
+    if (event.target === modal) {
+      hideModalDelete(modal);
+    }
+  };
+}
+
+// Ẩn modal
+function hideModal() {
+  const modal = document.getElementById("successModal");
+  modal.classList.add("modalHidden");
+  modal.style.display = "none";
+}
+
+function hideModalDelete() {
+  const modal = document.getElementById("deleteConfirmModal");
+  modal.classList.add("modalHidden");
+  modal.style.display = "none";
 }
 
 function goBack() {
@@ -302,7 +458,7 @@ function clearForm() {
 
 // Lắng nghe sự kiện DOMContentLoaded và gọi hàm fetchAllRooms
 document.addEventListener("DOMContentLoaded", () => {
-  fetchAllInformations(); 
+  fetchAllInformations();
 });
 
 document
@@ -318,3 +474,4 @@ window.goBack = goBack;
 window.clearForm = clearForm;
 window.handleFormSubmit = handleFormSubmit;
 window.updateInformation = updateInformation;
+window.filterInformation = filterInformation;
